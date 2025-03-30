@@ -1,0 +1,152 @@
+.html
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Personal Website</title>
+		<link rel="stylesheet" href="css/style.css" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+		/>
+	</head>
+	<body>
+		<header>
+			<div class="navbar">
+				<div class="navbar-left">
+					<div class="hamburger-menu" id="hamburger-menu">
+						<i class="fas fa-bars"></i>
+					</div>
+					<div class="avatar">
+						<img src="assets/avatar.jpg" alt="Avatar" />
+					</div>
+				</div>
+				<div class="theme-toggle">
+					<input type="checkbox" id="theme-switch" class="theme-switch" />
+					<label for="theme-switch" class="switch-label">
+						<i class="fas fa-sun"></i>
+						<i class="fas fa-moon"></i>
+						<span class="switch-ball"></span>
+					</label>
+				</div>
+			</div>
+		</header>
+
+		<!-- Navigation menu -->
+		<nav id="nav-menu">
+			<div class="close-menu" id="close-menu">
+				<i class="fas fa-times"></i>
+			</div>
+			<ul>
+				<li><a href="index.html">Home</a></li>
+				<li><a href="Pages/project.html">Projects</a></li>
+				<li><a href="Pages/contact.html">Contact</a></li>
+			</ul>
+		</nav>
+
+		<!-- Overlay for when menu is open -->
+		<div class="overlay" id="overlay"></div>
+
+		<main>
+			<!-- Content that changes based on theme -->
+			<section class="theme-content dark-content">
+				<div class="hero">
+					<h1>The Intense Side</h1>
+					<p>
+						Discover my discipline, workout routine, and hardcore side of life.
+					</p>
+				</div>
+
+				<div class="content-section">
+					<h2>Fitness Regimen</h2>
+					<p>
+						My workout plan follows a dedicated Push Pull Legs split, training 6
+						days a week with intensity and focus. This structured approach has
+						helped me develop both physical strength and mental discipline that
+						carries over into other aspects of my life. Beyond the physical
+						benefits, working out serves as a crucial mental outlet for me,
+						clearing my head and providing a valuable "daily reset" that helps
+						maintain my overall well-being and focus.
+					</p>
+				</div>
+
+				<div class="content-section">
+					<h2>Technical Growth</h2>
+					<p>
+						All my free time around the house is dedicated to expanding my
+						coding knowledge and skills. I have a deep interest in understanding
+						how things work at a fundamental level, which drives my passion for
+						technology and programming. This curiosity keeps me constantly
+						learning and exploring new concepts.
+					</p>
+				</div>
+
+				<div class="content-section">
+					<h2>Structured Discipline</h2>
+					<p>
+						I believe in maintaining a highly structured schedule to maximize
+						productivity. My approach involves tracking progress at multiple
+						levels: daily tasks feed into weekly goals, which support monthly
+						objectives, creating a clear path toward my long-term vision. This
+						systematic planning helps me stay focused and accountable.
+					</p>
+				</div>
+
+				<div class="content-section">
+					<h2>Future Vision</h2>
+					<p>
+						My structured planning extends up to 6 months ahead, with everything
+						building toward my ultimate goal of launching my own app/web
+						development company after completing university. This clear
+						direction gives purpose to my intense work ethic and continuous
+						self-improvement.
+					</p>
+				</div>
+			</section>
+
+			<section class="theme-content light-content">
+				<div class="hero">
+					<h1>The Social Side</h1>
+					<p>
+						Get to know my personality, friends, and the lighter aspects of my
+						life.
+					</p>
+				</div>
+
+				<div class="content-section">
+					<h2>Adventure & Exploration</h2>
+					<p>
+						As an adventure and nature enthusiast, I'm always seeking new
+						experiences in the outdoors. I have a strong appreciation for
+						aesthetics, whether it's dressing up for a night out or discovering
+						hidden gems during my favorite activity—bar and café hopping around
+						Singapore.
+					</p>
+				</div>
+
+				<div class="content-section">
+					<h2>Sports & Recreation</h2>
+					<p>
+						Sports play a significant role in my social life. I regularly play
+						basketball with friends and enjoy socializing over golf at the
+						driving range while working on my swing. Currently, I'm in the
+						process of establishing my golf handicap, and you can usually find
+						me at ranges at the east of Singapore during weekends.
+					</p>
+				</div>
+
+				<div class="content-section">
+					<h2>Meaningful Connections</h2>
+					<p>
+						What I value most about my social connections is the opportunity to
+						truly listen and understand people. I take genuine interest in
+						hearing about others' achievements and challenges, believing that
+						these conversations create the most meaningful relationships.
+					</p>
+				</div>
+			</section>
+		</main>
+		<script src="js/main.js"></script>
+	</body>
+</html>
