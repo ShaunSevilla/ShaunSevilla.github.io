@@ -33,22 +33,111 @@
 			</div>
 		</header>
 
-		<!-- Navigation menu -->
-		<nav id="nav-menu">
-			<div class="close-menu" id="close-menu">
-				<i class="fas fa-times"></i>
-			</div>
-			<ul>
-				<li><a href="index.html">Home</a></li>
-				<li><a href="Pages/project.html">Projects</a></li>
-				<li><a href="Pages/contact.html">Contact</a></li>
-			</ul>
-		</nav>
+		<!-- Sidebar Navigation (Resume Style) -->
+		<aside class="sidebar">
+			<div class="sidebar-content">
+				<div class="sidebar-header">
+					<div class="avatar">
+						<img src="assets/avatar.jpg" alt="Avatar" />
+					</div>
+					<h2 class="name">Shaun Sevilla</h2>
+					<p class="title">Student</p>
+				</div>
+				<div class="sidebar-profile-summary dark-summary">
+					<h3 class="sidebar-section-title">Who I Am - The Technical Side</h3>
+					<p>
+						I'm a Computer Science student with a passion for web development
+						and a strong technical mindset. My structured approach to learning
+						combines academic knowledge with hands-on coding projects.
+					</p>
+				</div>
 
-		<!-- Overlay for when menu is open -->
+				<div class="sidebar-profile-summary light-summary">
+					<h3 class="sidebar-section-title">Who I Am - The Balanced Side</h3>
+					<p>
+						Beyond my technical pursuits, I'm an adventurous spirit with a love
+						for outdoor activities and social experiences. My background in
+						Business and Tourism complements my technical skills.
+					</p>
+				</div>
+
+				<div class="sidebar-info">
+					<h3 class="sidebar-section-title">Academic Background</h3>
+					<div class="info-item">
+						<i class="fas fa-graduation-cap"></i>
+						<div>
+							<strong>University Of London, SIM</strong>
+							<p>Degree in Computer Science</p>
+							<p class="date">April 2023 - April 2026</p>
+						</div>
+					</div>
+					<div class="info-item">
+						<i class="fas fa-university"></i>
+						<div>
+							<strong>Temasek Polytechnic</strong>
+							<p>Diploma in Business, HR & Tourism</p>
+							<p class="date">April 2018 - April 2021</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="sidebar-info">
+					<h3 class="sidebar-section-title">Leadership Experience</h3>
+					<div class="info-item">
+						<i class="fas fa-medal"></i>
+						<div>
+							<p>Captain, Temasek Polytechnic Wakeboard Team</p>
+							<p class="date">2019-2020</p>
+						</div>
+					</div>
+					<div class="info-item">
+						<i class="fas fa-basketball-ball"></i>
+						<div>
+							<p>Captain, Greenview Secondary 2nd Basketball Team</p>
+							<p class="date">2016-2017</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="sidebar-nav">
+					<ul>
+						<li>
+							<a href="index.html" class="active"
+								><i class="fas fa-home"></i> Home</a
+							>
+						</li>
+						<li>
+							<a href="Pages/project.html"
+								><i class="fas fa-code-branch"></i> Projects</a
+							>
+						</li>
+						<li>
+							<a href="Pages/contact.html"
+								><i class="fas fa-envelope"></i> Contact</a
+							>
+						</li>
+					</ul>
+				</div>
+
+				<div class="theme-toggle sidebar-theme-toggle">
+					<input
+						type="checkbox"
+						id="sidebar-theme-switch"
+						class="theme-switch"
+					/>
+					<label for="sidebar-theme-switch" class="switch-label">
+						<i class="fas fa-sun"></i>
+						<i class="fas fa-moon"></i>
+						<span class="switch-ball"></span>
+					</label>
+				</div>
+			</div>
+		</aside>
+
+		<!-- Overlay for when mobile menu is open -->
 		<div class="overlay" id="overlay"></div>
 
-		<main>
+		<main class="main-with-sidebar">
 			<!-- Content that changes based on theme -->
 			<section class="theme-content dark-content">
 				<div class="hero">

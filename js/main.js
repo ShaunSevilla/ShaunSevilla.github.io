@@ -1,54 +1,92 @@
 document.addEventListener("DOMContentLoaded", function () {
 	// Navigation menu functionality
 	const hamburger = document.getElementById("hamburger-menu");
-	const closeMenu = document.getElementById("close-menu");
-	const navMenu = document.getElementById("nav-menu");
+	const sideBar = document.querySelector(".sidebar");
 	const overlay = document.getElementById("overlay");
+	const headerThemeToggle = document.querySelector(".navbar .theme-toggle");
 
-	// Function to open the menu
-	function openMenu() {
-		navMenu.classList.add("active");
+	// Function to open the menu on mobile
+	function openMenu(event) {
+		if (event) event.stopPropagation(); // Prevent document click from immediately closing the menu
+		sideBar.classList.add("active");
 		overlay.classList.add("active");
 		document.body.style.overflow = "hidden"; // Prevent scrolling when menu is open
+
+		// Hide the header theme toggle when sidebar is open
+		if (headerThemeToggle) {
+			headerThemeToggle.classList.add("hide-toggle");
+		}
 	}
 
-	// Function to close the menu
-	function closeMenuFunc() {
-		navMenu.classList.remove("active");
+	// Function to close the menu on mobile
+	function closeMenu() {
+		sideBar.classList.remove("active");
 		overlay.classList.remove("active");
 		document.body.style.overflow = ""; // Allow scrolling again
+
+		// Show the header theme toggle when sidebar is closed
+		if (headerThemeToggle) {
+			headerThemeToggle.classList.remove("hide-toggle");
+		}
 	}
 
-	// Event listeners for menu
-	hamburger.addEventListener("click", openMenu);
-	closeMenu.addEventListener("click", closeMenuFunc);
-	overlay.addEventListener("click", closeMenuFunc);
+	// Event listeners for mobile menu
+	if (hamburger) {
+		hamburger.addEventListener("click", openMenu);
+	}
 
-	// Close menu when clicking a link (optional)
-	const navLinks = document.querySelectorAll("#nav-menu a");
-	navLinks.forEach((link) => {
-		link.addEventListener("click", closeMenuFunc);
+	// Close menu when clicking on overlay
+	if (overlay) {
+		overlay.addEventListener("click", closeMenu);
+	}
+
+	// ADD this improved document click handler instead
+	document.addEventListener("click", function (event) {
+		// Only proceed if sidebar is active
+		if (!sideBar.classList.contains("active")) return;
+
+		// Check if click is outside sidebar AND not on hamburger menu
+		if (!sideBar.contains(event.target) && !hamburger.contains(event.target)) {
+			closeMenu();
+		}
 	});
 
-	// Theme toggle functionality
+	// Theme toggle functionality - main switch
 	const themeSwitch = document.getElementById("theme-switch");
+	const sidebarThemeSwitch = document.getElementById("sidebar-theme-switch");
 
 	// Check for saved user preference, otherwise use dark theme as default
 	const savedTheme = localStorage.getItem("theme") || "dark";
 	document.documentElement.setAttribute("data-theme", savedTheme);
-	themeSwitch.checked = savedTheme === "light";
 
-	themeSwitch.addEventListener("change", function () {
-		const theme = this.checked ? "light" : "dark";
+	// Sync both theme switches
+	if (themeSwitch) themeSwitch.checked = savedTheme === "light";
+	if (sidebarThemeSwitch) sidebarThemeSwitch.checked = savedTheme === "light";
+
+	// Function to handle theme change
+	function handleThemeChange(event) {
+		const theme = event.target.checked ? "light" : "dark";
 		document.documentElement.setAttribute("data-theme", theme);
 		localStorage.setItem("theme", theme);
+
+		// Sync the other switch
+		if (event.target === themeSwitch && sidebarThemeSwitch) {
+			sidebarThemeSwitch.checked = event.target.checked;
+		} else if (event.target === sidebarThemeSwitch && themeSwitch) {
+			themeSwitch.checked = event.target.checked;
+		}
 
 		// Optional: Add transition effect to the body
 		document.body.classList.add("theme-transition");
 		setTimeout(() => {
 			document.body.classList.remove("theme-transition");
 		}, 500);
-	});
+	}
+
+	// Add event listeners to both switches
+	if (themeSwitch) themeSwitch.addEventListener("change", handleThemeChange);
+	if (sidebarThemeSwitch)
+		sidebarThemeSwitch.addEventListener("change", handleThemeChange);
 
 	// Project section collapsible functionality - only apply on project page
 	const isProjectPage = window.location.href.includes("project.html");

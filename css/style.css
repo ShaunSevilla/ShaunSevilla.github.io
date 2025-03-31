@@ -123,7 +123,8 @@ header {
 	width: 100%;
 	height: 100%;
 	background-color: var(--overlay-color);
-	z-index: 1000; /* Below header and menu but above content */
+	z-index: 1000; /* Below sidebar but above content */
+	cursor: pointer;
 }
 
 .overlay.active {
@@ -311,9 +312,33 @@ html[data-theme="light"] .dark-content {
 	margin-bottom: 15px;
 }
 
-/* Project page styles */
+.navbar .theme-toggle {
+	position: relative;
+	margin-right: 10px;
+}
 
-/* Grid container and animation styles */
+/* Hide header theme toggle on desktop since sidebar is visible */
+@media (min-width: 992px) {
+	.navbar .theme-toggle {
+		display: none; /* Hide on desktop */
+	}
+}
+
+/* Show it on mobile */
+@media (max-width: 991px) {
+	.navbar .theme-toggle {
+		display: block; /* Show on mobile by default */
+		transition: opacity 0.3s ease, visibility 0.3s ease;
+	}
+
+	/* When sidebar is active, hide the header theme toggle */
+	.navbar .theme-toggle.hide-toggle {
+		opacity: 0;
+		visibility: hidden;
+	}
+}
+
+/* Project page styles */
 .grid-container {
 	max-height: 0;
 	opacity: 0;
@@ -680,4 +705,207 @@ html[data-theme="light"] .dark-content {
 
 .contact-item .text {
 	font-weight: 500;
+}
+
+/* Sidebar styling */
+.sidebar {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 330px;
+	height: 100vh;
+	background-color: var(--header-color);
+	border-right: 1px solid var(--border-color);
+	z-index: 1002;
+	display: flex;
+	flex-direction: column;
+	box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+	transition: transform 0.3s ease;
+}
+
+.sidebar-content {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	padding: 30px 20px;
+	overflow-y: auto;
+}
+
+.sidebar-header {
+	text-align: center;
+	margin-bottom: 25px;
+}
+
+.sidebar-header .avatar {
+	margin: 0 auto 15px;
+}
+
+.sidebar-header .avatar img {
+	width: 100px;
+	height: 100px;
+	border: 3px solid var(--accent-color);
+}
+
+.sidebar-header .name {
+	font-size: 1.4rem;
+	margin: 10px 0 5px;
+	color: var(--text-color);
+}
+
+.sidebar-header .title {
+	font-size: 0.9rem;
+	color: var(--accent-color);
+	margin: 0 0 15px;
+}
+
+.sidebar-info {
+	margin-bottom: 30px;
+}
+
+.info-item {
+	display: flex;
+	align-items: center;
+	margin-bottom: 12px;
+	color: var(--text-color);
+}
+
+.info-item i {
+	width: 20px;
+	margin-right: 10px;
+	color: var(--accent-color);
+}
+
+.sidebar-social {
+	display: flex;
+	justify-content: center;
+	gap: 15px;
+	margin-bottom: 30px;
+}
+
+.social-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	background-color: var(--bg-color);
+	color: var(--text-color);
+	transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+	background-color: var(--accent-color);
+	color: var(--bg-color);
+	transform: translateY(-3px);
+}
+
+.sidebar-nav {
+	margin-top: auto;
+	margin-bottom: 20px;
+}
+
+.sidebar-nav ul {
+	list-style: none;
+	padding: 0;
+}
+
+.sidebar-nav li {
+	margin-bottom: 10px;
+}
+
+.sidebar-nav a {
+	display: flex;
+	align-items: center;
+	padding: 12px 15px;
+	border-radius: 8px;
+	text-decoration: none;
+	color: var(--text-color);
+	transition: all 0.3s ease;
+}
+
+.sidebar-nav a i {
+	margin-right: 10px;
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav a.active {
+	background-color: var(--accent-color);
+	color: var(--bg-color);
+}
+
+.sidebar-theme-toggle {
+	margin-top: 15px;
+	display: flex;
+	justify-content: center;
+}
+
+/* Adjust main content to accommodate sidebar */
+.main-with-sidebar {
+	margin-left: 330px;
+	padding-top: 40px;
+	transition: margin-left 0.3s ease;
+}
+
+/* Mobile header styling */
+.mobile-header {
+	display: none;
+	background-color: var(--header-color);
+	padding: 10px 20px;
+	position: fixed;
+	width: 100%;
+	top: 0;
+	z-index: 1002;
+}
+
+/* Sidebar profile summary */
+.sidebar-profile-summary {
+	margin-bottom: 25px;
+	padding: 15px;
+	border-radius: 8px;
+	background-color: var(--bg-color);
+	transition: opacity 0.3s ease;
+}
+
+.sidebar-profile-summary p {
+	font-size: 0.9rem;
+	line-height: 1.5;
+	margin-top: 10px;
+}
+
+/* Control visibility based on theme */
+html[data-theme="dark"] .dark-summary {
+	display: block;
+}
+
+html[data-theme="dark"] .light-summary {
+	display: none;
+}
+
+html[data-theme="light"] .light-summary {
+	display: block;
+}
+
+html[data-theme="light"] .dark-summary {
+	display: none;
+}
+
+/* Responsive styles */
+@media (max-width: 991px) {
+	.sidebar {
+		transform: translateX(-100%);
+	}
+
+	.sidebar.active {
+		transform: translateX(0);
+	}
+
+	.mobile-header {
+		display: block;
+	}
+
+	.main-with-sidebar {
+		margin-left: 0;
+		padding-top: 80px;
+	}
 }
