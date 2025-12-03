@@ -151,4 +151,32 @@ document.addEventListener("DOMContentLoaded", function () {
 			});
 		});
 	}
+
+	// Workout toggle functionality (only for mobile)
+	const workoutToggles = document.querySelectorAll(".workout-toggle");
+	workoutToggles.forEach((toggle) => {
+		toggle.addEventListener("click", function () {
+			// Only toggle on mobile/tablet screens
+			if (window.innerWidth < 1400) {
+				const workoutDay = this.parentElement;
+				workoutDay.classList.toggle("active");
+			}
+		});
+	});
+
+	// Auto-open all workout days on desktop
+	function handleWorkoutLayout() {
+		const workoutDays = document.querySelectorAll(".workout-day");
+		if (window.innerWidth >= 1400) {
+			// Desktop: open all
+			workoutDays.forEach((day) => day.classList.add("active"));
+		} else {
+			// Mobile: close all
+			workoutDays.forEach((day) => day.classList.remove("active"));
+		}
+	}
+
+	// Run on load and resize
+	handleWorkoutLayout();
+	window.addEventListener("resize", handleWorkoutLayout);
 });

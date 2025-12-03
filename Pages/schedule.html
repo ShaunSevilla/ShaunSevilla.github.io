@@ -1,10 +1,9 @@
-/contact.html -->
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Contact | Shaun Sevilla</title>
+		<title>Schedule | Shaun Sevilla</title>
 		<link rel="stylesheet" href="../css/style.css" />
 		<link
 			rel="stylesheet"
@@ -79,14 +78,12 @@
 							<a href="../index.html"><i class="fas fa-home"></i> Home</a>
 						</li>
 						<li>
-							<a href="schedule.html"
+							<a href="schedule.html" class="active"
 								><i class="fas fa-calendar"></i> Schedule</a
 							>
 						</li>
 						<li>
-							<a href="contact.html" class="active"
-								><i class="fas fa-envelope"></i> Contact</a
-							>
+							<a href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
 						</li>
 					</ul>
 				</div>
@@ -107,6 +104,22 @@
 							<strong>Temasek Polytechnic</strong>
 							<p>Diploma in Business, HR & Tourism</p>
 							<p class="date">April 2018 - April 2021</p>
+						</div>
+					</div>
+					<div class="info-item">
+						<i class="fas fa-school"></i>
+						<div>
+							<strong>Greenview Secondary School</strong>
+							<p>GCE O & N Level</p>
+							<p class="date">Jan 2013 - Dec 2017</p>
+						</div>
+					</div>
+					<div class="info-item">
+						<i class="fas fa-school"></i>
+						<div>
+							<strong>Pasir Ris Primary School</strong>
+							<p>PSLE</p>
+							<p class="date">Jan 2006 - Dec 2012</p>
 						</div>
 					</div>
 				</div>
@@ -138,94 +151,54 @@
 			<!-- Content that changes based on theme -->
 			<section class="theme-content dark-content">
 				<div class="hero">
-					<h1>Professional Connect</h1>
+					<h1>Professional Schedule</h1>
 					<p>
-						For business inquiries, collaboration opportunities, or technical
-						discussions
+						Track my professional commitments, work activities, and business
+						engagements.
 					</p>
 				</div>
 
-				<div class="content-section contact-links-section">
-					<div class="contact-container">
-						<div class="contact-category">
-							<ul class="contact-links-list">
-								<li>
-									<a
-										href="mailto:00shaun.sevilla@gmail.com"
-										class="contact-item"
-									>
-										<span class="icon"><i class="fas fa-envelope"></i></span>
-										<span class="text">00shaun.sevilla@gmail.com</span>
-									</a>
-								</li>
-								<li>
-									<a
-										href="https://www.linkedin.com/in/shaunsevilla/"
-										target="_blank"
-										class="contact-item"
-									>
-										<span class="icon"><i class="fab fa-linkedin"></i></span>
-										<span class="text">Shaun Sevilla</span>
-									</a>
-								</li>
-								<li>
-									<a
-										href="https://github.com/shaunsevilla"
-										target="_blank"
-										class="contact-item"
-									>
-										<span class="icon"><i class="fab fa-github"></i></span>
-										<span class="text">Shaun Sevilla</span>
-									</a>
-								</li>
-							</ul>
-						</div>
+				<div class="content-section">
+					<h2>Work Calendar</h2>
+					<p>
+						My work calendar including meetings, client appointments, and
+						professional activities.
+					</p>
+					<div id="professional-calendar" class="calendar-container">
+						<div class="calendar-loading">Loading calendar events...</div>
 					</div>
 				</div>
 			</section>
 
 			<section class="theme-content light-content">
 				<div class="hero">
-					<h1>Social Connect</h1>
-					<p>Follow my personal interests, hobbies and casual updates</p>
+					<h1>Personal Schedule</h1>
+					<p>Get to know what I'm up to in my personal life.</p>
 				</div>
 
-				<div class="content-section contact-links-section">
-					<div class="contact-container">
-						<div class="contact-category">
-							<ul class="contact-links-list">
-								<li>
-									<a
-										href="https://www.instagram.com/se.villa/"
-										target="_blank"
-										class="contact-item"
-									>
-										<span class="icon"><i class="fab fa-instagram"></i></span>
-										<span class="text">@se.villa</span>
-									</a>
-								</li>
-								<li>
-									<a
-										href="https://t.me/ShaunSevilla"
-										target="_blank"
-										class="contact-item"
-									>
-										<span class="icon"><i class="fab fa-telegram"></i></span>
-										<span class="text">@ShaunSevilla</span>
-									</a>
-								</li>
-								<li>
-									<a href="#" target="_blank" class="contact-item">
-										<span class="icon"><i class="fab fa-discord"></i></span>
-										<span class="text">noppin#2598</span>
-									</a>
-								</li>
-							</ul>
-						</div>
+				<div class="content-section">
+					<h2>Personal Calendar</h2>
+					<p>
+						See what I'm up to - from café hopping adventures to golf sessions
+						and social gatherings.
+					</p>
+					<div id="personal-calendar" class="calendar-container">
+						<div class="calendar-loading">Loading calendar events...</div>
 					</div>
 				</div>
 			</section>
 		</main>
+
+		<!-- Calendar Event Modal -->
+		<div id="event-modal" class="modal">
+			<div class="modal-content">
+				<span class="close">&times;</span>
+				<h2 id="modal-title"></h2>
+				<div id="modal-details"></div>
+			</div>
+		</div>
+
 		<script src="../js/main.js"></script>
+		<script src="../js/calendar.js"></script>
 	</body>
 </html>

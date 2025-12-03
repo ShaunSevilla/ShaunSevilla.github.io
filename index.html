@@ -43,6 +43,18 @@
 					<h2 class="name">Shaun Sevilla</h2>
 					<p class="title">Student</p>
 				</div>
+				<div class="theme-toggle sidebar-theme-toggle">
+					<input
+						type="checkbox"
+						id="sidebar-theme-switch"
+						class="theme-switch"
+					/>
+					<label for="sidebar-theme-switch" class="switch-label">
+						<i class="fas fa-sun"></i>
+						<i class="fas fa-moon"></i>
+						<span class="switch-ball"></span>
+					</label>
+				</div>
 				<div class="sidebar-profile-summary dark-summary">
 					<h3 class="sidebar-section-title">Who I Am - The Technical Side</h3>
 					<p>
@@ -59,6 +71,26 @@
 						for outdoor activities and social experiences. My background in
 						Business and Tourism complements my technical skills.
 					</p>
+				</div>
+
+				<div class="sidebar-nav">
+					<ul>
+						<li>
+							<a href="index.html" class="active"
+								><i class="fas fa-home"></i> Home</a
+							>
+						</li>
+						<li>
+							<a href="Pages/schedule.html"
+								><i class="fas fa-calendar"></i> Schedule</a
+							>
+						</li>
+						<li>
+							<a href="Pages/contact.html"
+								><i class="fas fa-envelope"></i> Contact</a
+							>
+						</li>
+					</ul>
 				</div>
 
 				<div class="sidebar-info">
@@ -79,8 +111,23 @@
 							<p class="date">April 2018 - April 2021</p>
 						</div>
 					</div>
+					<div class="info-item">
+						<i class="fas fa-school"></i>
+						<div>
+							<strong>Greenview Secondary School</strong>
+							<p>GCE O & N Level</p>
+							<p class="date">Jan 2013 - Dec 2017</p>
+						</div>
+					</div>
+					<div class="info-item">
+						<i class="fas fa-school"></i>
+						<div>
+							<strong>Pasir Ris Primary School</strong>
+							<p>PSLE</p>
+							<p class="date">Jan 2006 - Dec 2012</p>
+						</div>
+					</div>
 				</div>
-
 				<div class="sidebar-info">
 					<h3 class="sidebar-section-title">Leadership Experience</h3>
 					<div class="info-item">
@@ -98,39 +145,6 @@
 						</div>
 					</div>
 				</div>
-
-				<div class="sidebar-nav">
-					<ul>
-						<li>
-							<a href="index.html" class="active"
-								><i class="fas fa-home"></i> Home</a
-							>
-						</li>
-						<li>
-							<a href="Pages/project.html"
-								><i class="fas fa-code-branch"></i> Projects</a
-							>
-						</li>
-						<li>
-							<a href="Pages/contact.html"
-								><i class="fas fa-envelope"></i> Contact</a
-							>
-						</li>
-					</ul>
-				</div>
-
-				<div class="theme-toggle sidebar-theme-toggle">
-					<input
-						type="checkbox"
-						id="sidebar-theme-switch"
-						class="theme-switch"
-					/>
-					<label for="sidebar-theme-switch" class="switch-label">
-						<i class="fas fa-sun"></i>
-						<i class="fas fa-moon"></i>
-						<span class="switch-ball"></span>
-					</label>
-				</div>
 			</div>
 		</aside>
 
@@ -142,100 +156,147 @@
 			<section class="theme-content dark-content">
 				<div class="hero">
 					<h1>Professional</h1>
+					<p>Track my professional commitments and work schedule.</p>
+				</div>
+
+				<div class="content-section">
+					<h2>Financial Advisor - AIA</h2>
 					<p>
-						Discover my discipline, workout routine, and hardcore side of life.
+						Currently serving as a Financial Advisor at AIA, helping clients
+						achieve their financial goals and secure their future through
+						comprehensive insurance and investment solutions.
 					</p>
 				</div>
 
 				<div class="content-section">
-					<h2>Fitness Regimen</h2>
+					<h2>Fitness Journey</h2>
 					<p>
-						My workout plan follows a dedicated Push Pull Legs split, training 6
-						days a week with intensity and focus. This structured approach has
-						helped me develop both physical strength and mental discipline that
-						carries over into other aspects of my life. Beyond the physical
-						benefits, working out serves as a crucial mental outlet for me,
-						clearing my head and providing a valuable "daily reset" that helps
-						maintain my overall well-being and focus.
+						My workout plan follows a Push Pull Legs split, training 6 days a
+						week. Click on each day to see the exercises.
 					</p>
+					<div class="workout-splits">
+						<div class="workout-day">
+							<button class="workout-toggle">
+								<h3>Push Day</h3>
+								<i class="fas fa-chevron-down"></i>
+							</button>
+							<div class="workout-exercises">
+								<div class="exercise-item superset">
+									<i class="fas fa-dumbbell"></i>
+									<span>Dumbbell Bench Press + Flat Bench Chest Fly</span>
+									<span class="superset-badge">Superset</span>
+								</div>
+								<div class="exercise-item superset">
+									<i class="fas fa-dumbbell"></i>
+									<span
+										>Incline Dumbbell Bench Press + Incline Bench Chest
+										Fly</span
+									>
+									<span class="superset-badge">Superset</span>
+								</div>
+								<div class="exercise-item superset">
+									<i class="fas fa-dumbbell"></i>
+									<span>Shoulder Press + Lateral Raise</span>
+									<span class="superset-badge">Superset</span>
+								</div>
+								<div class="exercise-item superset">
+									<i class="fas fa-dumbbell"></i>
+									<span>Upright Row + Forward Raise</span>
+									<span class="superset-badge">Superset</span>
+								</div>
+								<div class="exercise-item superset">
+									<i class="fas fa-dumbbell"></i>
+									<span>Triceps Rope Extension + Triceps Kickback</span>
+									<span class="superset-badge">Superset</span>
+								</div>
+								<div class="exercise-item superset">
+									<i class="fas fa-dumbbell"></i>
+									<span>Tricep Extension + Under Grip Tricep Extension</span>
+									<span class="superset-badge">Superset</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="workout-day">
+							<button class="workout-toggle">
+								<h3>Pull Day</h3>
+								<i class="fas fa-chevron-down"></i>
+							</button>
+							<div class="workout-exercises">
+								<div class="exercise-item">
+									<i class="fas fa-dumbbell"></i>
+									<span>Pull-up</span>
+								</div>
+								<div class="exercise-item superset">
+									<i class="fas fa-dumbbell"></i>
+									<span>Lat Pull + Dumbbell Curl</span>
+									<span class="superset-badge">Superset</span>
+								</div>
+								<div class="exercise-item">
+									<i class="fas fa-dumbbell"></i>
+									<span>Dumbbell Row</span>
+								</div>
+								<div class="exercise-item superset">
+									<i class="fas fa-dumbbell"></i>
+									<span>Face Pull + Machine Row</span>
+									<span class="superset-badge">Superset</span>
+								</div>
+								<div class="exercise-item superset">
+									<i class="fas fa-dumbbell"></i>
+									<span>Cable Curl + Hammer Curls</span>
+									<span class="superset-badge">Superset</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="workout-day">
+							<button class="workout-toggle">
+								<h3>Legs Day</h3>
+								<i class="fas fa-chevron-down"></i>
+							</button>
+							<div class="workout-exercises">
+								<div class="exercise-item">
+									<i class="fas fa-dumbbell"></i>
+									<span>Squats</span>
+								</div>
+								<div class="exercise-item">
+									<i class="fas fa-dumbbell"></i>
+									<span>RDL</span>
+								</div>
+								<div class="exercise-item">
+									<i class="fas fa-dumbbell"></i>
+									<span>Lunge</span>
+								</div>
+								<div class="exercise-item">
+									<i class="fas fa-dumbbell"></i>
+									<span>Leg Curl</span>
+								</div>
+								<div class="exercise-item">
+									<i class="fas fa-dumbbell"></i>
+									<span>Leg Extensions</span>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 
 				<div class="content-section">
-					<h2>Technical Growth</h2>
-					<p>
-						All my free time around the house is dedicated to expanding my
-						coding knowledge and skills. I have a deep interest in understanding
-						how things work at a fundamental level, which drives my passion for
-						technology and programming. This curiosity keeps me constantly
-						learning and exploring new concepts.
-					</p>
-				</div>
-
-				<div class="content-section">
-					<h2>Structured Discipline</h2>
-					<p>
-						I believe in maintaining a highly structured schedule to maximize
-						productivity. My approach involves tracking progress at multiple
-						levels: daily tasks feed into weekly goals, which support monthly
-						objectives, creating a clear path toward my long-term vision. This
-						systematic planning helps me stay focused and accountable.
-					</p>
-				</div>
-
-				<div class="content-section">
-					<h2>Future Vision</h2>
-					<p>
-						My structured planning extends up to 6 months ahead, with everything
-						building toward my ultimate goal of launching my own app/web
-						development company after completing university. This clear
-						direction gives purpose to my intense work ethic and continuous
-						self-improvement.
-					</p>
+					<h2>GitHub Projects</h2>
+					<p>Check out my latest repositories and contributions.</p>
+					<div id="github-stats" class="github-container">
+						<div class="github-loading">Loading GitHub data...</div>
+					</div>
 				</div>
 			</section>
-
 			<section class="theme-content light-content">
 				<div class="hero">
 					<h1>Personal</h1>
-					<p>
-						Get to know my personality, friends, and the lighter aspects of my
-						life.
-					</p>
-				</div>
-
-				<div class="content-section">
-					<h2>Adventure & Exploration</h2>
-					<p>
-						As an adventure and nature enthusiast, I'm always seeking new
-						experiences in the outdoors. I have a strong appreciation for
-						aesthetics, whether it's dressing up for a night out or discovering
-						hidden gems during my favorite activity—bar and café hopping around
-						Singapore.
-					</p>
-				</div>
-
-				<div class="content-section">
-					<h2>Sports & Recreation</h2>
-					<p>
-						Sports play a significant role in my social life. I regularly play
-						basketball with friends and enjoy socializing over golf at the
-						driving range while working on my swing. Currently, I'm in the
-						process of establishing my golf handicap, and you can usually find
-						me at ranges at the east of Singapore during weekends.
-					</p>
-				</div>
-
-				<div class="content-section">
-					<h2>Meaningful Connections</h2>
-					<p>
-						What I value most about my social connections is the opportunity to
-						truly listen and understand people. I take genuine interest in
-						hearing about others' achievements and challenges, believing that
-						these conversations create the most meaningful relationships.
-					</p>
+					<p>Welcome to my personal space.</p>
 				</div>
 			</section>
 		</main>
 		<script src="js/main.js"></script>
+		<script src="js/calendar.js"></script>
+		<script src="js/github.js"></script>
 	</body>
 </html>
