@@ -10,6 +10,11 @@
 			rel="stylesheet"
 			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
 		/>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.25.0/maps/maps.css"
+		/>
 	</head>
 	<body>
 		<header>
@@ -162,9 +167,20 @@
 				<div class="content-section">
 					<h2>Financial Advisor - AIA</h2>
 					<p>
-						Currently serving as a Financial Advisor at AIA, helping clients
-						achieve their financial goals and secure their future through
-						comprehensive insurance and investment solutions.
+						Goal is to create a sustainable portfolio of insurance and
+						investment. I've developed a Telegram bot
+						<a
+							href="https://t.me/ProsperityPath_bot"
+							target="_blank"
+							style="
+								color: var(--accent-color);
+								text-decoration: none;
+								font-weight: 500;
+							"
+							>@ProsperityPath_bot</a
+						>
+						that helps calculate optimal insurance and investment allocations
+						based on your disposable income level.
 					</p>
 				</div>
 
@@ -291,12 +307,39 @@
 			<section class="theme-content light-content">
 				<div class="hero">
 					<h1>Personal</h1>
-					<p>Welcome to my personal space.</p>
+					<p>Explore my world through an interactive map.</p>
+				</div>
+
+				<div class="content-section">
+					<h2>My Map</h2>
+					<p>
+						Places I've visited and my thoughts on them. Click on any location
+						below to explore!
+					</p>
+					<div id="tomtom-map" class="tomtom-map-container"></div>
+
+					<div class="filter-buttons">
+						<button class="filter-btn active" data-filter="all">
+							All Places
+						</button>
+						<button class="filter-btn" data-filter="Food">🍽️ Food</button>
+						<button class="filter-btn" data-filter="Cafe">☕ Cafe</button>
+						<button class="filter-btn" data-filter="Bar">🍺 Bar</button>
+						<button class="filter-btn" data-filter="Activity">
+							🎯 Activity
+						</button>
+						<button class="filter-btn" data-filter="Sights">🏛️ Sights</button>
+					</div>
+
+					<div id="places-list" class="places-list"></div>
 				</div>
 			</section>
 		</main>
+		<script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.25.0/maps/maps-web.min.js"></script>
+		<script src="js/places-data.js"></script>
 		<script src="js/main.js"></script>
 		<script src="js/calendar.js"></script>
 		<script src="js/github.js"></script>
+		<script src="js/tomtom-map.js"></script>
 	</body>
 </html>
