@@ -17,6 +17,11 @@
 				href: `${root}/Pages/fitness-sports.html`,
 			},
 			{
+				key: "schedule",
+				label: "Schedule",
+				href: `${root}/Pages/schedule.html`,
+			},
+			{
 				key: "contact",
 				label: "Contact",
 				href: `${root}/Pages/contact.html`,
