@@ -1,345 +1,169 @@
-.html
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<!doctype html>
+<html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Shaun's Website</title>
+		<title>Shaun Sevilla</title>
 		<link rel="stylesheet" href="css/style.css" />
 		<link
 			rel="stylesheet"
 			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
 		/>
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.25.0/maps/maps.css"
-		/>
 	</head>
 	<body>
-		<header>
-			<div class="navbar">
-				<div class="navbar-left">
-					<div class="hamburger-menu" id="hamburger-menu">
-						<i class="fas fa-bars"></i>
-					</div>
-					<div class="avatar">
-						<img src="assets/avatar.jpg" alt="Avatar" />
-					</div>
-				</div>
-				<div class="theme-toggle">
-					<input type="checkbox" id="theme-switch" class="theme-switch" />
-					<label for="theme-switch" class="switch-label">
-						<i class="fas fa-sun"></i>
-						<i class="fas fa-moon"></i>
-						<span class="switch-ball"></span>
-					</label>
-				</div>
+		<nav>
+			<div class="nav-inner">
+				<a href="index.html" class="nav-logo">SS</a>
+				<button
+					class="nav-hamburger"
+					id="nav-hamburger"
+					aria-label="Toggle navigation"
+				>
+					<span></span><span></span><span></span>
+				</button>
+				<ul class="nav-links" id="nav-links">
+					<li><a href="index.html" class="active">Home</a></li>
+					<li><a href="Pages/schedule.html">Schedule</a></li>
+					<li><a href="Pages/contact.html">Contact</a></li>
+				</ul>
 			</div>
-		</header>
+		</nav>
 
-		<!-- Sidebar Navigation (Resume Style) -->
-		<aside class="sidebar">
-			<div class="sidebar-content">
-				<div class="sidebar-header">
-					<div class="avatar">
-						<img src="assets/avatar.jpg" alt="Avatar" />
-					</div>
-					<h2 class="name">Shaun Sevilla</h2>
-					<p class="title">Student</p>
-				</div>
-				<div class="theme-toggle sidebar-theme-toggle">
-					<input
-						type="checkbox"
-						id="sidebar-theme-switch"
-						class="theme-switch"
-					/>
-					<label for="sidebar-theme-switch" class="switch-label">
-						<i class="fas fa-sun"></i>
-						<i class="fas fa-moon"></i>
-						<span class="switch-ball"></span>
-					</label>
-				</div>
-				<div class="sidebar-profile-summary dark-summary">
-					<h3 class="sidebar-section-title">Who I Am - The Technical Side</h3>
-					<p>
-						I'm a Computer Science student with a passion for web development
-						and a strong technical mindset. My structured approach to learning
-						combines academic knowledge with hands-on coding projects.
+		<main>
+			<!-- HERO -->
+			<section class="hero">
+				<div class="hero-inner">
+					<p class="hero-tagline">
+						Computer Scientist <span>&middot;</span> Financial Advisor
+						<span>&middot;</span> Athlete
+					</p>
+					<h1 class="hero-name">Shaun Sevilla</h1>
+					<p class="hero-statement">
+						Hard work is not a strategy &mdash; it&rsquo;s a standard.
 					</p>
 				</div>
+				<div class="hero-scroll">Scroll</div>
+			</section>
 
-				<div class="sidebar-profile-summary light-summary">
-					<h3 class="sidebar-section-title">Who I Am - The Balanced Side</h3>
-					<p>
-						Beyond my technical pursuits, I'm an adventurous spirit with a love
-						for outdoor activities and social experiences. My background in
-						Business and Tourism complements my technical skills.
-					</p>
-				</div>
-
-				<div class="sidebar-nav">
-					<ul>
-						<li>
-							<a href="index.html" class="active"
-								><i class="fas fa-home"></i> Home</a
-							>
-						</li>
-						<li>
-							<a href="Pages/schedule.html"
-								><i class="fas fa-calendar"></i> Schedule</a
-							>
-						</li>
-						<li>
-							<a href="Pages/contact.html"
-								><i class="fas fa-envelope"></i> Contact</a
-							>
-						</li>
-					</ul>
-				</div>
-
-				<div class="sidebar-info">
-					<h3 class="sidebar-section-title">Academic Background</h3>
-					<div class="info-item">
-						<i class="fas fa-graduation-cap"></i>
-						<div>
-							<strong>University Of London, SIM</strong>
-							<p>Degree in Computer Science</p>
-							<p class="date">April 2023 - April 2026</p>
-						</div>
-					</div>
-					<div class="info-item">
-						<i class="fas fa-university"></i>
-						<div>
-							<strong>Temasek Polytechnic</strong>
-							<p>Diploma in Business, HR & Tourism</p>
-							<p class="date">April 2018 - April 2021</p>
-						</div>
-					</div>
-					<div class="info-item">
-						<i class="fas fa-school"></i>
-						<div>
-							<strong>Greenview Secondary School</strong>
-							<p>GCE O & N Level</p>
-							<p class="date">Jan 2013 - Dec 2017</p>
-						</div>
-					</div>
-					<div class="info-item">
-						<i class="fas fa-school"></i>
-						<div>
-							<strong>Pasir Ris Primary School</strong>
-							<p>PSLE</p>
-							<p class="date">Jan 2006 - Dec 2012</p>
-						</div>
-					</div>
-				</div>
-				<div class="sidebar-info">
-					<h3 class="sidebar-section-title">Leadership Experience</h3>
-					<div class="info-item">
-						<i class="fas fa-medal"></i>
-						<div>
-							<p>Captain, Temasek Polytechnic Wakeboard Team</p>
-							<p class="date">2019-2020</p>
-						</div>
-					</div>
-					<div class="info-item">
-						<i class="fas fa-basketball-ball"></i>
-						<div>
-							<p>Captain, Greenview Secondary 2nd Basketball Team</p>
-							<p class="date">2016-2017</p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</aside>
-
-		<!-- Overlay for when mobile menu is open -->
-		<div class="overlay" id="overlay"></div>
-
-		<main class="main-with-sidebar">
-			<!-- Content that changes based on theme -->
-			<section class="theme-content dark-content">
-				<div class="hero">
-					<h1>Professional</h1>
-					<p>Track my professional commitments and work schedule.</p>
-				</div>
-
-				<div class="content-section">
-					<h2>Financial Advisor - AIA</h2>
-					<p>
-						Goal is to create a sustainable portfolio of insurance and
-						investment. I've developed a Telegram bot
-						<a
-							href="https://t.me/ProsperityPath_bot"
-							target="_blank"
-							style="
-								color: var(--accent-color);
-								text-decoration: none;
-								font-weight: 500;
-							"
-							>@ProsperityPath_bot</a
-						>
-						that helps calculate optimal insurance and investment allocations
-						based on your disposable income level.
-					</p>
-				</div>
-
-				<div class="content-section">
-					<h2>Fitness Journey</h2>
-					<p>
-						My workout plan follows a Push Pull Legs split, training 6 days a
-						week. Click on each day to see the exercises.
-					</p>
-					<div class="workout-splits">
-						<div class="workout-day">
-							<button class="workout-toggle">
-								<h3>Push Day</h3>
-								<i class="fas fa-chevron-down"></i>
-							</button>
-							<div class="workout-exercises">
-								<div class="exercise-item superset">
-									<i class="fas fa-dumbbell"></i>
-									<span>Dumbbell Bench Press + Flat Bench Chest Fly</span>
-									<span class="superset-badge">Superset</span>
-								</div>
-								<div class="exercise-item superset">
-									<i class="fas fa-dumbbell"></i>
-									<span
-										>Incline Dumbbell Bench Press + Incline Bench Chest
-										Fly</span
-									>
-									<span class="superset-badge">Superset</span>
-								</div>
-								<div class="exercise-item superset">
-									<i class="fas fa-dumbbell"></i>
-									<span>Shoulder Press + Lateral Raise</span>
-									<span class="superset-badge">Superset</span>
-								</div>
-								<div class="exercise-item superset">
-									<i class="fas fa-dumbbell"></i>
-									<span>Upright Row + Forward Raise</span>
-									<span class="superset-badge">Superset</span>
-								</div>
-								<div class="exercise-item superset">
-									<i class="fas fa-dumbbell"></i>
-									<span>Triceps Rope Extension + Triceps Kickback</span>
-									<span class="superset-badge">Superset</span>
-								</div>
-								<div class="exercise-item superset">
-									<i class="fas fa-dumbbell"></i>
-									<span>Tricep Extension + Under Grip Tricep Extension</span>
-									<span class="superset-badge">Superset</span>
-								</div>
+			<!-- WHAT I DO -->
+			<section id="work">
+				<div class="container">
+					<span class="section-label">What I Do</span>
+					<h2 class="section-title">At a Glance</h2>
+					<div class="section-line"></div>
+					<div class="pillars-grid">
+						<a href="Pages/software-development.html" class="pillar-card-link">
+							<div class="pillar-card">
+								<div class="pillar-icon"><i class="fas fa-code"></i></div>
+								<div class="pillar-title">Software Development</div>
+								<p class="pillar-text">
+									Pursuing a Computer Science degree at University of London
+									(SIM). I build full-stack projects, automate workflows, and
+									push myself to learn something new every day. Relentless about
+									getting better.
+								</p>
+								<span class="pillar-link"
+									>View Details <i class="fas fa-arrow-right"></i
+								></span>
 							</div>
-						</div>
+						</a>
 
-						<div class="workout-day">
-							<button class="workout-toggle">
-								<h3>Pull Day</h3>
-								<i class="fas fa-chevron-down"></i>
-							</button>
-							<div class="workout-exercises">
-								<div class="exercise-item">
-									<i class="fas fa-dumbbell"></i>
-									<span>Pull-up</span>
-								</div>
-								<div class="exercise-item superset">
-									<i class="fas fa-dumbbell"></i>
-									<span>Lat Pull + Dumbbell Curl</span>
-									<span class="superset-badge">Superset</span>
-								</div>
-								<div class="exercise-item">
-									<i class="fas fa-dumbbell"></i>
-									<span>Dumbbell Row</span>
-								</div>
-								<div class="exercise-item superset">
-									<i class="fas fa-dumbbell"></i>
-									<span>Face Pull + Machine Row</span>
-									<span class="superset-badge">Superset</span>
-								</div>
-								<div class="exercise-item superset">
-									<i class="fas fa-dumbbell"></i>
-									<span>Cable Curl + Hammer Curls</span>
-									<span class="superset-badge">Superset</span>
-								</div>
+						<a href="Pages/financial-advisory.html" class="pillar-card-link">
+							<div class="pillar-card">
+								<div class="pillar-icon"><i class="fas fa-chart-line"></i></div>
+								<div class="pillar-title">Financial Advisory</div>
+								<p class="pillar-text">
+									Financial Advisor at AIA, building a sustainable portfolio of
+									insurance and investments. I also built @ProsperityPath_bot, a
+									Telegram bot that calculates optimal financial allocations
+									based on disposable income.
+								</p>
+								<span class="pillar-link"
+									>View Details <i class="fas fa-arrow-right"></i
+								></span>
 							</div>
-						</div>
+						</a>
 
-						<div class="workout-day">
-							<button class="workout-toggle">
-								<h3>Legs Day</h3>
-								<i class="fas fa-chevron-down"></i>
-							</button>
-							<div class="workout-exercises">
-								<div class="exercise-item">
-									<i class="fas fa-dumbbell"></i>
-									<span>Squats</span>
-								</div>
-								<div class="exercise-item">
-									<i class="fas fa-dumbbell"></i>
-									<span>RDL</span>
-								</div>
-								<div class="exercise-item">
-									<i class="fas fa-dumbbell"></i>
-									<span>Lunge</span>
-								</div>
-								<div class="exercise-item">
-									<i class="fas fa-dumbbell"></i>
-									<span>Leg Curl</span>
-								</div>
-								<div class="exercise-item">
-									<i class="fas fa-dumbbell"></i>
-									<span>Leg Extensions</span>
-								</div>
+						<a href="Pages/fitness-sports.html" class="pillar-card-link">
+							<div class="pillar-card">
+								<div class="pillar-icon"><i class="fas fa-dumbbell"></i></div>
+								<div class="pillar-title">Fitness &amp; Sport</div>
+								<p class="pillar-text">
+									Push Pull Legs &mdash; six days a week, no exceptions.
+									Discipline in the gym is the same discipline I bring to
+									everything else. Former captain of the Temasek Polytechnic
+									Wakeboard Team.
+								</p>
+								<span class="pillar-link"
+									>View Details <i class="fas fa-arrow-right"></i
+								></span>
 							</div>
-						</div>
-					</div>
-				</div>
-
-				<div class="content-section">
-					<h2>GitHub Projects</h2>
-					<p>Check out my latest repositories and contributions.</p>
-					<div id="github-stats" class="github-container">
-						<div class="github-loading">Loading GitHub data...</div>
+						</a>
 					</div>
 				</div>
 			</section>
-			<section class="theme-content light-content">
-				<div class="hero">
-					<h1>Personal</h1>
-					<p>Explore my world through an interactive map.</p>
-				</div>
 
-				<div class="content-section">
-					<h2>My Map</h2>
-					<p>
-						Places I've visited and my thoughts on them. Click on any location
-						below to explore!
-					</p>
-					<div id="tomtom-map" class="tomtom-map-container"></div>
-
-					<div class="filter-buttons">
-						<button class="filter-btn active" data-filter="all">
-							All Places
-						</button>
-						<button class="filter-btn" data-filter="Food">🍽️ Food</button>
-						<button class="filter-btn" data-filter="Cafe">☕ Cafe</button>
-						<button class="filter-btn" data-filter="Bar">🍺 Bar</button>
-						<button class="filter-btn" data-filter="Activity">
-							🎯 Activity
-						</button>
-						<button class="filter-btn" data-filter="Sights">🏛️ Sights</button>
+			<!-- LEADERSHIP -->
+			<section id="leadership">
+				<div class="container">
+					<span class="section-label">Leadership</span>
+					<h2 class="section-title">Roles</h2>
+					<div class="section-line"></div>
+					<div class="leadership-grid">
+						<div class="leadership-item">
+							<p class="leadership-role">
+								Captain &mdash; Temasek Polytechnic Wakeboard Team
+							</p>
+							<p class="leadership-date">2019 &ndash; 2020</p>
+						</div>
+						<div class="leadership-item">
+							<p class="leadership-role">
+								Captain &mdash; Greenview Secondary 2nd Basketball Team
+							</p>
+							<p class="leadership-date">2016 &ndash; 2017</p>
+						</div>
 					</div>
+				</div>
+			</section>
 
-					<div id="places-list" class="places-list"></div>
+			<!-- EDUCATION -->
+			<section id="credentials">
+				<div class="container">
+					<span class="section-label">Background</span>
+					<h2 class="section-title">Education</h2>
+					<div class="section-line"></div>
+					<div class="timeline">
+						<div class="timeline-entry">
+							<p class="tl-date">2023 &ndash; 2026</p>
+							<p class="tl-school">University of London, SIM</p>
+							<p class="tl-degree">Bachelor of Science, Computer Science</p>
+						</div>
+						<div class="timeline-entry">
+							<p class="tl-date">2018 &ndash; 2021</p>
+							<p class="tl-school">Temasek Polytechnic</p>
+							<p class="tl-degree">Diploma in Business, HR &amp; Tourism</p>
+						</div>
+						<div class="timeline-entry">
+							<p class="tl-date">2013 &ndash; 2017</p>
+							<p class="tl-school">Greenview Secondary School</p>
+							<p class="tl-degree">GCE O &amp; N Level</p>
+						</div>
+						<div class="timeline-entry">
+							<p class="tl-date">2006 &ndash; 2012</p>
+							<p class="tl-school">Pasir Ris Primary School</p>
+							<p class="tl-degree">PSLE</p>
+						</div>
+					</div>
 				</div>
 			</section>
 		</main>
-		<script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.25.0/maps/maps-web.min.js"></script>
-		<script src="js/places-data.js"></script>
+
+		<footer>
+			<div class="container">
+				<p>&copy; 2026 <span>Shaun Sevilla</span>. Relentlessly building.</p>
+			</div>
+		</footer>
+
 		<script src="js/main.js"></script>
-		<script src="js/calendar.js"></script>
-		<script src="js/github.js"></script>
-		<script src="js/tomtom-map.js"></script>
 	</body>
 </html>

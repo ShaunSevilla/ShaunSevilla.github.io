@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Financial Advisory | Shaun Sevilla</title>
+		<link rel="stylesheet" href="../css/style.css" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+		/>
+	</head>
+	<body>
+		<nav>
+			<div class="nav-inner">
+				<a href="../index.html" class="nav-logo">SS</a>
+				<button
+					class="nav-hamburger"
+					id="nav-hamburger"
+					aria-label="Toggle navigation"
+				>
+					<span></span><span></span><span></span>
+				</button>
+				<ul class="nav-links" id="nav-links">
+					<li><a href="../index.html">Home</a></li>
+					<li><a href="schedule.html">Schedule</a></li>
+					<li><a href="contact.html">Contact</a></li>
+				</ul>
+			</div>
+		</nav>
+
+		<main>
+			<section class="detail-hero">
+				<div class="container">
+					<span class="section-label">Discipline Two</span>
+					<h1 class="section-title">Financial Advisory</h1>
+					<div class="section-line"></div>
+					<p class="detail-intro">
+						Ascendence Wealth Management (AWM), AIA Singapore.
+					</p>
+					<p class="detail-intro">
+						My planning approach is simple and disciplined: I map income and
+						commitments first, keep insurance cost below 10% of income, then
+						allocate efficiently toward long-term investing for clear,
+						affordable, and consistent outcomes.
+					</p>
+				</div>
+			</section>
+
+			<section class="detail-section advisory-layout">
+				<div class="container">
+					<div class="advisory-flow">
+						<section class="advisory-step bot-cta-block" id="bot">
+							<span class="section-label">Prosperity Path</span>
+							<h2>Start With The Bot</h2>
+							<p>
+								The fastest way to start is the bot. It gives a quick
+								goal-to-monthly plan estimate, checks your gap, and routes you
+								to me for follow-up.
+							</p>
+							<a
+								href="https://t.me/ProsperityPath_bot"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="bot-cta-link"
+							>
+								Open @ProsperityPath_bot
+								<i class="fas fa-arrow-right"></i>
+							</a>
+						</section>
+
+						<section class="advisory-step" id="indicators">
+							<span class="section-label">What I Look At</span>
+							<h2>Indicators Dashboard</h2>
+							<p>
+								Live macro and market indicators from FRED that I use in
+								planning and portfolio conversations.
+							</p>
+							<div class="indicator-pillars" aria-label="Indicator pillars">
+								<div class="indicator-pillar">Inflation</div>
+								<div class="indicator-pillar">Labour Market</div>
+								<div class="indicator-pillar">Economic Activity</div>
+								<div class="indicator-pillar">Business Surveys</div>
+							</div>
+							<div id="fred-indicators" class="fred-dashboard">
+								<p class="fred-loading">Loading indicators...</p>
+							</div>
+						</section>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<footer>
+			<div class="container">
+				<p>&copy; 2026 <span>Shaun Sevilla</span>. Relentlessly building.</p>
+			</div>
+		</footer>
+
+		<script src="../js/main.js"></script>
+		<script src="../js/fred-indicators.js"></script>
+	</body>
+</html>

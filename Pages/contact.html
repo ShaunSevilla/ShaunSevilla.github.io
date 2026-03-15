@@ -1,231 +1,101 @@
-/contact.html -->
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Contact | Shaun Sevilla</title>
-		<link rel="stylesheet" href="../css/style.css" />
-		<link
-			rel="stylesheet"
-			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-		/>
-	</head>
-	<body>
-		<header>
-			<div class="navbar">
-				<div class="navbar-left">
-					<div class="hamburger-menu" id="hamburger-menu">
-						<i class="fas fa-bars"></i>
-					</div>
-					<div class="avatar">
-						<img src="../assets/avatar.jpg" alt="Avatar" />
-					</div>
-				</div>
-				<div class="theme-toggle">
-					<input type="checkbox" id="theme-switch" class="theme-switch" />
-					<label for="theme-switch" class="switch-label">
-						<i class="fas fa-sun"></i>
-						<i class="fas fa-moon"></i>
-						<span class="switch-ball"></span>
-					</label>
-				</div>
-			</div>
-		</header>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact &mdash; Shaun Sevilla</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+</head>
+<body>
 
-		<!-- Sidebar Navigation (Resume Style) -->
-		<aside class="sidebar">
-			<div class="sidebar-content">
-				<div class="sidebar-header">
-					<div class="avatar">
-						<img src="../assets/avatar.jpg" alt="Avatar" />
-					</div>
-					<h2 class="name">Shaun Sevilla</h2>
-					<p class="title">Student</p>
-				</div>
-				<div class="theme-toggle sidebar-theme-toggle">
-					<input
-						type="checkbox"
-						id="sidebar-theme-switch"
-						class="theme-switch"
-					/>
-					<label for="sidebar-theme-switch" class="switch-label">
-						<i class="fas fa-sun"></i>
-						<i class="fas fa-moon"></i>
-						<span class="switch-ball"></span>
-					</label>
-				</div>
-				<div class="sidebar-profile-summary dark-summary">
-					<h3 class="sidebar-section-title">Who I Am - The Technical Side</h3>
-					<p>
-						I'm a Computer Science student with a passion for web development
-						and a strong technical mindset. My structured approach to learning
-						combines academic knowledge with hands-on coding projects.
-					</p>
-				</div>
+  <nav>
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-logo">SS</a>
+      <button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="schedule.html">Schedule</a></li>
+        <li><a href="contact.html" class="active">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
 
-				<div class="sidebar-profile-summary light-summary">
-					<h3 class="sidebar-section-title">Who I Am - The Balanced Side</h3>
-					<p>
-						Beyond my technical pursuits, I'm an adventurous spirit with a love
-						for outdoor activities and social experiences. My background in
-						Business and Tourism complements my technical skills.
-					</p>
-				</div>
+  <main>
+    <section class="contact-hero">
+      <div class="container">
+        <span class="section-label">Get in Touch</span>
+        <h1 class="section-title">Contact</h1>
+        <div class="section-line"></div>
+        <ul class="contact-list">
+          <li>
+            <a href="mailto:00shaun.sevilla@gmail.com">
+              <span class="contact-icon"><i class="fas fa-envelope"></i></span>
+              <span>
+                <span class="contact-label">Email</span>
+                <span class="contact-value">00shaun.sevilla@gmail.com</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="https://www.linkedin.com/in/shaunsevilla/" target="_blank" rel="noopener noreferrer">
+              <span class="contact-icon"><i class="fab fa-linkedin"></i></span>
+              <span>
+                <span class="contact-label">LinkedIn</span>
+                <span class="contact-value">Shaun Sevilla</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/ShaunSevilla" target="_blank" rel="noopener noreferrer">
+              <span class="contact-icon"><i class="fab fa-github"></i></span>
+              <span>
+                <span class="contact-label">GitHub</span>
+                <span class="contact-value">ShaunSevilla</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="https://www.instagram.com/se.villa/" target="_blank" rel="noopener noreferrer">
+              <span class="contact-icon"><i class="fab fa-instagram"></i></span>
+              <span>
+                <span class="contact-label">Instagram</span>
+                <span class="contact-value">@se.villa</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="https://t.me/ShaunSevilla" target="_blank" rel="noopener noreferrer">
+              <span class="contact-icon"><i class="fab fa-telegram"></i></span>
+              <span>
+                <span class="contact-label">Telegram</span>
+                <span class="contact-value">@ShaunSevilla</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="contact-icon"><i class="fab fa-discord"></i></span>
+              <span>
+                <span class="contact-label">Discord</span>
+                <span class="contact-value">noppin#2598</span>
+              </span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </main>
 
-				<div class="sidebar-nav">
-					<ul>
-						<li>
-							<a href="../index.html"><i class="fas fa-home"></i> Home</a>
-						</li>
-						<li>
-							<a href="schedule.html"
-								><i class="fas fa-calendar"></i> Schedule</a
-							>
-						</li>
-						<li>
-							<a href="contact.html" class="active"
-								><i class="fas fa-envelope"></i> Contact</a
-							>
-						</li>
-					</ul>
-				</div>
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 <span>Shaun Sevilla</span>. Relentlessly building.</p>
+    </div>
+  </footer>
 
-				<div class="sidebar-info">
-					<h3 class="sidebar-section-title">Academic Background</h3>
-					<div class="info-item">
-						<i class="fas fa-graduation-cap"></i>
-						<div>
-							<strong>University Of London, SIM</strong>
-							<p>Degree in Computer Science</p>
-							<p class="date">April 2023 - April 2026</p>
-						</div>
-					</div>
-					<div class="info-item">
-						<i class="fas fa-university"></i>
-						<div>
-							<strong>Temasek Polytechnic</strong>
-							<p>Diploma in Business, HR & Tourism</p>
-							<p class="date">April 2018 - April 2021</p>
-						</div>
-					</div>
-				</div>
+  <script src="../js/main.js"></script>
 
-				<div class="sidebar-info">
-					<h3 class="sidebar-section-title">Leadership Experience</h3>
-					<div class="info-item">
-						<i class="fas fa-medal"></i>
-						<div>
-							<p>Captain, Temasek Polytechnic Wakeboard Team</p>
-							<p class="date">2019-2020</p>
-						</div>
-					</div>
-					<div class="info-item">
-						<i class="fas fa-basketball-ball"></i>
-						<div>
-							<p>Captain, Greenview Secondary 2nd Basketball Team</p>
-							<p class="date">2016-2017</p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</aside>
-
-		<!-- Overlay for when mobile menu is open -->
-		<div class="overlay" id="overlay"></div>
-
-		<main class="main-with-sidebar">
-			<!-- Content that changes based on theme -->
-			<section class="theme-content dark-content">
-				<div class="hero">
-					<h1>Professional Connect</h1>
-					<p>
-						For business inquiries, collaboration opportunities, or technical
-						discussions
-					</p>
-				</div>
-
-				<div class="content-section contact-links-section">
-					<div class="contact-container">
-						<div class="contact-category">
-							<ul class="contact-links-list">
-								<li>
-									<a
-										href="mailto:00shaun.sevilla@gmail.com"
-										class="contact-item"
-									>
-										<span class="icon"><i class="fas fa-envelope"></i></span>
-										<span class="text">00shaun.sevilla@gmail.com</span>
-									</a>
-								</li>
-								<li>
-									<a
-										href="https://www.linkedin.com/in/shaunsevilla/"
-										target="_blank"
-										class="contact-item"
-									>
-										<span class="icon"><i class="fab fa-linkedin"></i></span>
-										<span class="text">Shaun Sevilla</span>
-									</a>
-								</li>
-								<li>
-									<a
-										href="https://github.com/shaunsevilla"
-										target="_blank"
-										class="contact-item"
-									>
-										<span class="icon"><i class="fab fa-github"></i></span>
-										<span class="text">Shaun Sevilla</span>
-									</a>
-								</li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</section>
-
-			<section class="theme-content light-content">
-				<div class="hero">
-					<h1>Social Connect</h1>
-					<p>Follow my personal interests, hobbies and casual updates</p>
-				</div>
-
-				<div class="content-section contact-links-section">
-					<div class="contact-container">
-						<div class="contact-category">
-							<ul class="contact-links-list">
-								<li>
-									<a
-										href="https://www.instagram.com/se.villa/"
-										target="_blank"
-										class="contact-item"
-									>
-										<span class="icon"><i class="fab fa-instagram"></i></span>
-										<span class="text">@se.villa</span>
-									</a>
-								</li>
-								<li>
-									<a
-										href="https://t.me/ShaunSevilla"
-										target="_blank"
-										class="contact-item"
-									>
-										<span class="icon"><i class="fab fa-telegram"></i></span>
-										<span class="text">@ShaunSevilla</span>
-									</a>
-								</li>
-								<li>
-									<a href="#" target="_blank" class="contact-item">
-										<span class="icon"><i class="fab fa-discord"></i></span>
-										<span class="text">noppin#2598</span>
-									</a>
-								</li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</section>
-		</main>
-		<script src="../js/main.js"></script>
-	</body>
+</body>
 </html>

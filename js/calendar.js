@@ -12,6 +12,22 @@ const CALENDAR_CONFIG = {
 };
 
 /**
+ * Decode iCal escaped text sequences.
+ * Examples: \\n -> newline, \\, -> comma, \\; -> semicolon, \\\\ -> backslash
+ * @param {string} text - Raw iCal text value
+ * @returns {string} Decoded text value
+ */
+function decodeICalText(text) {
+	if (!text) return "";
+
+	return text
+		.replace(/\\\\/g, "\\")
+		.replace(/\\[nN]/g, "\n")
+		.replace(/\\,/g, ",")
+		.replace(/\\;/g, ";");
+}
+
+/**
  * Parse iCal data
  * @param {string} icalData - Raw iCal data
  * @returns {Array} Array of event objects
@@ -36,6 +52,10 @@ function parseICalData(icalData) {
 				isAllDay: false,
 			};
 		} else if (line === "END:VEVENT" && currentEvent) {
+			currentEvent.summary = decodeICalText(currentEvent.summary);
+			currentEvent.description = decodeICalText(currentEvent.description);
+			currentEvent.location = decodeICalText(currentEvent.location);
+
 			// Mark as all-day if no time component exists
 			if (currentEvent.dtstart && !hasTimeComponent(currentEvent.dtstart)) {
 				currentEvent.isAllDay = true;
@@ -64,7 +84,7 @@ function parseICalData(icalData) {
 					currentField = "summary";
 					break;
 				case "DESCRIPTION":
-					currentEvent.description = value.replace(/\\n/g, "\n");
+					currentEvent.description = value;
 					currentField = "description";
 					break;
 				case "LOCATION":
@@ -248,17 +268,17 @@ function getEventsForDate(events, date) {
 		const targetDate = new Date(
 			date.getFullYear(),
 			date.getMonth(),
-			date.getDate()
+			date.getDate(),
 		);
 		const startDate = new Date(
 			eventStart.getFullYear(),
 			eventStart.getMonth(),
-			eventStart.getDate()
+			eventStart.getDate(),
 		);
 		const endDate = new Date(
 			eventEnd.getFullYear(),
 			eventEnd.getMonth(),
-			eventEnd.getDate()
+			eventEnd.getDate(),
 		);
 
 		// Check if the target date falls within the event's date range
@@ -360,12 +380,12 @@ function renderCalendar(containerId, events) {
 
 		calendarHTML += `
             <div class="calendar-day ${isToday ? "today" : ""} ${
-			isPast ? "past" : ""
-		} ${dayEvents.length > 0 ? "has-events" : ""}" 
+							isPast ? "past" : ""
+						} ${dayEvents.length > 0 ? "has-events" : ""}" 
                  data-date="${currentYear}-${String(currentMonth + 1).padStart(
-			2,
-			"0"
-		)}-${String(day).padStart(2, "0")}">
+										2,
+										"0",
+									)}-${String(day).padStart(2, "0")}">
                 <div class="day-number">${day}</div>
                 ${
 									dayEvents.length > 0
@@ -380,8 +400,8 @@ function renderCalendar(containerId, events) {
 													.map(
 														(e) =>
 															`<div class="preview-item">${escapeHtml(
-																e.summary || "Event"
-															)}</div>`
+																e.summary || "Event",
+															)}</div>`,
 													)
 													.join("")}
                     </div>
@@ -449,16 +469,16 @@ function showEventModal(containerId, date, events) {
 			const timeDisplay = event.isAllDay
 				? "All Day"
 				: isMultiDay
-				? formatDateRange(event.dtstart, event.dtend)
-				: `${formatTime(event.dtstart)} - ${formatTime(event.dtend)}`;
+					? formatDateRange(event.dtstart, event.dtend)
+					: `${formatTime(event.dtstart)} - ${formatTime(event.dtend)}`;
 
 			return `
         <div class="modal-event ${event.isAllDay ? "all-day-event" : ""} ${
-				isMultiDay ? "multi-day-event" : ""
-			}" onclick="toggleEventDetails(this)">
+					isMultiDay ? "multi-day-event" : ""
+				}" onclick="toggleEventDetails(this)">
             <div class="modal-event-summary">
                 <strong>${escapeHtml(
-									event.summary || "Untitled Event"
+									event.summary || "Untitled Event",
 								)}</strong>
                 <span class="event-time">${timeDisplay}</span>
                 <i class="fas fa-chevron-down expand-icon"></i>
@@ -471,7 +491,7 @@ function showEventModal(containerId, date, events) {
                         <i class="fas fa-calendar-alt"></i>
                         <span>${formatDateRange(
 													event.dtstart,
-													event.dtend
+													event.dtend,
 												)}</span>
                     </div>
                 `
@@ -503,8 +523,8 @@ function showEventModal(containerId, date, events) {
                     <div class="detail-row">
                         <i class="fas fa-clock"></i>
                         <span>${formatTime(event.dtstart)} - ${formatTime(
-												event.dtend
-										  )}</span>
+													event.dtend,
+												)}</span>
                     </div>
                 `
 										: ""
@@ -676,20 +696,20 @@ async function fetchAndDisplayCalendar(calendarUrl, containerId) {
  * Initialize calendars when DOM is ready
  */
 function initializeCalendars() {
-	console.log("Initializing calendars...");
+	// Unified calendar
+	if (document.getElementById("calendar")) {
+		fetchAndDisplayCalendar(CALENDAR_CONFIG.professional, "calendar");
+	}
 
-	// Fetch professional calendar
+	// Legacy IDs (kept for backward compat)
 	if (document.getElementById("professional-calendar")) {
-		console.log("Loading professional calendar...");
 		fetchAndDisplayCalendar(
 			CALENDAR_CONFIG.professional,
-			"professional-calendar"
+			"professional-calendar",
 		);
 	}
 
-	// Fetch personal calendar
 	if (document.getElementById("personal-calendar")) {
-		console.log("Loading personal calendar...");
 		fetchAndDisplayCalendar(CALENDAR_CONFIG.personal, "personal-calendar");
 	}
 }
