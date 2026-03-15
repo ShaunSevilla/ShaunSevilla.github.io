@@ -88,7 +88,7 @@ nav {
 
 .nav-links {
 	display: flex;
-	gap: 2.5rem;
+	gap: 2rem;
 	list-style: none;
 }
 
@@ -715,7 +715,7 @@ section {
 
 /* CONTACT */
 .contact-hero {
-	padding: 8rem 0 5rem;
+	padding: 8rem 0 3.5rem;
 }
 
 .contact-list {
@@ -761,12 +761,12 @@ section {
 
 /* SCHEDULE */
 .schedule-hero {
-	padding: 8rem 0 5rem;
+	padding: 8rem 0 3.5rem;
 }
 
 /* DETAIL PAGES */
 .detail-hero {
-	padding: 8rem 0 3rem;
+	padding: 8rem 0 3.5rem;
 }
 
 .detail-intro {
@@ -779,6 +779,10 @@ section {
 
 .detail-intro a {
 	color: var(--gold);
+}
+
+.advisory-copy-column {
+	max-width: 760px;
 }
 
 .detail-section {
@@ -833,16 +837,12 @@ section {
 .advisory-flow {
 	display: flex;
 	flex-direction: column;
-	gap: 0;
+	gap: 1.4rem;
 	border-top: none;
 }
 
-.advisory-layout .container {
-	max-width: 1280px;
-}
-
 .advisory-step {
-	padding: 2.4rem 0;
+	padding: 0;
 	border-bottom: none;
 }
 
@@ -860,7 +860,7 @@ section {
 }
 
 .bot-cta-block {
-	padding-bottom: 3rem;
+	padding-bottom: 0;
 }
 
 .bot-cta-link {
@@ -893,10 +893,7 @@ section {
 }
 
 .indicator-pillar {
-	border-left: 1px solid var(--border);
-	border-right: 1px solid var(--border);
-	border-top: none;
-	border-bottom: none;
+	border: none;
 	background: var(--surface);
 	padding: 0.7rem 0.8rem;
 	font-size: 0.68rem;
@@ -921,12 +918,10 @@ section {
 }
 
 .fred-group {
-	border-left: 1px solid var(--border);
-	border-right: 1px solid var(--border);
-	border-top: none;
-	border-bottom: none;
+	border: none;
 	background: var(--surface);
 	overflow: hidden;
+	padding: 0;
 }
 
 .fred-group-title {
@@ -949,7 +944,7 @@ section {
 	padding: 0.66rem 0.78rem;
 	text-align: left;
 	font-size: 0.79rem;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+	border-bottom: none;
 }
 
 .fred-table th:nth-child(1),
@@ -978,7 +973,7 @@ section {
 	text-transform: uppercase;
 	color: var(--text-muted);
 	font-weight: 500;
-	background: var(--surface-2);
+	background: var(--surface);
 }
 
 .fred-table tr:last-child td {
@@ -1002,10 +997,6 @@ section {
 }
 
 @media (min-width: 1366px) {
-	.advisory-layout .container {
-		max-width: 1360px;
-	}
-
 	.fred-dashboard {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: 1.15rem;
@@ -1017,10 +1008,6 @@ section {
 }
 
 @media (min-width: 1700px) {
-	.advisory-layout .container {
-		max-width: 1500px;
-	}
-
 	.fred-dashboard {
 		gap: 1.25rem;
 	}
@@ -1485,6 +1472,46 @@ footer {
 	padding: 2.5rem 0;
 	text-align: center;
 }
+
+.site-footer .container {
+	display: flex;
+	flex-direction: column;
+	gap: 1.2rem;
+}
+
+.footer-contact-links {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0.5rem 0.8rem;
+}
+
+.footer-contact-links a {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.64rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	padding: 0.35rem 0.6rem;
+	border: 1px solid var(--border);
+	color: var(--text-muted);
+	transition:
+		color 0.2s,
+		border-color 0.2s,
+		background 0.2s;
+}
+
+.footer-contact-links a:hover {
+	color: var(--gold);
+	border-color: var(--gold-dim);
+	background: rgba(201, 168, 76, 0.05);
+}
+
+.footer-contact-links i {
+	font-size: 0.66rem;
+}
+
 footer p {
 	font-size: 0.72rem;
 	letter-spacing: 0.1em;
@@ -1501,6 +1528,10 @@ footer span {
 
 	.nav-inner {
 		padding: 0 1.5rem;
+	}
+
+	.nav-links {
+		gap: 1.4rem;
 	}
 
 	.repos-grid {
@@ -1553,6 +1584,10 @@ footer span {
 		grid-template-columns: 1fr;
 	}
 
+	.footer-contact-links {
+		gap: 0.45rem 0.55rem;
+	}
+
 	.github-preview-head {
 		align-items: flex-start;
 	}
@@ -1598,6 +1633,15 @@ footer span {
 
 	.contact-value {
 		font-size: 0.84rem;
+	}
+
+	.footer-contact-links {
+		justify-content: flex-start;
+	}
+
+	.footer-contact-links a {
+		font-size: 0.58rem;
+		letter-spacing: 0.1em;
 	}
 }
 

@@ -10,24 +10,8 @@
 			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
 		/>
 	</head>
-	<body>
-		<nav>
-			<div class="nav-inner">
-				<a href="index.html" class="nav-logo">SS</a>
-				<button
-					class="nav-hamburger"
-					id="nav-hamburger"
-					aria-label="Toggle navigation"
-				>
-					<span></span><span></span><span></span>
-				</button>
-				<ul class="nav-links" id="nav-links">
-					<li><a href="index.html" class="active">Home</a></li>
-					<li><a href="Pages/schedule.html">Schedule</a></li>
-					<li><a href="Pages/contact.html">Contact</a></li>
-				</ul>
-			</div>
-		</nav>
+	<body data-root="." data-page="home">
+		<nav id="site-nav"></nav>
 
 		<main>
 			<!-- HERO -->
@@ -103,6 +87,38 @@
 				</div>
 			</section>
 
+			<section class="detail-section">
+				<div class="container">
+					<span class="section-label">Live Calendar</span>
+					<h2 class="section-title">Current Schedule</h2>
+					<div class="section-line"></div>
+					<div id="calendar" class="calendar-container">
+						<p class="calendar-loading">Loading calendar...</p>
+					</div>
+				</div>
+			</section>
+
+			<section class="detail-section advisory-layout">
+				<div class="container">
+					<span class="section-label">Live Markets</span>
+					<h2 class="section-title">Indicators Dashboard</h2>
+					<div class="section-line"></div>
+					<p class="detail-intro">
+						Live macro and market indicators from FRED that I use in planning
+						and portfolio conversations.
+					</p>
+					<div class="indicator-pillars" aria-label="Indicator pillars">
+						<div class="indicator-pillar">Inflation</div>
+						<div class="indicator-pillar">Labour Market</div>
+						<div class="indicator-pillar">Economic Activity</div>
+						<div class="indicator-pillar">Business Surveys</div>
+					</div>
+					<div id="fred-indicators" class="fred-dashboard">
+						<p class="fred-loading">Loading indicators...</p>
+					</div>
+				</div>
+			</section>
+
 			<!-- LEADERSHIP -->
 			<section id="leadership">
 				<div class="container">
@@ -158,12 +174,11 @@
 			</section>
 		</main>
 
-		<footer>
-			<div class="container">
-				<p>&copy; 2026 <span>Shaun Sevilla</span>. Relentlessly building.</p>
-			</div>
-		</footer>
+		<footer id="site-footer" class="site-footer"></footer>
 
+		<script src="js/layout.js"></script>
 		<script src="js/main.js"></script>
+		<script src="js/calendar.js"></script>
+		<script src="js/fred-indicators.js"></script>
 	</body>
 </html>

@@ -62,6 +62,16 @@ function formatValue(value, format) {
 	return n.toFixed(1);
 }
 
+function formatCompactDate(value) {
+	if (!value) return "N/A";
+
+	const parts = value.split("-");
+	if (parts.length !== 3) return value;
+
+	const [year, month, day] = parts;
+	return `${day}${month}${year.slice(-2)}`;
+}
+
 async function fetchSeries(seriesId) {
 	const params = new URLSearchParams({
 		series_id: seriesId,
@@ -196,7 +206,7 @@ async function loadIndicators() {
 							previous: data.previous
 								? formatValue(data.previous.value, item.format)
 								: "N/A",
-							date: data.latest ? data.latest.date : "N/A",
+							date: data.latest ? formatCompactDate(data.latest.date) : "N/A",
 						};
 					} catch (err) {
 						return {

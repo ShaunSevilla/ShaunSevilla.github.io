@@ -1,49 +1,35 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Schedule &mdash; Shaun Sevilla</title>
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-</head>
-<body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Schedule &mdash; Shaun Sevilla</title>
+		<link rel="stylesheet" href="../css/style.css" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+		/>
+	</head>
+	<body data-root=".." data-page="schedule">
+		<nav id="site-nav"></nav>
 
-  <nav>
-    <div class="nav-inner">
-      <a href="../index.html" class="nav-logo">SS</a>
-      <button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle navigation">
-        <span></span><span></span><span></span>
-      </button>
-      <ul class="nav-links" id="nav-links">
-        <li><a href="../index.html">Home</a></li>
-        <li><a href="schedule.html" class="active">Schedule</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-    </div>
-  </nav>
+		<main>
+			<section class="schedule-hero">
+				<div class="container">
+					<span class="section-label">What&rsquo;s On</span>
+					<h1 class="section-title">Schedule</h1>
+					<div class="section-line"></div>
+					<div id="calendar" class="calendar-container">
+						<p class="calendar-loading">Loading calendar&hellip;</p>
+					</div>
+				</div>
+			</section>
+		</main>
 
-  <main>
-    <section class="schedule-hero">
-      <div class="container">
-        <span class="section-label">What&rsquo;s On</span>
-        <h1 class="section-title">Schedule</h1>
-        <div class="section-line"></div>
-        <div id="calendar" class="calendar-container">
-          <p class="calendar-loading">Loading calendar&hellip;</p>
-        </div>
-      </div>
-    </section>
-  </main>
+		<footer id="site-footer" class="site-footer"></footer>
 
-  <footer>
-    <div class="container">
-      <p>&copy; 2026 <span>Shaun Sevilla</span>. Relentlessly building.</p>
-    </div>
-  </footer>
-
-  <script src="../js/main.js"></script>
-  <script src="../js/calendar.js"></script>
-
-</body>
+		<script src="../js/layout.js"></script>
+		<script src="../js/main.js"></script>
+		<script src="../js/calendar.js"></script>
+	</body>
 </html>
