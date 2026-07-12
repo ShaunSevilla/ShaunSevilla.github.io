@@ -16,6 +16,7 @@
 		<main>
 			<!-- HERO -->
 			<section class="hero">
+				<img src="assets/Subject.png" alt="Shaun Sevilla in casual wear" class="hero-portrait hero-portrait-casual" />
 				<div class="hero-inner">
 					<p class="hero-tagline">
 						Computer Scientist <span>&middot;</span> Financial Advisor
@@ -25,11 +26,16 @@
 					<p class="hero-statement">
 						Hard work is not a strategy &mdash; it&rsquo;s a standard.
 					</p>
+					<a href="Pages/booking.html" class="hero-booking-link">
+						Book a Consultation <i class="fas fa-arrow-right"></i>
+					</a>
 				</div>
+				<img src="assets/hero-suit-cutout.png" alt="Shaun Sevilla in professional attire" class="hero-portrait hero-portrait-professional" />
 				<div class="hero-scroll">Scroll</div>
 			</section>
 
 			<!-- WHAT I DO -->
+			<div class="home-profile-grid">
 			<section id="work">
 				<div class="container">
 					<span class="section-label">What I Do</span>
@@ -39,12 +45,9 @@
 						<a href="Pages/software-development.html" class="pillar-card-link">
 							<div class="pillar-card">
 								<div class="pillar-icon"><i class="fas fa-code"></i></div>
-								<div class="pillar-title">Software Development</div>
+								<h3 class="pillar-title">Software Development</h3>
 								<p class="pillar-text">
-									Pursuing a Computer Science degree at University of London
-									(SIM). I build full-stack projects, automate workflows, and
-									push myself to learn something new every day. Relentless about
-									getting better.
+									Practical web and app products, built cleanly and shipped with intent.
 								</p>
 								<span class="pillar-link"
 									>View Details <i class="fas fa-arrow-right"></i
@@ -55,12 +58,9 @@
 						<a href="Pages/financial-advisory.html" class="pillar-card-link">
 							<div class="pillar-card">
 								<div class="pillar-icon"><i class="fas fa-chart-line"></i></div>
-								<div class="pillar-title">Financial Advisory</div>
+								<h3 class="pillar-title">Financial Advisory</h3>
 								<p class="pillar-text">
-									Financial Advisor at AIA, building a sustainable portfolio of
-									insurance and investments. I also built @ProsperityPath_bot, a
-									Telegram bot that calculates optimal financial allocations
-									based on disposable income.
+									Clear protection and investment plans built around real goals.
 								</p>
 								<span class="pillar-link"
 									>View Details <i class="fas fa-arrow-right"></i
@@ -71,12 +71,9 @@
 						<a href="Pages/fitness-sports.html" class="pillar-card-link">
 							<div class="pillar-card">
 								<div class="pillar-icon"><i class="fas fa-dumbbell"></i></div>
-								<div class="pillar-title">Fitness &amp; Sport</div>
+								<h3 class="pillar-title">Fitness &amp; Sport</h3>
 								<p class="pillar-text">
-									Push Pull Legs &mdash; six days a week, no exceptions.
-									Discipline in the gym is the same discipline I bring to
-									everything else. Former captain of the Temasek Polytechnic
-									Wakeboard Team.
+									HYROX, basketball, swimming, golf and five training days a week.
 								</p>
 								<span class="pillar-link"
 									>View Details <i class="fas fa-arrow-right"></i
@@ -87,34 +84,60 @@
 				</div>
 			</section>
 
-			<section class="detail-section">
+			<!-- EDUCATION & EXPERIENCE -->
+			<section id="credentials">
 				<div class="container">
-					<span class="section-label">Live Calendar</span>
-					<h2 class="section-title">Current Schedule</h2>
+					<span class="section-label">Background</span>
+					<h2 class="section-title">Education &amp; Experience</h2>
 					<div class="section-line"></div>
-					<div id="calendar" class="calendar-container">
-						<p class="calendar-loading">Loading calendar...</p>
+					<div class="timeline">
+						<div class="timeline-entry">
+							<p class="tl-date">2026 &ndash; Present</p>
+							<p class="tl-school">Financial Advisor</p>
+							<p class="tl-degree">AIA Singapore</p>
+						</div>
+						<div class="timeline-entry">
+							<p class="tl-date">2023 &ndash; 2026</p>
+							<p class="tl-school">University of London, SIM</p>
+						</div>
+						<div class="timeline-entry">
+							<p class="tl-date">2021 &ndash; 2022</p>
+							<p class="tl-school">Singapore Armed Forces, Commandos</p>
+							<p class="tl-degree">National Service &middot; Leadership &amp; Operations</p>
+						</div>
+						<div class="timeline-entry">
+							<p class="tl-date">2018 &ndash; 2021</p>
+							<p class="tl-school">Temasek Polytechnic</p>
+							<p class="tl-degree">Business, HR &amp; Tourism</p>
+						</div>
+						<div class="timeline-entry">
+							<p class="tl-date">2013 &ndash; 2017</p>
+							<p class="tl-school">Greenview Secondary School</p>
+							<p class="tl-degree">GCE O &amp; N Level</p>
+						</div>
+						<div class="timeline-entry">
+							<p class="tl-date">2006 &ndash; 2012</p>
+							<p class="tl-school">Pasir Ris Primary School</p>
+							<p class="tl-degree">PSLE</p>
+						</div>
 					</div>
 				</div>
 			</section>
+			</div>
 
-			<section class="detail-section advisory-layout">
-				<div class="container">
-					<span class="section-label">Live Markets</span>
-					<h2 class="section-title">Indicators Dashboard</h2>
-					<div class="section-line"></div>
-					<p class="detail-intro">
-						Live macro and market indicators from FRED that I use in planning
-						and portfolio conversations.
-					</p>
-					<div class="indicator-pillars" aria-label="Indicator pillars">
-						<div class="indicator-pillar">Inflation</div>
-						<div class="indicator-pillar">Labour Market</div>
-						<div class="indicator-pillar">Economic Activity</div>
-						<div class="indicator-pillar">Business Surveys</div>
+			<div class="home-overview">
+			<section class="consultation-cta">
+				<div class="container consultation-cta-inner">
+					<div>
+						<span class="section-label">Consultation Hours</span>
+						<h2>Let&rsquo;s make a clear plan.</h2>
+						<p>Focused two-hour sessions. Singapore Time.</p>
 					</div>
-					<div id="fred-indicators" class="fred-dashboard">
-						<p class="fred-loading">Loading indicators...</p>
+					<div class="consultation-actions">
+						<div class="consultation-hours" aria-label="Typical consultation hours">
+							<span>8&ndash;10am</span><span>12&ndash;2pm</span><span>2&ndash;4pm</span><span>8&ndash;10pm</span>
+						</div>
+						<a href="Pages/booking.html" class="bot-cta-link">View Live Availability <i class="fas fa-arrow-right"></i></a>
 					</div>
 				</div>
 			</section>
@@ -141,44 +164,13 @@
 					</div>
 				</div>
 			</section>
+			</div>
 
-			<!-- EDUCATION -->
-			<section id="credentials">
-				<div class="container">
-					<span class="section-label">Background</span>
-					<h2 class="section-title">Education</h2>
-					<div class="section-line"></div>
-					<div class="timeline">
-						<div class="timeline-entry">
-							<p class="tl-date">2023 &ndash; 2026</p>
-							<p class="tl-school">University of London, SIM</p>
-							<p class="tl-degree">Bachelor of Science, Computer Science</p>
-						</div>
-						<div class="timeline-entry">
-							<p class="tl-date">2018 &ndash; 2021</p>
-							<p class="tl-school">Temasek Polytechnic</p>
-							<p class="tl-degree">Diploma in Business, HR &amp; Tourism</p>
-						</div>
-						<div class="timeline-entry">
-							<p class="tl-date">2013 &ndash; 2017</p>
-							<p class="tl-school">Greenview Secondary School</p>
-							<p class="tl-degree">GCE O &amp; N Level</p>
-						</div>
-						<div class="timeline-entry">
-							<p class="tl-date">2006 &ndash; 2012</p>
-							<p class="tl-school">Pasir Ris Primary School</p>
-							<p class="tl-degree">PSLE</p>
-						</div>
-					</div>
-				</div>
-			</section>
 		</main>
 
 		<footer id="site-footer" class="site-footer"></footer>
 
 		<script src="js/layout.js"></script>
 		<script src="js/main.js"></script>
-		<script src="js/calendar.js"></script>
-		<script src="js/fred-indicators.js"></script>
 	</body>
 </html>

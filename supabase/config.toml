@@ -1,0 +1,4 @@
+project_id = "rubfkxwhieqwqjeaoszi"
+
+[functions.sync-booking-to-notion]
+verify_jwt = false

@@ -1,36 +1,42 @@
-# Personal Website
+# Shaun Sevilla — Personal Website
 
-This project is a personal website designed with a clean aesthetic using a dark nude color scheme. It serves as a portfolio to showcase individual projects, provide contact information, and share personal details.
+A static personal portfolio hosted with GitHub Pages. The site presents Shaun's
+software-development work, financial-advisory practice, fitness interests,
+education, leadership experience, and contact information.
 
-## Project Structure
+## Pages
 
-The project consists of the following files and directories:
+- `index.html` — homepage and overview
+- `Pages/software-development.html` — capabilities, Telegram bot, and live GitHub preview
+- `Pages/financial-advisory.html` — advisory approach and consultation booking
+- `Pages/sg-money-guide.html` — Singapore money fundamentals and official resources
+- `Pages/fitness-sports.html` — training and sports background
+- `Pages/contact.html` — email and social links
+- `Pages/booking.html` — live Supabase consultation booking
 
-- **index.html**: The main HTML file for the website, containing the structure of the homepage and links to the CSS and JavaScript files.
-- **about.html**: An HTML file that provides information about the individual or project, following the same structure as index.html.
-- **contact.html**: This HTML file includes a contact form or contact information, maintaining the same layout as index.html.
-- **projects.html**: An HTML file that showcases projects or portfolio items, adhering to the layout of the other HTML files.
-- **css/style.css**: The base CSS file for the website, including typography, layout, and the dark nude color scheme.
-- **css/dark-theme.css**: Additional CSS for a dark theme, enhancing the website's aesthetic.
-- **js/main.js**: JavaScript file that manages interactive elements on the website, such as form submissions and dynamic content loading.
-- **assets/fonts**: Directory containing font files used in the website for consistent typography.
-- **assets/icons**: Directory holding icon files used throughout the website, contributing to the overall design.
-- **.gitignore**: Specifies files and directories to be ignored by Git, such as node_modules or build files.
+## Shared files
 
-## Setup Instructions
+- `css/style.css` — site-wide theme, layout, components, and responsive styles
+- `js/layout.js` — shared navigation and footer
+- `js/main.js` — mobile navigation behavior
+- `js/software-github.js` — GitHub profile and repository preview
+- `js/booking.js` — availability and booking form behavior
+- `supabase/migrations/001_create_consultation_bookings.sql` — clean booking database installation
+- `supabase/functions/sync-booking-to-notion/index.ts` — one-way Notion booking synchronization
 
-1. Clone the repository to your local machine.
-2. Open the project in your preferred code editor.
-3. Open `index.html` in a web browser to view the website.
-4. Customize the content in the HTML files as needed.
+## Running locally
 
-## Features
+Serve the repository through a local HTTP server so browser requests behave like
+they do on GitHub Pages:
 
-- Responsive design that adapts to different screen sizes.
-- Clean and modern aesthetic with a dark nude color scheme.
-- Interactive elements powered by JavaScript.
-- Easy navigation between different sections of the website.
+```sh
+python3 -m http.server 8000
+```
 
-## License
+Then open `http://localhost:8000`.
 
-This project is open-source and available for anyone to use and modify.
+## External services
+
+The site loads fonts and icons from external CDNs and retrieves live profile data
+from GitHub. The GitHub section shows an error message if the service is
+unavailable.

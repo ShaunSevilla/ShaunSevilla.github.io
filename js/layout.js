@@ -2,6 +2,16 @@
 	function buildNav(root, page) {
 		const links = [
 			{
+				key: "home",
+				label: "Home",
+				href: `${root}/index.html`,
+			},
+			{
+				key: "booking",
+				label: "Book",
+				href: `${root}/Pages/booking.html`,
+			},
+			{
 				key: "software",
 				label: "Software",
 				href: `${root}/Pages/software-development.html`,
@@ -15,11 +25,6 @@
 				key: "fitness",
 				label: "Fitness",
 				href: `${root}/Pages/fitness-sports.html`,
-			},
-			{
-				key: "schedule",
-				label: "Schedule",
-				href: `${root}/Pages/schedule.html`,
 			},
 			{
 				key: "contact",
@@ -38,7 +43,7 @@
 		return `
 			<div class="nav-inner">
 				<a href="${root}/index.html" class="nav-logo">SS</a>
-				<button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle navigation">
+				<button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle navigation" aria-controls="nav-links" aria-expanded="false">
 					<span></span><span></span><span></span>
 				</button>
 				<ul class="nav-links" id="nav-links">

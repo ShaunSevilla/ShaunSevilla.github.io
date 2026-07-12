@@ -29,7 +29,6 @@ function renderGithubPreview(user, repos) {
 
 	el.innerHTML = `
 		<div class="github-preview-head">
-			<img src="${user.avatar_url}" alt="${user.login}" />
 			<div>
 				<h3 class="github-preview-name">${user.name || user.login}</h3>
 				<p class="github-preview-handle">@${user.login}</p>

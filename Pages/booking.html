@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Book a Consultation | Shaun Sevilla</title>
+		<link rel="stylesheet" href="../css/style.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+	</head>
+	<body data-root=".." data-page="booking">
+		<nav id="site-nav"></nav>
+
+		<main>
+			<section class="detail-hero booking-hero">
+				<div class="container">
+					<span class="section-label">Let&rsquo;s Talk</span>
+					<h1 class="section-title">Book a Consultation</h1>
+					<div class="section-line"></div>
+					<p class="detail-intro">
+						Choose a two-hour consultation window and tell me what you would
+						like to discuss. Available times update automatically.
+					</p>
+				</div>
+			</section>
+
+			<section class="detail-section booking-section">
+				<div class="container booking-layout">
+					<div class="booking-picker">
+						<div class="booking-step">
+							<span class="booking-step-number">01</span>
+							<div>
+								<h2>Choose a date</h2>
+								<p>Weekday availability for the next two weeks.</p>
+							</div>
+						</div>
+						<div id="booking-dates" class="booking-dates" aria-label="Available dates"></div>
+
+						<div class="booking-step" id="booking-time-step">
+							<span class="booking-step-number">02</span>
+							<div>
+								<h2>Choose a time</h2>
+								<p>Booked consultations are unavailable automatically.</p>
+							</div>
+						</div>
+						<div id="booking-times" class="booking-times" aria-label="Available times"></div>
+					</div>
+
+					<form id="booking-form" class="booking-form">
+						<div class="booking-step" id="booking-details-step">
+							<span class="booking-step-number">03</span>
+							<div>
+								<h2>Your details</h2>
+								<p>I&rsquo;ll use these details only for your consultation.</p>
+							</div>
+						</div>
+
+						<label>
+							<span>Name</span>
+							<input type="text" name="name" autocomplete="name" minlength="2" maxlength="100" placeholder="Shaun Sevilla" required />
+						</label>
+						<label>
+							<span>Phone number or Telegram handle</span>
+							<input type="text" name="contact" autocomplete="tel" minlength="3" maxlength="100" placeholder="9123 4567 or @username" required />
+						</label>
+						<label>
+							<span>What would you like to discuss? <em>Optional</em></span>
+							<textarea name="notes" rows="4" maxlength="1000"></textarea>
+						</label>
+						<label class="booking-honeypot" aria-hidden="true">
+							<span>Website</span>
+							<input type="text" name="website" tabindex="-1" autocomplete="off" />
+						</label>
+						<button id="booking-submit" class="booking-submit" type="submit" disabled>
+							Confirm Consultation
+						</button>
+						<p id="booking-status" class="booking-status" role="status" aria-live="polite"></p>
+					</form>
+				</div>
+			</section>
+		</main>
+
+		<footer id="site-footer" class="site-footer"></footer>
+		<script src="../js/layout.js"></script>
+		<script src="../js/main.js"></script>
+		<script src="../js/booking.js"></script>
+	</body>
+</html>
