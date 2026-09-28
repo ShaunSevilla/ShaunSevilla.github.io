@@ -47,11 +47,93 @@
 
 			<section class="compound-calculator-section">
 				<div class="container">
+					<span class="section-label">Try It Yourself</span>
+					<h2 class="calculators-heading">Run the numbers.</h2>
+					<p class="calculator-intro">Same rates and rules as the ProsperityPath bot. Tap a calculator to open it.</p>
+
 					<details class="calculator-dropdown">
 						<summary>
 							<div>
-								<span class="section-label">Try It Yourself</span>
-								<h2>Compound Interest Calculator</h2>
+								<h3><i class="fas fa-house" aria-hidden="true"></i> HDB Loan Calculator</h3>
+								<p>Concessionary loan downpayment, CPF usable and monthly instalment.</p>
+							</div>
+							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
+						</summary>
+						<div class="calculator-dropdown-body">
+							<article class="calculator-card">
+								<p class="calculator-card-note">Assumes the HDB concessionary loan (75% LTV / 25% downpayment, rate pegged 0.1% above CPF OA).</p>
+								<form class="booking-form calculator-form" id="hdb-loan-form">
+									<label><span>Flat purchase price ($)</span><input type="number" id="hdb-price" min="0" step="1000" placeholder="500000" required /></label>
+									<p class="calculator-field-hint" id="hdb-price-hint"></p>
+									<label><span>CPF Ordinary Account available ($)</span><input type="number" id="hdb-cpf" min="0" step="1000" placeholder="80000" required /></label>
+									<p class="calculator-field-hint" id="hdb-cpf-hint"></p>
+									<label><span>Cash for downpayment ($)</span><input type="number" id="hdb-cash" min="0" step="1000" placeholder="10000" required /></label>
+									<p class="calculator-field-hint" id="hdb-cash-hint"></p>
+									<label><span>Loan tenure (years, max 25)</span><input type="number" id="hdb-years" min="1" max="25" step="1" placeholder="25" required /></label>
+									<button type="submit" class="booking-submit">Calculate</button>
+									<p class="booking-status" id="hdb-status" role="status"></p>
+								</form>
+								<div class="calculator-result" id="hdb-result" hidden></div>
+							</article>
+						</div>
+					</details>
+
+					<details class="calculator-dropdown">
+						<summary>
+							<div>
+								<h3><i class="fas fa-piggy-bank" aria-hidden="true"></i> CPF Growth Calculator</h3>
+								<p>Projects your OA, SA/RA and MediSave balances forward over time.</p>
+							</div>
+							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
+						</summary>
+						<div class="calculator-dropdown-body">
+							<article class="calculator-card">
+								<p class="calculator-card-note">Uses today's CPF contribution, allocation and interest rules.</p>
+								<form class="booking-form calculator-form" id="cpf-form">
+									<label><span>Current age</span><input type="number" id="cpf-age" min="16" max="90" step="1" placeholder="30" required /></label>
+									<label><span>Monthly income before CPF deductions ($)</span><input type="number" id="cpf-wage" min="0" step="100" placeholder="5000" required /></label>
+									<label><span>Current CPF Ordinary Account (OA) balance ($)</span><input type="number" id="cpf-oa" min="0" step="1000" placeholder="20000" required /></label>
+									<label><span id="cpf-sa-label">Current CPF Special Account (SA) balance ($)</span><input type="number" id="cpf-sa" min="0" step="1000" placeholder="15000" required /></label>
+									<label><span>Current MediSave Account (MA) balance ($)</span><input type="number" id="cpf-ma" min="0" step="1000" placeholder="10000" required /></label>
+									<label><span>Project until age</span><input type="number" id="cpf-target-age" min="17" max="150" step="1" placeholder="65" required /></label>
+									<button type="submit" class="booking-submit">Calculate</button>
+									<p class="booking-status" id="cpf-status" role="status"></p>
+								</form>
+								<div class="calculator-result" id="cpf-result" hidden></div>
+							</article>
+						</div>
+					</details>
+
+					<details class="calculator-dropdown">
+						<summary>
+							<div>
+								<h3><i class="fas fa-car" aria-hidden="true"></i> Vehicle Loan Calculator</h3>
+								<p>MAS loan-to-value caps and monthly instalment on a flat-rate car loan.</p>
+							</div>
+							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
+						</summary>
+						<div class="calculator-dropdown-body">
+							<article class="calculator-card">
+								<p class="calculator-card-note">Uses MAS's loan-to-value caps (70% of price if OMV ≤ $20,000, else 60%) and 7-year tenure cap. Car loans are quoted as a flat rate, not reducing balance.</p>
+								<form class="booking-form calculator-form" id="vehicle-loan-form">
+									<label><span>Purchase price ($)</span><input type="number" id="vehicle-price" min="0" step="1000" placeholder="120000" required /></label>
+									<label><span>Open Market Value / OMV ($)</span><input type="number" id="vehicle-omv" min="0" step="500" placeholder="25000" required /></label>
+									<p class="calculator-field-hint" id="vehicle-omv-hint"></p>
+									<label><span>Downpayment ($)</span><input type="number" id="vehicle-downpayment" min="0" step="1000" placeholder="55000" required /></label>
+									<label><span>Loan tenure (years, max 7)</span><input type="number" id="vehicle-years" min="1" max="7" step="1" placeholder="7" required /></label>
+									<label><span>Quoted interest rate (% p.a., flat)</span><input type="number" id="vehicle-rate" min="0" step="0.01" placeholder="2.78" required /></label>
+									<button type="submit" class="booking-submit">Calculate</button>
+									<p class="booking-status" id="vehicle-status" role="status"></p>
+								</form>
+								<div class="calculator-result" id="vehicle-result" hidden></div>
+							</article>
+						</div>
+					</details>
+
+					<details class="calculator-dropdown">
+						<summary>
+							<div>
+								<h3><i class="fas fa-chart-line" aria-hidden="true"></i> Compound Interest Calculator</h3>
 								<p>See how a starting amount and regular yearly contributions could grow over time.</p>
 							</div>
 							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
@@ -70,6 +152,8 @@
 							</article>
 						</div>
 					</details>
+
+					<p class="money-guide-disclaimer">Projections only, based on today's published rates and rules, which can change. Doesn't check Mortgage Servicing Ratio, Total Debt Servicing Ratio, age-based loan tenure caps, or a bank loan's lower rate but 5% minimum-cash rule. The CPF calculator uses only your stated monthly wage (excludes bonus/AWS), assumes your Special Account moves fully into your Retirement Account at 55 without modelling the Full Retirement Sum cap, and caps MediSave at the $79,000 Basic Healthcare Sum. Not personalised advice.</p>
 				</div>
 			</section>
 
@@ -89,6 +173,8 @@
 
 		<script src="../js/layout.js"></script>
 		<script src="../js/main.js"></script>
+		<script src="../js/loan-calculators.js"></script>
+		<script src="../js/cpf-calculator.js"></script>
 		<script src="../js/compound-calculator.js"></script>
 	</body>
 </html>

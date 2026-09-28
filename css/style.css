@@ -1476,13 +1476,26 @@ section {
 	font-size: clamp(1.5rem, 3vw, 2.3rem);
 }
 
-/* COMPOUND INTEREST CALCULATOR DROPDOWN */
+/* PAGE CALCULATORS (dropdowns) */
 .compound-calculator-section {
 	padding: 0 0 var(--section-space);
 }
 
+.calculators-heading {
+	font-size: clamp(2rem, 4vw, 3.2rem);
+	margin: 0.3rem 0 0.6rem;
+}
+
+.compound-calculator-section > .container > .calculator-intro {
+	margin-bottom: 2rem;
+}
+
 .calculator-dropdown {
-	border-block: 1px solid var(--border);
+	border-bottom: 1px solid var(--border);
+}
+
+.calculator-dropdown:first-of-type {
+	border-top: 1px solid var(--border);
 }
 
 .calculator-dropdown summary {
@@ -1490,7 +1503,7 @@ section {
 	align-items: center;
 	justify-content: space-between;
 	gap: 2rem;
-	padding-block: 2.25rem;
+	padding-block: 1.75rem;
 	cursor: pointer;
 	list-style: none;
 	transition: border-color var(--transition), background var(--transition);
@@ -1504,14 +1517,24 @@ section {
 	background: var(--gold-faint);
 }
 
-.calculator-dropdown summary h2 {
-	font-size: clamp(1.6rem, 3vw, 2.4rem);
+.calculator-dropdown summary h2,
+.calculator-dropdown summary h3 {
+	font-size: clamp(1.2rem, 2.4vw, 1.6rem);
 	margin: 0.2rem 0 0.35rem;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.calculator-dropdown summary h2 i,
+.calculator-dropdown summary h3 i {
+	color: var(--gold);
 }
 
 .calculator-dropdown summary p {
 	color: var(--text-muted);
 	margin: 0;
+	font-size: 0.9rem;
 }
 
 .calculator-dropdown-icon {
