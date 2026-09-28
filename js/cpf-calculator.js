@@ -4,10 +4,17 @@
 	// CPF contribution, allocation and interest rules, effective 1 January 2026.
 	// Sources: cpf.gov.sg "CPF Contribution Rates from 1 Jan 2026" and "CPF
 	// Allocation Rates from 1 Jan 2026" (official PDFs), cpf.gov.sg "How much
-	// extra interest can I earn on my CPF savings?", and the CPF Board's Jan
-	// 2026 Basic Healthcare Sum announcement.
+	// extra interest can I earn on my CPF savings?", cpf.gov.sg's Jan 2026
+	// Basic Healthcare Sum announcement, and cpf.gov.sg's Full Retirement Sum
+	// and "closure of the Special Account" pages.
 	const CPF_OW_CEILING = 8000;
 	const CPF_BHS = 79000;
+	// Full Retirement Sum for the 2026 cohort. Used to cap (a) the one-time
+	// SA-to-RA transfer at 55 (SA first, then OA; excess parks in OA) and
+	// (b) MediSave-overflow that's redirected to SA/RA "to help set aside
+	// your FRS" before it spills into OA. Held fixed rather than projected
+	// forward, since the FRS itself is reviewed and typically rises most years.
+	const CPF_FRS = 220400;
 	const CPF_OA_INTEREST_RATE = 0.025;
 	const CPF_SA_MA_RA_INTEREST_RATE = 0.04;
 	const CPF_EXTRA_INTEREST_OA_CAP = 20000;
@@ -101,10 +108,23 @@
 				ra += middleAdd;
 			}
 
+			// SA closure at 55: SA is transferred into RA first, then OA
+			// tops it up, capped at the Full Retirement Sum — anything
+			// above that stays in / moves to OA instead of RA.
 			const redirectToRa = ageNow >= 55;
 			if (redirectToRa && sa > 0) {
-				ra += sa;
+				const spaceInRa = Math.max(CPF_FRS - ra, 0);
+				const fromSa = Math.min(sa, spaceInRa);
+				ra += fromSa;
+				oa += sa - fromSa;
 				sa = 0;
+
+				const remainingSpace = Math.max(CPF_FRS - ra, 0);
+				if (remainingSpace > 0 && oa > 0) {
+					const fromOa = Math.min(oa, remainingSpace);
+					ra += fromOa;
+					oa -= fromOa;
+				}
 			}
 
 			const extra = computeMonthlyExtraInterest({ ra, oa, sa, ma }, ageNow);
@@ -117,13 +137,22 @@
 				sa += sa * (CPF_SA_MA_RA_INTEREST_RATE / 12) + extra.sa + extra.oa;
 			}
 
+			// MediSave is capped at the Basic Healthcare Sum; overflow is
+			// redirected to SA/RA to help set aside the Full Retirement
+			// Sum, then spills into OA once that's reached.
 			if (ma > CPF_BHS) {
 				const overflow = ma - CPF_BHS;
 				ma = CPF_BHS;
 				if (redirectToRa) {
-					ra += overflow;
+					const space = Math.max(CPF_FRS - ra, 0);
+					const toRa = Math.min(overflow, space);
+					ra += toRa;
+					oa += overflow - toRa;
 				} else {
-					sa += overflow;
+					const space = Math.max(CPF_FRS - sa, 0);
+					const toSa = Math.min(overflow, space);
+					sa += toSa;
+					oa += overflow - toSa;
 				}
 			}
 
@@ -134,18 +163,6 @@
 		}
 
 		return { yearly };
-	}
-
-	function pickSnapshotIndices(count) {
-		const indices = [];
-		for (let i = 0; i < Math.min(count, 10); i += 1) indices.push(i);
-		for (let i = 14; i < count - 1; i += 5) indices.push(i);
-		if (count - 1 >= 10 && indices[indices.length - 1] !== count - 1) indices.push(count - 1);
-		return indices;
-	}
-
-	function resultRow(label, value) {
-		return `<div class="calculator-result-row"><span>${label}</span><strong>${value}</strong></div>`;
 	}
 
 	function setStatus(el, message, isError) {
@@ -161,6 +178,62 @@
 		label.textContent = age >= 55
 			? "Current CPF Retirement Account (RA) balance ($)"
 			: "Current CPF Special Account (SA) balance ($)";
+	}
+
+	let cpfChartInstance = null;
+
+	function renderChart(yearly) {
+		const canvas = document.getElementById("cpf-chart-canvas");
+		if (!canvas || typeof Chart === "undefined") return;
+
+		const labels = yearly.map((y) => Math.round(y.age));
+		const oaData = yearly.map((y) => Math.round(y.oa));
+		const saRaData = yearly.map((y) => Math.round(y.sa + y.ra));
+		const maData = yearly.map((y) => Math.round(y.ma));
+
+		if (cpfChartInstance) {
+			cpfChartInstance.destroy();
+		}
+
+		cpfChartInstance = new Chart(canvas.getContext("2d"), {
+			type: "line",
+			data: {
+				labels,
+				datasets: [
+					{ label: "OA", data: oaData, borderColor: "#c9a84c", backgroundColor: "rgba(201, 168, 76, 0.16)", fill: true, tension: 0.25, pointRadius: 0, borderWidth: 2 },
+					{ label: "SA / RA", data: saRaData, borderColor: "#6fae9c", backgroundColor: "rgba(111, 174, 156, 0.16)", fill: true, tension: 0.25, pointRadius: 0, borderWidth: 2 },
+					{ label: "MediSave", data: maData, borderColor: "#b0764c", backgroundColor: "rgba(176, 118, 76, 0.16)", fill: true, tension: 0.25, pointRadius: 0, borderWidth: 2 },
+				],
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				interaction: { mode: "index", intersect: false },
+				plugins: {
+					legend: { labels: { color: "#c9c4b4", boxWidth: 12, font: { family: "inherit" } } },
+					tooltip: {
+						callbacks: {
+							title: (items) => `Age ${items[0].label}`,
+							label: (item) => `${item.dataset.label}: ${formatCurrency(item.parsed.y)}`,
+						},
+					},
+				},
+				scales: {
+					x: {
+						title: { display: true, text: "Age", color: "#888888" },
+						ticks: { color: "#888888" },
+						grid: { color: "rgba(255, 255, 255, 0.06)" },
+					},
+					y: {
+						ticks: {
+							color: "#888888",
+							callback: (v) => (v >= 1000 ? `$${Math.round(v / 1000)}k` : `$${v}`),
+						},
+						grid: { color: "rgba(255, 255, 255, 0.06)" },
+					},
+				},
+			},
+		});
 	}
 
 	function initCpfCalculator() {
@@ -204,20 +277,16 @@
 
 			const projection = projectCpf({ currentAge, targetAge, monthlyWage, oaBalance, saOrRaBalance, maBalance });
 			const { yearly } = projection;
-			const indices = pickSnapshotIndices(yearly.length);
-
-			let rows = "";
-			for (const idx of indices) {
-				const snapshot = yearly[idx];
-				rows += resultRow(`Age ${Math.round(snapshot.age)}`, `OA ${formatCurrency(snapshot.oa)} · SA/RA ${formatCurrency(snapshot.sa + snapshot.ra)} · MA ${formatCurrency(snapshot.ma)} · Total ${formatCurrency(snapshot.total)}`);
-			}
-
 			const final = yearly[yearly.length - 1];
-			rows += resultRow(`At age ${targetAge}`, `Total ${formatCurrency(final.total)}`);
-			rows += `<p class="calculator-note">Wage used: ${formatCurrency(Math.min(monthlyWage, CPF_OW_CEILING))}/month (capped at the $${CPF_OW_CEILING.toLocaleString("en-SG")} OW ceiling). Assumes CPF contribution &amp; allocation rates effective 1 Jan 2026; OA 2.5% p.a., SA/RA/MA 4% p.a.; extra interest of 1% on the first $60,000 combined balances (2%/1% tiers from age 55); your SA is assumed to move fully into RA at 55 (doesn't model the Full Retirement Sum cap); MediSave capped at the $79,000 Basic Healthcare Sum; based only on your stated wage (bonuses/AWS excluded). Educational estimate only, not financial advice.</p>`;
 
-			resultBox.innerHTML = rows;
+			resultBox.innerHTML =
+				`<div class="cpf-chart-wrap"><canvas id="cpf-chart-canvas" height="240"></canvas></div>` +
+				`<div class="calculator-result-row"><span>At age ${targetAge}</span><strong>${formatCurrency(final.total)}</strong></div>` +
+				`<div class="calculator-result-row"><span>OA · SA/RA · MediSave</span><strong>${formatCurrency(final.oa)} · ${formatCurrency(final.sa + final.ra)} · ${formatCurrency(final.ma)}</strong></div>` +
+				`<p class="calculator-note">Wage used: ${formatCurrency(Math.min(monthlyWage, CPF_OW_CEILING))}/month (capped at the $${CPF_OW_CEILING.toLocaleString("en-SG")} OW ceiling). Assumes CPF contribution &amp; allocation rates effective 1 Jan 2026; OA 2.5% p.a., SA/RA/MA 4% p.a.; extra interest of 1% on the first $60,000 combined balances (2%/1% tiers from age 55). At 55, SA moves into RA (SA first, then OA) up to the Full Retirement Sum — $220,400 for the 2026 cohort, held fixed rather than projected forward — with the rest parked in OA. MediSave is capped at the $79,000 Basic Healthcare Sum, with any excess flowing to SA/RA up to the FRS, then to OA. Based only on your stated wage (bonuses/AWS excluded). Educational estimate only, not financial advice.</p>`;
+
 			resultBox.hidden = false;
+			renderChart(yearly);
 		});
 	}
 

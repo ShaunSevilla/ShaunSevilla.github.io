@@ -65,11 +65,11 @@
 							<article class="calculator-card">
 								<p class="calculator-card-note">Assumes the HDB concessionary loan (75% LTV / 25% downpayment, rate pegged 0.1% above CPF OA).</p>
 								<form class="booking-form calculator-form" id="hdb-loan-form">
-									<label><span>Flat purchase price ($)</span><input type="number" id="hdb-price" min="0" step="1000" placeholder="500000" required /></label>
+									<label><span>Flat purchase price ($)</span><input type="number" id="hdb-price" min="0" step="1" placeholder="500000" required /></label>
 									<p class="calculator-field-hint" id="hdb-price-hint"></p>
-									<label><span>CPF Ordinary Account available ($)</span><input type="number" id="hdb-cpf" min="0" step="1000" placeholder="80000" required /></label>
+									<label><span>CPF Ordinary Account available ($)</span><input type="number" id="hdb-cpf" min="0" step="1" placeholder="80000" required /></label>
 									<p class="calculator-field-hint" id="hdb-cpf-hint"></p>
-									<label><span>Cash for downpayment ($)</span><input type="number" id="hdb-cash" min="0" step="1000" placeholder="10000" required /></label>
+									<label><span>Cash for downpayment ($)</span><input type="number" id="hdb-cash" min="0" step="1" placeholder="10000" required /></label>
 									<p class="calculator-field-hint" id="hdb-cash-hint"></p>
 									<label><span>Loan tenure (years, max 25)</span><input type="number" id="hdb-years" min="1" max="25" step="1" placeholder="25" required /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
@@ -93,10 +93,10 @@
 								<p class="calculator-card-note">Uses today's CPF contribution, allocation and interest rules.</p>
 								<form class="booking-form calculator-form" id="cpf-form">
 									<label><span>Current age</span><input type="number" id="cpf-age" min="16" max="90" step="1" placeholder="30" required /></label>
-									<label><span>Monthly income before CPF deductions ($)</span><input type="number" id="cpf-wage" min="0" step="100" placeholder="5000" required /></label>
-									<label><span>Current CPF Ordinary Account (OA) balance ($)</span><input type="number" id="cpf-oa" min="0" step="1000" placeholder="20000" required /></label>
-									<label><span id="cpf-sa-label">Current CPF Special Account (SA) balance ($)</span><input type="number" id="cpf-sa" min="0" step="1000" placeholder="15000" required /></label>
-									<label><span>Current MediSave Account (MA) balance ($)</span><input type="number" id="cpf-ma" min="0" step="1000" placeholder="10000" required /></label>
+									<label><span>Monthly income before CPF deductions ($)</span><input type="number" id="cpf-wage" min="0" step="1" placeholder="5000" required /></label>
+									<label><span>Current CPF Ordinary Account (OA) balance ($)</span><input type="number" id="cpf-oa" min="0" step="1" placeholder="20000" required /></label>
+									<label><span id="cpf-sa-label">Current CPF Special Account (SA) balance ($)</span><input type="number" id="cpf-sa" min="0" step="1" placeholder="15000" required /></label>
+									<label><span>Current MediSave Account (MA) balance ($)</span><input type="number" id="cpf-ma" min="0" step="1" placeholder="10000" required /></label>
 									<label><span>Project until age</span><input type="number" id="cpf-target-age" min="17" max="150" step="1" placeholder="65" required /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="cpf-status" role="status"></p>
@@ -118,10 +118,10 @@
 							<article class="calculator-card">
 								<p class="calculator-card-note">Uses MAS's loan-to-value caps (70% of price if OMV ≤ $20,000, else 60%) and 7-year tenure cap. Car loans are quoted as a flat rate, not reducing balance.</p>
 								<form class="booking-form calculator-form" id="vehicle-loan-form">
-									<label><span>Purchase price ($)</span><input type="number" id="vehicle-price" min="0" step="1000" placeholder="120000" required /></label>
-									<label><span>Open Market Value / OMV ($)</span><input type="number" id="vehicle-omv" min="0" step="500" placeholder="25000" required /></label>
+									<label><span>Purchase price ($)</span><input type="number" id="vehicle-price" min="0" step="1" placeholder="120000" required /></label>
+									<label><span>Open Market Value / OMV ($)</span><input type="number" id="vehicle-omv" min="0" step="1" placeholder="25000" required /></label>
 									<p class="calculator-field-hint" id="vehicle-omv-hint"></p>
-									<label><span>Downpayment ($)</span><input type="number" id="vehicle-downpayment" min="0" step="1000" placeholder="55000" required /></label>
+									<label><span>Downpayment ($)</span><input type="number" id="vehicle-downpayment" min="0" step="1" placeholder="55000" required /></label>
 									<label><span>Loan tenure (years, max 7)</span><input type="number" id="vehicle-years" min="1" max="7" step="1" placeholder="7" required /></label>
 									<label><span>Quoted interest rate (% p.a., flat)</span><input type="number" id="vehicle-rate" min="0" step="0.01" placeholder="2.78" required /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
@@ -143,8 +143,8 @@
 						<div class="calculator-dropdown-body">
 							<article class="calculator-card">
 								<form class="booking-form calculator-form" id="compound-form">
-									<label><span>Starting amount ($)</span><input type="number" id="compound-principal" min="0" step="100" placeholder="10000" required /></label>
-									<label><span>Amount added each year ($)</span><input type="number" id="compound-addition" min="0" step="100" placeholder="3000" required /></label>
+									<label><span>Starting amount ($)</span><input type="number" id="compound-principal" min="0" step="1" placeholder="10000" required /></label>
+									<label><span>Amount added each year ($)</span><input type="number" id="compound-addition" min="0" step="1" placeholder="3000" required /></label>
 									<label><span>Number of years</span><input type="number" id="compound-years" min="1" step="1" placeholder="20" required /></label>
 									<label><span>Expected annual return (%)</span><input type="number" id="compound-rate" min="0" step="0.1" placeholder="6" required /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
@@ -176,6 +176,7 @@
 		<script src="../js/layout.js"></script>
 		<script src="../js/main.js"></script>
 		<script src="../js/loan-calculators.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 		<script src="../js/cpf-calculator.js"></script>
 		<script src="../js/compound-calculator.js"></script>
 	</body>

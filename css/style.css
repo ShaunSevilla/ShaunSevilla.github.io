@@ -1779,6 +1779,12 @@ section {
 	border-top: 1px solid var(--gold-dim);
 }
 
+.cpf-chart-wrap {
+	position: relative;
+	height: 240px;
+	margin-bottom: 1rem;
+}
+
 .calculator-result-row {
 	display: flex;
 	justify-content: space-between;
