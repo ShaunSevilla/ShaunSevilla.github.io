@@ -1581,6 +1581,82 @@ section {
 	margin-top: 0;
 }
 
+.money-guide-calculators {
+	border-top: 1px solid var(--border);
+}
+
+.calculator-intro {
+	color: var(--text-muted);
+	max-width: 46rem;
+	margin-top: 0.5rem;
+}
+
+.calculator-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--component-gap);
+	margin-top: 2rem;
+}
+
+.calculator-card {
+	border: 1px solid var(--border);
+	padding: 1.5rem;
+}
+
+.calculator-card h3 {
+	margin: 0 0 0.5rem;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.calculator-card h3 i {
+	color: var(--gold);
+}
+
+.calculator-card-note {
+	color: var(--text-muted);
+	font-size: 0.82rem;
+	margin-bottom: 1.25rem;
+}
+
+.calculator-form {
+	margin-bottom: 0;
+}
+
+.calculator-result {
+	margin-top: 1.5rem;
+	padding-top: 1.25rem;
+	border-top: 1px solid var(--gold-dim);
+}
+
+.calculator-result-row {
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.5rem 0;
+	border-bottom: 1px solid var(--border);
+	font-size: 0.88rem;
+}
+
+.calculator-result-row:last-of-type {
+	border-bottom: none;
+}
+
+.calculator-result-row span {
+	color: var(--text-muted);
+}
+
+.calculator-result-row strong {
+	text-align: right;
+}
+
+.calculator-note {
+	color: var(--text-muted);
+	font-size: 0.78rem;
+	margin-top: 1rem;
+}
+
 .money-guide-resources {
 	border-top: 1px solid var(--border);
 }
@@ -1840,6 +1916,10 @@ footer span {
 
 	.money-topic-points {
 		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.calculator-grid {
+		grid-template-columns: 1fr;
 	}
 
 }
