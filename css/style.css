@@ -1999,19 +1999,26 @@ footer span {
 		max-width: 76%;
 	}
 
+	/* Width is intentionally left auto: the box only sets a height, so the
+	   image renders at its own natural aspect ratio and is never stretched
+	   into a box shaped for a different photo — a tall, narrow full-body
+	   cutout and a wide, cropped bust shot both end up fully on screen,
+	   just anchored to the right edge, behind the heading text. */
 	.page-hero-photo {
 		position: absolute;
-		top: 1.5rem;
-		right: -16%;
+		top: 1rem;
+		right: -3%;
 		bottom: auto;
 		left: auto;
-		width: 68%;
-		height: clamp(280px, 50vw, 380px);
-		opacity: 0.55;
+		width: auto;
+		height: clamp(220px, 42vw, 320px);
+		opacity: 0.5;
 		z-index: 1;
 	}
 
 	.page-hero-photo img {
+		width: auto;
+		height: 100%;
 		object-position: right top;
 	}
 
@@ -2128,11 +2135,10 @@ footer span {
 	}
 
 	.page-hero-photo {
-		top: 1.5rem;
-		right: -26%;
-		width: 88%;
-		height: 300px;
-		opacity: 0.5;
+		top: 0.75rem;
+		right: -2%;
+		height: 230px;
+		opacity: 0.45;
 	}
 
 	.page-hero-grid > :first-child {
