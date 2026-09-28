@@ -1984,11 +1984,29 @@ footer span {
 
 	.page-hero-grid {
 		grid-template-columns: 1fr;
+		position: relative;
+	}
+
+	.page-hero-grid > :first-child {
+		position: relative;
+		z-index: 2;
+		max-width: 76%;
 	}
 
 	.page-hero-photo {
-		height: min(34vh, 300px);
-		order: -1;
+		position: absolute;
+		top: 1.5rem;
+		right: -16%;
+		bottom: auto;
+		left: auto;
+		width: 68%;
+		height: clamp(280px, 50vw, 380px);
+		opacity: 0.55;
+		z-index: 1;
+	}
+
+	.page-hero-photo img {
+		object-position: right top;
 	}
 
 	.fitness-hero-grid {
@@ -2104,7 +2122,15 @@ footer span {
 	}
 
 	.page-hero-photo {
-		height: min(26vh, 220px);
+		top: 1.5rem;
+		right: -26%;
+		width: 88%;
+		height: 300px;
+		opacity: 0.5;
+	}
+
+	.page-hero-grid > :first-child {
+		max-width: 82%;
 	}
 
 	.home-overview {
