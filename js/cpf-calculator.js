@@ -9,12 +9,21 @@
 	// and "closure of the Special Account" pages.
 	const CPF_OW_CEILING = 8000;
 	const CPF_BHS = 79000;
-	// Full Retirement Sum for the 2026 cohort. Used to cap (a) the one-time
-	// SA-to-RA transfer at 55 (SA first, then OA; excess parks in OA) and
-	// (b) MediSave-overflow that's redirected to SA/RA "to help set aside
-	// your FRS" before it spills into OA. Held fixed rather than projected
-	// forward, since the FRS itself is reviewed and typically rises most years.
+	// BHS has risen roughly 2.7%-6.6% a year over the past decade (2020:
+	// $60,000 to 2026: $79,000 is a ~4.7% CAGR); 5% p.a. projects it forward
+	// to the year each member turns 55.
+	const CPF_BHS_GROWTH_RATE = 0.05;
+	// Full Retirement Sum for the 2026 cohort. Used as the base year to cap
+	// (a) the one-time SA-to-RA transfer at 55 (SA first, then OA; excess
+	// parks in OA) and (b) MediSave-overflow that's redirected to SA/RA "to
+	// help set aside your FRS" before it spills into OA. Because the FRS
+	// keeps rising most years, it's projected forward (at CPF_FRS_GROWTH_RATE)
+	// to estimate the cap that will actually apply in the year each member
+	// turns 55, rather than holding today's figure fixed.
 	const CPF_FRS = 220400;
+	// FRS has been officially announced through the 2027 cohort ($228,200,
+	// up from $220,400 for 2026 — a confirmed 3.5% increase). Source: cpf.gov.sg.
+	const CPF_FRS_GROWTH_RATE = 0.035;
 	const CPF_OA_INTEREST_RATE = 0.025;
 	const CPF_SA_MA_RA_INTEREST_RATE = 0.04;
 	const CPF_EXTRA_INTEREST_OA_CAP = 20000;
@@ -55,6 +64,17 @@
 		return CPF_ALLOCATION_BANDS.find((band) => age <= band.maxAge) || CPF_ALLOCATION_BANDS[CPF_ALLOCATION_BANDS.length - 1];
 	}
 
+	// The FRS and BHS both rise most years, so using today's figures for
+	// someone still years away from 55 would understate the caps that will
+	// actually apply. Projects both sums forward to the year the member
+	// turns 55 (immediately, if they already have).
+	function estimateFrsAndBhsAt55(currentAge) {
+		const yearsUntil55 = Math.max(0, 55 - currentAge);
+		const frsAt55 = CPF_FRS * Math.pow(1 + CPF_FRS_GROWTH_RATE, yearsUntil55);
+		const bhsAt55 = CPF_BHS * Math.pow(1 + CPF_BHS_GROWTH_RATE, yearsUntil55);
+		return { yearsUntil55, frsAt55, bhsAt55 };
+	}
+
 	function computeMonthlyExtraInterest({ ra, oa, sa, ma }, age) {
 		const tiers = (age >= 55 ? CPF_EXTRA_INTEREST_55_PLUS : CPF_EXTRA_INTEREST_BELOW_55).map((tier) => ({ ...tier }));
 		const order = [
@@ -89,6 +109,10 @@
 		let sa = currentAge < 55 ? saOrRaBalance : 0;
 		let ra = currentAge >= 55 ? saOrRaBalance : 0;
 
+		// Use the FRS/BHS projected forward to the year this member turns
+		// 55, rather than today's figures, as the caps applied throughout.
+		const { frsAt55: frsCap, bhsAt55: bhsCap } = estimateFrsAndBhsAt55(currentAge);
+
 		const totalMonths = Math.round((targetAge - currentAge) * 12);
 		const yearly = [];
 
@@ -113,13 +137,13 @@
 			// above that stays in / moves to OA instead of RA.
 			const redirectToRa = ageNow >= 55;
 			if (redirectToRa && sa > 0) {
-				const spaceInRa = Math.max(CPF_FRS - ra, 0);
+				const spaceInRa = Math.max(frsCap - ra, 0);
 				const fromSa = Math.min(sa, spaceInRa);
 				ra += fromSa;
 				oa += sa - fromSa;
 				sa = 0;
 
-				const remainingSpace = Math.max(CPF_FRS - ra, 0);
+				const remainingSpace = Math.max(frsCap - ra, 0);
 				if (remainingSpace > 0 && oa > 0) {
 					const fromOa = Math.min(oa, remainingSpace);
 					ra += fromOa;
@@ -140,16 +164,16 @@
 			// MediSave is capped at the Basic Healthcare Sum; overflow is
 			// redirected to SA/RA to help set aside the Full Retirement
 			// Sum, then spills into OA once that's reached.
-			if (ma > CPF_BHS) {
-				const overflow = ma - CPF_BHS;
-				ma = CPF_BHS;
+			if (ma > bhsCap) {
+				const overflow = ma - bhsCap;
+				ma = bhsCap;
 				if (redirectToRa) {
-					const space = Math.max(CPF_FRS - ra, 0);
+					const space = Math.max(frsCap - ra, 0);
 					const toRa = Math.min(overflow, space);
 					ra += toRa;
 					oa += overflow - toRa;
 				} else {
-					const space = Math.max(CPF_FRS - sa, 0);
+					const space = Math.max(frsCap - sa, 0);
 					const toSa = Math.min(overflow, space);
 					sa += toSa;
 					oa += overflow - toSa;
@@ -162,7 +186,7 @@
 			}
 		}
 
-		return { yearly };
+		return { yearly, frsCap, bhsCap };
 	}
 
 	function setStatus(el, message, isError) {
@@ -276,14 +300,19 @@
 			}
 
 			const projection = projectCpf({ currentAge, targetAge, monthlyWage, oaBalance, saOrRaBalance, maBalance });
-			const { yearly } = projection;
+			const { yearly, frsCap, bhsCap } = projection;
 			const final = yearly[yearly.length - 1];
+
+			const allocation = getAllocation(currentAge);
+			const middleLabel = allocation.middleAccount === "RA" ? "RA" : "SA";
+			const yearsUntil55 = Math.max(0, 55 - currentAge);
+			const age55Label = currentAge >= 55 ? "now (55+)" : `age 55, in ${yearsUntil55} year${yearsUntil55 === 1 ? "" : "s"}`;
 
 			resultBox.innerHTML =
 				`<div class="cpf-chart-wrap"><canvas id="cpf-chart-canvas" height="240"></canvas></div>` +
 				`<div class="calculator-result-row"><span>At age ${targetAge}</span><strong>${formatCurrency(final.total)}</strong></div>` +
 				`<div class="calculator-result-row"><span>OA · SA/RA · MediSave</span><strong>${formatCurrency(final.oa)} · ${formatCurrency(final.sa + final.ra)} · ${formatCurrency(final.ma)}</strong></div>` +
-				`<p class="calculator-note">Wage used: ${formatCurrency(Math.min(monthlyWage, CPF_OW_CEILING))}/month (capped at the $${CPF_OW_CEILING.toLocaleString("en-SG")} OW ceiling). Assumes CPF contribution &amp; allocation rates effective 1 Jan 2026; OA 2.5% p.a., SA/RA/MA 4% p.a.; extra interest of 1% on the first $60,000 combined balances (2%/1% tiers from age 55). At 55, SA moves into RA (SA first, then OA) up to the Full Retirement Sum — $220,400 for the 2026 cohort, held fixed rather than projected forward — with the rest parked in OA. MediSave is capped at the $79,000 Basic Healthcare Sum, with any excess flowing to SA/RA up to the FRS, then to OA. Based only on your stated wage (bonuses/AWS excluded). Educational estimate only, not financial advice.</p>`;
+				`<p class="calculator-note">Wage used: ${formatCurrency(Math.min(monthlyWage, CPF_OW_CEILING))}/month (capped at the $${CPF_OW_CEILING.toLocaleString("en-SG")} OW ceiling). Assumes CPF contribution &amp; allocation rates effective 1 Jan 2026; OA 2.5% p.a., SA/RA/MA 4% p.a.; extra interest of 1% on the first $60,000 combined balances (2%/1% tiers from age 55). At your current age, monthly contributions split roughly ${Math.round(allocation.oa * 100)}% to OA, ${Math.round(allocation.middle * 100)}% to ${middleLabel}, and ${Math.round(allocation.ma * 100)}% to MediSave. Estimated at ${age55Label}: Full Retirement Sum &asymp; ${formatCurrency(frsCap)} (projected at 3.5% p.a. from the 2026 figure) and Basic Healthcare Sum &asymp; ${formatCurrency(bhsCap)} (projected at 5% p.a.). At 55, SA moves into RA (SA first, then OA) up to that projected Full Retirement Sum, with the rest parked in OA. MediSave is capped at the projected Basic Healthcare Sum, with any excess flowing to SA/RA up to the FRS, then to OA. Based only on your stated wage (bonuses/AWS excluded). Educational estimate only, not financial advice.</p>`;
 
 			resultBox.hidden = false;
 			renderChart(yearly);
