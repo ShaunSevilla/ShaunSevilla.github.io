@@ -47,6 +47,34 @@
 				</div>
 			</section>
 
+			<section class="compound-calculator-section">
+				<div class="container">
+					<details class="calculator-dropdown">
+						<summary>
+							<div>
+								<span class="section-label">Try It Yourself</span>
+								<h2>Compound Interest Calculator</h2>
+								<p>See how a starting amount and regular yearly contributions could grow over time.</p>
+							</div>
+							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
+						</summary>
+						<div class="calculator-dropdown-body">
+							<article class="calculator-card">
+								<form class="booking-form calculator-form" id="compound-form">
+									<label><span>Starting amount ($)</span><input type="number" id="compound-principal" min="0" step="100" placeholder="10000" required /></label>
+									<label><span>Amount added each year ($)</span><input type="number" id="compound-addition" min="0" step="100" placeholder="3000" required /></label>
+									<label><span>Number of years</span><input type="number" id="compound-years" min="1" step="1" placeholder="20" required /></label>
+									<label><span>Expected annual return (%)</span><input type="number" id="compound-rate" min="0" step="0.1" placeholder="6" required /></label>
+									<button type="submit" class="booking-submit">Calculate</button>
+									<p class="booking-status" id="compound-status" role="status"></p>
+								</form>
+								<div class="calculator-result" id="compound-result" hidden></div>
+							</article>
+						</div>
+					</details>
+				</div>
+			</section>
+
 			<section class="guide-entry">
 				<a href="sg-money-guide.html" class="container guide-entry-inner">
 					<div>
@@ -63,5 +91,6 @@
 
 		<script src="../js/layout.js"></script>
 		<script src="../js/main.js"></script>
+		<script src="../js/compound-calculator.js"></script>
 	</body>
 </html>

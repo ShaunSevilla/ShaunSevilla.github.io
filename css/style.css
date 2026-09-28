@@ -1445,6 +1445,64 @@ section {
 	font-size: clamp(1.5rem, 3vw, 2.3rem);
 }
 
+/* COMPOUND INTEREST CALCULATOR DROPDOWN */
+.compound-calculator-section {
+	padding: 0 0 var(--section-space);
+}
+
+.calculator-dropdown {
+	border-block: 1px solid var(--border);
+}
+
+.calculator-dropdown summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 2rem;
+	padding-block: 2.25rem;
+	cursor: pointer;
+	list-style: none;
+	transition: border-color var(--transition), background var(--transition);
+}
+
+.calculator-dropdown summary::-webkit-details-marker {
+	display: none;
+}
+
+.calculator-dropdown summary:hover {
+	background: var(--gold-faint);
+}
+
+.calculator-dropdown summary h2 {
+	font-size: clamp(1.6rem, 3vw, 2.4rem);
+	margin: 0.2rem 0 0.35rem;
+}
+
+.calculator-dropdown summary p {
+	color: var(--text-muted);
+	margin: 0;
+}
+
+.calculator-dropdown-icon {
+	color: var(--gold);
+	font-size: 1.1rem;
+	flex-shrink: 0;
+	transition: transform var(--transition);
+}
+
+.calculator-dropdown[open] .calculator-dropdown-icon {
+	transform: rotate(180deg);
+}
+
+.calculator-dropdown-body {
+	padding-bottom: 2.5rem;
+}
+
+.calculator-dropdown .calculator-card {
+	border: none;
+	padding: 0;
+}
+
 /* SINGAPORE MONEY GUIDE */
 .guide-entry {
 	padding: var(--component-gap) 0 var(--section-space);
