@@ -15,9 +15,18 @@ function renderGithubPreview(user, repos) {
 	const el = document.getElementById("github-preview");
 	if (!el) return;
 
+	// Repos without a description show their language and last update
+	// instead of a bare "No description".
+	const formatUpdated = (iso) =>
+		new Date(iso).toLocaleDateString("en-SG", { month: "short", year: "numeric" });
+
 	const repoHtml = repos
 		.map((repo) => {
-			const desc = repo.description || "No description";
+			const desc =
+				repo.description ||
+				[repo.language, `Updated ${formatUpdated(repo.pushed_at || repo.updated_at)}`]
+					.filter(Boolean)
+					.join(" · ");
 			return `
 				<div class="github-preview-repo">
 					<a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">${repo.name}</a>
@@ -35,9 +44,8 @@ function renderGithubPreview(user, repos) {
 			</div>
 		</div>
 		<div class="github-preview-meta">
-			<span>${user.public_repos} Repos</span>
-			<span>${user.followers} Followers</span>
-			<span>${user.following} Following</span>
+			<span>${user.public_repos} Public repos</span>
+			<a href="${user.html_url}" target="_blank" rel="noopener noreferrer">View on GitHub &rarr;</a>
 		</div>
 		<div class="github-preview-repos">${repoHtml}</div>
 	`;

@@ -406,7 +406,8 @@ section {
 	padding: 0;
 }
 
-.home-profile-grid #credentials {
+.home-profile-grid #credentials,
+.home-profile-grid #work {
 	border: 0;
 	background: transparent;
 }
@@ -545,10 +546,14 @@ section {
 	color: var(--text-muted);
 }
 
+/* Photo sits after the text so every entry's date and title share one
+   left edge down the timeline. */
 .timeline-entry-photo {
 	display: flex;
+	flex-direction: row-reverse;
+	justify-content: flex-end;
 	align-items: center;
-	gap: 1.1rem;
+	gap: 1.4rem;
 }
 .timeline-photo {
 	width: 76px;
@@ -585,7 +590,7 @@ section {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: var(--component-gap);
-	align-items: start;
+	align-items: stretch;
 	padding-top: 0.5rem;
 }
 
@@ -657,10 +662,15 @@ section {
 /* CONTACT */
 .contact-list {
 	list-style: none;
-	display: flex;
-	flex-direction: column;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 0.75rem;
-	max-width: 680px;
+}
+
+@media (max-width: 720px) {
+	.contact-list {
+		grid-template-columns: 1fr;
+	}
 }
 
 .contact-list li a {
@@ -881,6 +891,19 @@ section {
 	gap: 0.85rem;
 }
 
+/* Filled variant for the main action in a section (booking). */
+.bot-cta-link.bot-cta-primary {
+	background: var(--gold);
+	border-color: var(--gold);
+	color: var(--bg);
+	font-weight: 600;
+}
+
+.bot-cta-link.bot-cta-primary:hover {
+	background: transparent;
+	color: var(--gold);
+}
+
 /* CONSULTATION */
 .consultation-cta {
 	padding: 3.5rem 0;
@@ -890,7 +913,7 @@ section {
 
 .consultation-cta-inner {
 	display: grid;
-	grid-template-columns: minmax(0, 0.85fr) minmax(520px, 1.15fr);
+	grid-template-columns: minmax(0, 1fr) auto;
 	align-items: center;
 	gap: clamp(2rem, 5vw, 5rem);
 }
@@ -1176,7 +1199,8 @@ section {
 	margin-bottom: 1rem;
 }
 
-.github-preview-meta span {
+.github-preview-meta span,
+.github-preview-meta a {
 	border: 1px solid var(--gold-dim);
 	color: var(--gold);
 	font-size: 0.68rem;
@@ -1291,6 +1315,8 @@ section {
 	object-position: right top;
 	position: relative;
 	z-index: 1;
+	-webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+	mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
 }
 
 .fitness-hero-hyrox {
@@ -1500,7 +1526,7 @@ section {
 
 /* PAGE CALCULATORS (dropdowns) */
 .compound-calculator-section {
-	padding: 0 0 var(--section-space);
+	padding: var(--section-space) 0;
 }
 
 .calculators-heading {
@@ -1627,6 +1653,7 @@ section {
 .money-guide-hero .container {
 	position: relative;
 	z-index: 2;
+	width: 100%;
 }
 
 .money-guide-hero-photo {
@@ -1848,6 +1875,39 @@ section {
 	margin-top: 1rem;
 }
 
+/* Headline figure at the top of a calculator result (monthly payment,
+   projected total, future value). */
+.calculator-result-headline {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+	padding: 1.1rem 1.25rem;
+	margin-bottom: 0.75rem;
+	border: 1px solid var(--gold-dim);
+	background: rgba(201, 168, 76, 0.06);
+}
+
+.calculator-result-headline span {
+	font-size: 0.66rem;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--text-muted);
+}
+
+.calculator-result-headline strong {
+	font-family: "Cormorant Garamond", serif;
+	font-size: clamp(2rem, 5vw, 2.6rem);
+	font-weight: 600;
+	line-height: 1.1;
+	color: var(--gold);
+}
+
+.calculator-result-headline em {
+	font-style: normal;
+	font-size: 0.8rem;
+	color: var(--text-muted);
+}
+
 .calculator-note-list {
 	color: var(--text-muted);
 	font-size: 0.78rem;
@@ -1948,7 +2008,8 @@ section {
 
 .money-guide-actions {
 	display: flex;
-	flex-direction: column;
+	flex-wrap: wrap;
+	justify-content: flex-end;
 	gap: 0.75rem;
 }
 
@@ -2442,5 +2503,28 @@ footer span {
 @media (max-width: 760px) {
 	.skills-grid {
 		grid-template-columns: 1fr;
+	}
+}
+
+/* Inner-page heroes on small screens: the cutout sits behind the intro copy,
+   so keep that copy legible. */
+@media (max-width: 768px) {
+	.page-hero-grid > :first-child p,
+	.page-hero-grid > :first-child .section-label {
+		text-shadow:
+			0 2px 8px rgba(0, 0, 0, 0.95),
+			0 0 22px rgba(0, 0, 0, 0.85);
+	}
+
+	.page-hero-photo {
+		opacity: 0.38;
+	}
+
+	.consultation-cta-inner {
+		grid-template-columns: 1fr;
+	}
+
+	.money-guide-actions {
+		justify-content: stretch;
 	}
 }

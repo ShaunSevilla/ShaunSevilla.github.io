@@ -298,12 +298,12 @@
 			const age55Heading = `In ${age55Year}, when you turn 55`;
 
 			resultBox.innerHTML =
+				`<div class="calculator-result-headline"><span>At age ${targetAge}</span><strong>${formatCurrency(final.total)}</strong></div>` +
 				`<div class="cpf-chart-wrap"><canvas id="cpf-chart-canvas" height="240"></canvas></div>` +
-				`<div class="calculator-result-row"><span>At age ${targetAge}</span><strong>${formatCurrency(final.total)}</strong></div>` +
 				`<div class="calculator-result-row"><span>OA · SA/RA · MediSave</span><strong>${formatCurrency(final.oa)} · ${formatCurrency(final.sa + final.ra)} · ${formatCurrency(final.ma)}</strong></div>` +
 				`<p class="calculator-note">Wage used: ${formatCurrency(Math.min(monthlyWage, CPF_OW_CEILING))}/month (capped at the $${CPF_OW_CEILING.toLocaleString("en-SG")} OW ceiling).</p>` +
 				(currentAge >= 55
-					? `<p class="calculator-note">Your Full Retirement Sum was set in the year you turned 55 (and your Basic Healthcare Sum is fixed at 65) &mdash; check your exact figures in your CPF account.</p>`
+					? `<p class="calculator-note">Your Full Retirement Sum was set in the year you turned 55 and your Basic Healthcare Sum is fixed at 65. Check your exact figures in your CPF account.</p>`
 					: `<p class="calculator-note">${age55Heading}:</p>` +
 						`<ul class="calculator-note-list">` +
 						`<li>Full Retirement Sum &asymp; ${formatCurrency(frsCap)}</li>` +

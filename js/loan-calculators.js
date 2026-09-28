@@ -161,6 +161,10 @@
 		};
 	}
 
+	function headline(label, value, sub) {
+		return `<div class="calculator-result-headline"><span>${label}</span><strong>${value}</strong>${sub ? `<em>${sub}</em>` : ""}</div>`;
+	}
+
 	function resultRow(label, value) {
 		return `<div class="calculator-result-row"><span>${label}</span><strong>${value}</strong></div>`;
 	}
@@ -267,21 +271,19 @@
 					resultRow("Minimum downpayment needed (25%)", formatCurrency(results.requiredDownpayment)) +
 					resultRow("Your CPF + cash", formatCurrency(results.totalAvailable)) +
 					resultRow("Shortfall", formatCurrency(results.shortfall)) +
-					`<p class="calculator-note">Of that, ~${formatCurrency(results.otpCash)} is due upfront at the Option to Purchase stage — cash only, since CPF can't be used until the resale application is processed.</p>` +
-					`<p class="calculator-note">You're short of the minimum downpayment under current LTV rules (75% max loan). You'd need more CPF, more cash, or a lower-priced flat.</p>`;
+					`<p class="calculator-note">Of that, about ${formatCurrency(results.otpCash)} is due in cash at the Option to Purchase, since CPF can't be used until the resale application is processed.</p>` +
+					`<p class="calculator-note">You'd need more CPF, more cash, or a lower-priced flat.</p>`;
 				resultBox.hidden = false;
 				return;
 			}
 
 			resultBox.innerHTML =
+				headline("Monthly payment", formatCurrency(results.monthlyPayment), `${results.years} years at ${(HDB_LOAN_ANNUAL_RATE * 100).toFixed(1)}% p.a.`) +
 				resultRow("Minimum downpayment (25%)", formatCurrency(results.requiredDownpayment)) +
 				resultRow("Cash used", formatCurrency(results.cash)) +
 				resultRow("CPF used", `${formatCurrency(results.cpfUsed)} (${formatCurrency(results.cpfLeftover)} left untouched)`) +
 				resultRow("Total downpayment", formatCurrency(results.totalDownpayment)) +
 				resultRow("Loan amount", formatCurrency(results.loanAmount)) +
-				resultRow("Interest rate", `${(HDB_LOAN_ANNUAL_RATE * 100).toFixed(1)}% p.a. (HDB concessionary)`) +
-				resultRow("Loan tenure", `${results.years} years`) +
-				resultRow("Monthly payment", formatCurrency(results.monthlyPayment)) +
 				resultRow("Total repayment", formatCurrency(results.totalRepayment)) +
 				resultRow("Total interest paid", formatCurrency(results.totalInterest)) +
 				buildHdbPaymentTimeline(results);
@@ -296,21 +298,21 @@
 		const otpPct = Math.max(2, (results.otpCash / results.requiredDownpayment) * 100);
 		const completionPct = 100 - otpPct;
 
-		let html = `<p class="calculator-note" style="margin-top:1.2rem;"><strong style="color:var(--text);">Payment timeline</strong></p>`;
+		let html = `<p class="calculator-note" style="margin-top:1.2rem;"><strong style="color:var(--text);">When you pay</strong></p>`;
 		html += `<div class="hdb-timeline-bar"><span class="hdb-timeline-otp" style="width:${otpPct}%;"></span><span class="hdb-timeline-completion" style="width:${completionPct}%;"></span></div>`;
-		html += `<div class="hdb-timeline-legend"><span><i class="hdb-timeline-swatch hdb-timeline-swatch-otp"></i>At OTP</span><span><i class="hdb-timeline-swatch hdb-timeline-swatch-completion"></i>At Key Collection</span></div>`;
+		html += `<div class="hdb-timeline-legend"><span><i class="hdb-timeline-swatch hdb-timeline-swatch-otp"></i>At OTP</span><span><i class="hdb-timeline-swatch hdb-timeline-swatch-completion"></i>At key collection</span></div>`;
 		html += `<ul class="calculator-note-list">`;
-		html += `<li>At OTP + exercising the option (cash only, negotiable — typically ~1% of price, capped at $5,000): ${formatCurrency(results.otpCash)}</li>`;
-		html += `<li>At Key Collection (completion, ~8&ndash;10 weeks later): ${formatCurrency(results.completionDownpayment)} remaining downpayment (cash ${formatCurrency(results.completionCash)} + CPF ${formatCurrency(results.cpfUsed)}), plus Buyer's Stamp Duty &asymp; ${formatCurrency(results.bsd)} (payable via CPF or cash)</li>`;
+		html += `<li>At OTP (cash only): ${formatCurrency(results.otpCash)}</li>`;
+		html += `<li>At key collection (~8 to 10 weeks later): ${formatCurrency(results.completionDownpayment)} (cash ${formatCurrency(results.completionCash)} + CPF ${formatCurrency(results.cpfUsed)}), plus stamp duty of about ${formatCurrency(results.bsd)} (CPF or cash)</li>`;
 		html += `</ul>`;
 
 		if (results.cashShortfallForOtp > 0) {
-			html += `<p class="calculator-note" style="color:var(--gold,#c9a84c);">Your planned cash (${formatCurrency(results.cash)}) is less than the ${formatCurrency(results.otpCash)} needed at OTP — that portion must be cash, since CPF isn't available yet at that stage.</p>`;
+			html += `<p class="calculator-note" style="color:var(--gold);">Your planned cash (${formatCurrency(results.cash)}) is less than the ${formatCurrency(results.otpCash)} due at OTP. That part must be cash, since CPF can't be used yet.</p>`;
 		}
 
 		const totalCash = results.cash + results.bsdCashPortion;
-		html += `<p class="calculator-note"><strong>Cash to fork out in total: ~${formatCurrency(totalCash)}</strong>${results.bsdCashPortion > 0 ? " (includes stamp duty your leftover CPF can't fully cover)" : ""}. Legal, registration and request-for-value fees add roughly $650&ndash;$1,000 more (payable via CPF or cash).</p>`;
-		html += `<p class="calculator-note">Assumes an HDB concessionary loan at today's rate and a 75% LTV / 25% downpayment rule. Doesn't check Mortgage Servicing Ratio, loan tenure age caps, or a bank loan's lower rate but 5% min-cash rule. The option fee/exercise fee split is negotiable with the seller — HDB only requires the combined total not exceed $5,000, paid in cash.</p>`;
+		html += `<p class="calculator-note"><strong>Cash you need in total: about ${formatCurrency(totalCash)}</strong>${results.bsdCashPortion > 0 ? " (incl. stamp duty your leftover CPF can't cover)" : ""}. Legal and admin fees add about $650 to $1,000 (CPF or cash).</p>`;
+		html += `<p class="calculator-note">Uses today's HDB loan rate and the 25% downpayment rule. Doesn't check MSR, age limits or bank loans. The OTP fee split is negotiable, but it's cash only and capped at $5,000.</p>`;
 
 		return html;
 	}
@@ -358,25 +360,23 @@
 					resultRow("Minimum downpayment required", formatCurrency(results.minDownpayment)) +
 					resultRow("Your downpayment", formatCurrency(results.downpayment)) +
 					resultRow("Shortfall", formatCurrency(results.shortfall)) +
-					`<p class="calculator-note">MAS caps vehicle loans at 70% of price when OMV is $20,000 or under, and 60% when OMV is above $20,000 — so you're short of the minimum downpayment needed.</p>`;
+					`<p class="calculator-note">MAS caps car loans at 70% of the price if OMV is $20,000 or less, and 60% if it's higher.</p>`;
 				resultBox.hidden = false;
 				return;
 			}
 
 			resultBox.innerHTML =
+				headline("Monthly payment", formatCurrency(results.monthlyPayment), `${results.years} years at ${results.ratePercent}% p.a. flat`) +
 				(results.hasOmv
 					? resultRow("Max loan allowed", `${results.maxLoanPercent}% of price`)
 					: resultRow("Max loan allowed", "Not checked (no OMV given)")) +
 				resultRow("Downpayment", formatCurrency(results.downpayment)) +
 				resultRow("Loan amount", formatCurrency(results.loanAmount)) +
-				resultRow("Interest rate", `${results.ratePercent}% p.a. flat`) +
-				resultRow("Loan tenure", `${results.years} years`) +
-				resultRow("Monthly payment", formatCurrency(results.monthlyPayment)) +
 				resultRow("Total repayment", formatCurrency(results.totalRepayment)) +
 				resultRow("Total interest paid", formatCurrency(results.totalInterest)) +
 				(results.hasOmv
-					? `<p class="calculator-note">Car loans use a flat rate, not reducing balance — the effective rate is roughly 1.8–2x higher than the flat rate quoted.</p>`
-					: `<p class="calculator-note">Without the OMV, MAS's loan-to-value cap (70% of price if OMV ≤ $20,000, else 60%) couldn't be checked — your dealer/bank will confirm how much they'll actually finance. Car loans also use a flat rate, not reducing balance — the effective rate is roughly 1.8–2x higher than the flat rate quoted.</p>`);
+					? `<p class="calculator-note">Car loans quote a flat rate, so the real (effective) rate is roughly 1.8 to 2x higher.</p>`
+					: `<p class="calculator-note">No OMV given, so the MAS loan limit wasn't checked. Your dealer or bank will confirm how much they'll finance. Car loans quote a flat rate, so the real rate is roughly 1.8 to 2x higher.</p>`);
 			resultBox.hidden = false;
 		});
 	}

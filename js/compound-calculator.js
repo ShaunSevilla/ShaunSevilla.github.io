@@ -54,10 +54,10 @@
 			const { totalContributions, totalInterest, futureValue } = calculateCompoundInterest({ principal, annualAddition, years, ratePercent });
 
 			resultBox.innerHTML =
-				resultRow("Total contributions", formatCurrency(totalContributions)) +
-				resultRow("Total interest earned", formatCurrency(totalInterest)) +
-				resultRow("Future value", formatCurrency(futureValue)) +
-				`<p class="calculator-note">Assumes compounding annually, with each year's addition made at the start of that year. Projection only — actual returns are not guaranteed.</p>`;
+				`<div class="calculator-result-headline"><span>In ${years} years</span><strong>${formatCurrency(futureValue)}</strong></div>` +
+				resultRow("You put in", formatCurrency(totalContributions)) +
+				resultRow("Interest earned", formatCurrency(totalInterest)) +
+				`<p class="calculator-note">Assumes compounding annually, with each year's addition made at the start of that year. Projection only. Returns aren't guaranteed.</p>`;
 			resultBox.hidden = false;
 		});
 	}
