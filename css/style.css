@@ -701,30 +701,57 @@ section {
 	z-index: 2;
 }
 
-/* Generic "photo sits next to the heading" hero layout, reused across page
-   heroes (mirrors the Fitness page hero). A normal grid column, not an
-   absolutely-positioned overlay, so the photo can never get clipped by a
-   shorter section and is always shown at full size, right next to the text. */
+/* Generic "photo sits behind the heading, aligned right" hero layout,
+   reused across page heroes. The photo is an absolutely-positioned,
+   low-opacity overlay behind the header text at every viewport width
+   (never a separate column), so it never crowds or reflows the copy and
+   is consistent whether the section is tall or short. */
 .page-hero-grid {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) minmax(240px, 340px);
-	align-items: center;
-	gap: var(--component-gap);
+	position: relative;
+	/* Keeps the section at least as tall as the photo behind it, so
+	   .detail-hero's overflow:hidden can never clip the image on pages
+	   with a short heading/intro. */
+	min-height: clamp(320px, 30vw, 480px);
 }
 
+.page-hero-grid > :first-child {
+	position: relative;
+	z-index: 2;
+	max-width: 620px;
+}
+
+/* Width is intentionally left auto: the box only sets a height, so the
+   image renders at its own natural aspect ratio and is never stretched
+   into a box shaped for a different photo — a tall, narrow full-body
+   cutout and a wide, cropped bust shot both end up fully on screen,
+   just anchored to the right edge, behind the heading text. */
 .page-hero-photo {
+	position: absolute;
+	top: 1.5rem;
+	right: -3%;
+	bottom: auto;
+	left: auto;
+	width: auto;
+	height: clamp(300px, 26vw, 460px);
+	opacity: 0.55;
+	z-index: 1;
 	display: flex;
-	justify-content: center;
-	align-items: flex-end;
-	height: min(46vh, 400px);
+	justify-content: flex-end;
 }
 
 .page-hero-photo img {
-	width: 100%;
+	width: auto;
 	height: 100%;
 	object-fit: contain;
-	object-position: bottom;
+	object-position: right top;
 	filter: saturate(0.95) contrast(1.02);
+}
+
+/* Booking's photo (booking-cutout.png) was shot facing the opposite way
+   from the rest of the cutouts, so it's mirrored back to face into the
+   page (toward the heading) instead of off the edge of the screen. */
+.booking-hero .page-hero-photo img {
+	transform: scaleX(-1);
 }
 
 .detail-intro {
@@ -1989,37 +2016,18 @@ footer span {
 	}
 
 	.page-hero-grid {
-		grid-template-columns: 1fr;
-		position: relative;
+		min-height: clamp(240px, 44vw, 340px);
 	}
 
 	.page-hero-grid > :first-child {
-		position: relative;
-		z-index: 2;
 		max-width: 76%;
 	}
 
-	/* Width is intentionally left auto: the box only sets a height, so the
-	   image renders at its own natural aspect ratio and is never stretched
-	   into a box shaped for a different photo — a tall, narrow full-body
-	   cutout and a wide, cropped bust shot both end up fully on screen,
-	   just anchored to the right edge, behind the heading text. */
 	.page-hero-photo {
-		position: absolute;
 		top: 1rem;
 		right: -3%;
-		bottom: auto;
-		left: auto;
-		width: auto;
 		height: clamp(220px, 42vw, 320px);
 		opacity: 0.5;
-		z-index: 1;
-	}
-
-	.page-hero-photo img {
-		width: auto;
-		height: 100%;
-		object-position: right top;
 	}
 
 	.fitness-hero-grid {
@@ -2132,6 +2140,10 @@ footer span {
 
 	.money-guide-hero-photo {
 		display: none;
+	}
+
+	.page-hero-grid {
+		min-height: 250px;
 	}
 
 	.page-hero-photo {
