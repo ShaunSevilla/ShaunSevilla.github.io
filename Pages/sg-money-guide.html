@@ -80,6 +80,22 @@
 						</article>
 
 						<article class="calculator-card">
+							<h3><i class="fas fa-piggy-bank" aria-hidden="true"></i> CPF Growth Calculator</h3>
+							<p class="calculator-card-note">Projects your OA, SA/RA and MediSave balances forward using today's CPF contribution, allocation and interest rules.</p>
+							<form class="booking-form calculator-form" id="cpf-form">
+								<label><span>Current age</span><input type="number" id="cpf-age" min="16" max="90" step="1" placeholder="30" required /></label>
+								<label><span>Monthly income before CPF deductions ($)</span><input type="number" id="cpf-wage" min="0" step="100" placeholder="5000" required /></label>
+								<label><span>Current CPF Ordinary Account (OA) balance ($)</span><input type="number" id="cpf-oa" min="0" step="1000" placeholder="20000" required /></label>
+								<label><span id="cpf-sa-label">Current CPF Special Account (SA) balance ($)</span><input type="number" id="cpf-sa" min="0" step="1000" placeholder="15000" required /></label>
+								<label><span>Current MediSave Account (MA) balance ($)</span><input type="number" id="cpf-ma" min="0" step="1000" placeholder="10000" required /></label>
+								<label><span>Project until age</span><input type="number" id="cpf-target-age" min="17" max="150" step="1" placeholder="65" required /></label>
+								<button type="submit" class="booking-submit">Calculate</button>
+								<p class="booking-status" id="cpf-status" role="status"></p>
+							</form>
+							<div class="calculator-result" id="cpf-result" hidden></div>
+						</article>
+
+						<article class="calculator-card">
 							<h3><i class="fas fa-car" aria-hidden="true"></i> Vehicle Loan Calculator</h3>
 							<p class="calculator-card-note">Uses MAS's loan-to-value caps (70% of price if OMV ≤ $20,000, else 60%) and 7-year tenure cap. Car loans are quoted as a flat rate, not reducing balance.</p>
 							<form class="booking-form calculator-form" id="vehicle-loan-form">
@@ -95,7 +111,7 @@
 							<div class="calculator-result" id="vehicle-result" hidden></div>
 						</article>
 					</div>
-					<p class="money-guide-disclaimer">Projections only, based on today's published rates and rules, which can change. Doesn't check Mortgage Servicing Ratio, Total Debt Servicing Ratio, age-based loan tenure caps, or a bank loan's lower rate but 5% minimum-cash rule. Not personalised advice.</p>
+					<p class="money-guide-disclaimer">Projections only, based on today's published rates and rules, which can change. Doesn't check Mortgage Servicing Ratio, Total Debt Servicing Ratio, age-based loan tenure caps, or a bank loan's lower rate but 5% minimum-cash rule. The CPF calculator uses only your stated monthly wage (excludes bonus/AWS), assumes your Special Account moves fully into your Retirement Account at 55 without modelling the Full Retirement Sum cap, and caps MediSave at the $79,000 Basic Healthcare Sum. Not personalised advice.</p>
 				</div>
 			</section>
 
@@ -158,5 +174,6 @@
 		<script src="../js/layout.js"></script>
 		<script src="../js/main.js"></script>
 		<script src="../js/loan-calculators.js"></script>
+		<script src="../js/cpf-calculator.js"></script>
 	</body>
 </html>
