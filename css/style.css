@@ -309,6 +309,14 @@ section {
 	color: var(--text-muted);
 	max-width: 540px;
 	margin: 0 auto;
+	/* The portraits sit behind this line on phones — keep it legible. */
+	text-shadow:
+		0 2px 10px rgba(0, 0, 0, 0.95),
+		0 0 26px rgba(0, 0, 0, 0.85);
+}
+
+.hero-tagline {
+	text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
 }
 
 .hero-booking-link {
@@ -317,6 +325,7 @@ section {
 	gap: 0.55rem;
 	margin-top: 2rem;
 	padding: 0.8rem 1.15rem;
+	background: rgba(10, 10, 10, 0.72);
 	border: 1px solid var(--gold-dim);
 	color: var(--gold);
 	font-size: 0.72rem;
@@ -2276,6 +2285,10 @@ footer span {
 
 	.hero-name {
 		font-size: clamp(3.3rem, 18vw, 5rem);
+	}
+
+	.hero-statement {
+		color: #c8c8c8;
 	}
 
 	.fitness-hero {
