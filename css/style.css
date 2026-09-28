@@ -536,6 +536,30 @@ section {
 	color: var(--text-muted);
 }
 
+.timeline-entry-photo {
+	display: flex;
+	align-items: center;
+	gap: 1.1rem;
+}
+.timeline-photo {
+	width: 76px;
+	height: 76px;
+	object-fit: cover;
+	object-position: top center;
+	border-radius: 10px;
+	border: 1px solid var(--gold-dim);
+	flex-shrink: 0;
+}
+@media (max-width: 560px) {
+	.timeline-entry-photo {
+		gap: 0.9rem;
+	}
+	.timeline-photo {
+		width: 60px;
+		height: 60px;
+	}
+}
+
 /* GITHUB */
 .github-loading,
 .github-error {
