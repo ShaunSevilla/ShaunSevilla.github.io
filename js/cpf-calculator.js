@@ -279,22 +279,12 @@
 			const oaBalance = Number(document.getElementById("cpf-oa").value);
 			const saOrRaBalance = Number(document.getElementById("cpf-sa").value);
 			const maBalance = Number(document.getElementById("cpf-ma").value);
-			const targetAge = Number(document.getElementById("cpf-target-age").value);
+			// Standardised projection horizon: always to age 65, or 10 years
+			// out for anyone who's already past 65.
+			const targetAge = currentAge < 65 ? 65 : currentAge + 10;
 
 			if (!(currentAge >= 16 && currentAge <= 90) || !(monthlyWage > 0) || oaBalance < 0 || saOrRaBalance < 0 || maBalance < 0) {
 				setStatus(status, "Please fill in every field with a valid number.", true);
-				resultBox.hidden = true;
-				return;
-			}
-
-			if (!Number.isInteger(targetAge) || targetAge <= currentAge) {
-				setStatus(status, "Please enter a target age older than your current age.", true);
-				resultBox.hidden = true;
-				return;
-			}
-
-			if (targetAge - currentAge > 60) {
-				setStatus(status, "Please project 60 years or fewer ahead.", true);
 				resultBox.hidden = true;
 				return;
 			}
