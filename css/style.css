@@ -1839,6 +1839,18 @@ section {
 	margin-top: 1rem;
 }
 
+.calculator-note-list {
+	color: var(--text-muted);
+	font-size: 0.78rem;
+	margin: 0.4rem 0 0;
+	padding-left: 1.1rem;
+	list-style: disc;
+}
+
+.calculator-note-list li {
+	margin-bottom: 0.2rem;
+}
+
 .money-guide-resources {
 	border-top: 1px solid var(--border);
 }
@@ -2119,10 +2131,18 @@ footer span {
 		grid-template-columns: 1fr;
 	}
 
+	/* Behind-the-heading, aligned-right treatment, matching the rest of the
+	   site's hero photos, instead of the desktop bottom-right placement
+	   (which has nothing to sit next to once the copy stacks to one column). */
 	.money-guide-hero-photo {
-		width: 55%;
-		opacity: 0.35;
-		bottom: 4%;
+		top: 1.5rem;
+		right: -4%;
+		bottom: auto;
+		left: auto;
+		width: auto;
+		max-width: none;
+		height: clamp(240px, 40vw, 340px);
+		opacity: 0.5;
 	}
 
 }
@@ -2139,7 +2159,10 @@ footer span {
 	}
 
 	.money-guide-hero-photo {
-		display: none;
+		top: 1rem;
+		right: -3%;
+		height: 230px;
+		opacity: 0.45;
 	}
 
 	.page-hero-grid {

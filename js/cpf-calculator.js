@@ -303,16 +303,21 @@
 			const { yearly, frsCap, bhsCap } = projection;
 			const final = yearly[yearly.length - 1];
 
-			const allocation = getAllocation(currentAge);
-			const middleLabel = allocation.middleAccount === "RA" ? "RA" : "SA";
 			const yearsUntil55 = Math.max(0, 55 - currentAge);
-			const age55Label = currentAge >= 55 ? "now (55+)" : `age 55, in ${yearsUntil55} year${yearsUntil55 === 1 ? "" : "s"}`;
+			const age55Year = new Date().getFullYear() + yearsUntil55;
+			const age55Heading = currentAge >= 55 ? "Now that you're 55+" : `In ${age55Year}, when you turn 55`;
 
 			resultBox.innerHTML =
 				`<div class="cpf-chart-wrap"><canvas id="cpf-chart-canvas" height="240"></canvas></div>` +
 				`<div class="calculator-result-row"><span>At age ${targetAge}</span><strong>${formatCurrency(final.total)}</strong></div>` +
 				`<div class="calculator-result-row"><span>OA · SA/RA · MediSave</span><strong>${formatCurrency(final.oa)} · ${formatCurrency(final.sa + final.ra)} · ${formatCurrency(final.ma)}</strong></div>` +
-				`<p class="calculator-note">Wage used: ${formatCurrency(Math.min(monthlyWage, CPF_OW_CEILING))}/month (capped at the $${CPF_OW_CEILING.toLocaleString("en-SG")} OW ceiling). Assumes CPF contribution &amp; allocation rates effective 1 Jan 2026; OA 2.5% p.a., SA/RA/MA 4% p.a.; extra interest of 1% on the first $60,000 combined balances (2%/1% tiers from age 55). At your current age, monthly contributions split roughly ${Math.round(allocation.oa * 100)}% to OA, ${Math.round(allocation.middle * 100)}% to ${middleLabel}, and ${Math.round(allocation.ma * 100)}% to MediSave. Estimated at ${age55Label}: Full Retirement Sum &asymp; ${formatCurrency(frsCap)} (projected at 3.5% p.a. from the 2026 figure) and Basic Healthcare Sum &asymp; ${formatCurrency(bhsCap)} (projected at 5% p.a.). At 55, SA moves into RA (SA first, then OA) up to that projected Full Retirement Sum, with the rest parked in OA. MediSave is capped at the projected Basic Healthcare Sum, with any excess flowing to SA/RA up to the FRS, then to OA. Based only on your stated wage (bonuses/AWS excluded). Educational estimate only, not financial advice.</p>`;
+				`<p class="calculator-note">Wage used: ${formatCurrency(Math.min(monthlyWage, CPF_OW_CEILING))}/month (capped at the $${CPF_OW_CEILING.toLocaleString("en-SG")} OW ceiling).</p>` +
+				`<p class="calculator-note">${age55Heading}:</p>` +
+				`<ul class="calculator-note-list">` +
+				`<li>Full Retirement Sum &asymp; ${formatCurrency(frsCap)}</li>` +
+				`<li>Basic Healthcare Sum &asymp; ${formatCurrency(bhsCap)}</li>` +
+				`</ul>` +
+				`<p class="calculator-note">Educational estimate only, not financial advice.</p>`;
 
 			resultBox.hidden = false;
 			renderChart(yearly);
