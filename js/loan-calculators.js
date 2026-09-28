@@ -67,11 +67,16 @@
 		return (loanAmount * monthlyRate * factor) / (factor - 1);
 	}
 
-	function calculateHdbLoan({ price, cpfAvailable, cash, years }) {
+	function calculateHdbLoan({ price, cpfAvailable, grants = 0, cash, years }) {
+		// Grants (EHG, CPF Housing Grant, PHG, etc.) are credited to the
+		// buyer's CPF OA at completion, not handed over as cash — so for
+		// this math they pool with CPF: same OTP-cash restriction, same
+		// effect on the required downpayment.
+		const cpfPool = cpfAvailable + grants;
 		const requiredDownpayment = price * (1 - HDB_LOAN_LTV);
 		const otpCash = Math.min(price * HDB_OTP_DEPOSIT_RATE, HDB_OTP_DEPOSIT_CAP);
 		const bsd = computeBsd(price);
-		const totalAvailable = cpfAvailable + cash;
+		const totalAvailable = cpfPool + cash;
 
 		if (totalAvailable < requiredDownpayment) {
 			return {
@@ -80,12 +85,13 @@
 				otpCash,
 				totalAvailable,
 				shortfall: requiredDownpayment - totalAvailable,
+				grants,
 			};
 		}
 
 		const cpfNeeded = Math.max(0, requiredDownpayment - cash);
-		const cpfUsed = Math.min(cpfAvailable, cpfNeeded);
-		const cpfLeftover = cpfAvailable - cpfUsed;
+		const cpfUsed = Math.min(cpfPool, cpfNeeded);
+		const cpfLeftover = cpfPool - cpfUsed;
 		const totalDownpayment = cash + cpfUsed;
 		const loanAmount = price - totalDownpayment;
 
@@ -105,6 +111,7 @@
 			sufficient: true,
 			requiredDownpayment,
 			cash,
+			grants,
 			cpfUsed,
 			cpfLeftover,
 			totalDownpayment,
@@ -185,6 +192,7 @@
 
 		const priceEl = document.getElementById("hdb-price");
 		const cpfEl = document.getElementById("hdb-cpf");
+		const grantsEl = document.getElementById("hdb-grants");
 		const price = Number(priceEl.value);
 
 		if (!(price > 0)) {
@@ -199,16 +207,20 @@
 
 		const cpfRaw = cpfEl.value;
 		const cpfAvailable = cpfRaw === "" ? null : Number(cpfRaw);
+		const grantsRaw = grantsEl ? grantsEl.value : "";
+		const grants = grantsRaw === "" || !Number.isFinite(Number(grantsRaw)) || Number(grantsRaw) < 0 ? 0 : Number(grantsRaw);
+		const poolLabel = grants > 0 ? "CPF + grants" : "CPF";
 
 		if (cpfAvailable === null || !Number.isFinite(cpfAvailable) || cpfAvailable < 0) {
-			cpfHint.textContent = `CPF usable toward downpayment: ${formatCurrency(0)} – ${formatCurrency(requiredDownpayment)} (depends on your CPF balance)`;
-			cashHint.textContent = `Cash needed: ${formatCurrency(0)} – ${formatCurrency(requiredDownpayment)} (depends on how much CPF you use)`;
+			cpfHint.textContent = `${poolLabel} usable toward downpayment: ${formatCurrency(0)} – ${formatCurrency(requiredDownpayment)} (depends on your CPF balance)`;
+			cashHint.textContent = `Cash needed: ${formatCurrency(0)} – ${formatCurrency(requiredDownpayment)} (depends on how much ${poolLabel} you use)`;
 			return;
 		}
 
-		const maxCpfUsable = Math.min(cpfAvailable, requiredDownpayment);
-		const minCash = Math.max(0, requiredDownpayment - cpfAvailable);
-		cpfHint.textContent = `CPF usable toward downpayment: ${formatCurrency(0)} – ${formatCurrency(maxCpfUsable)}`;
+		const cpfPool = cpfAvailable + grants;
+		const maxCpfUsable = Math.min(cpfPool, requiredDownpayment);
+		const minCash = Math.max(0, requiredDownpayment - cpfPool);
+		cpfHint.textContent = `${poolLabel} usable toward downpayment: ${formatCurrency(0)} – ${formatCurrency(maxCpfUsable)}`;
 		cashHint.textContent = `Cash needed: ${formatCurrency(minCash)} – ${formatCurrency(requiredDownpayment)}`;
 	}
 
@@ -239,8 +251,10 @@
 
 		const priceEl = document.getElementById("hdb-price");
 		const cpfEl = document.getElementById("hdb-cpf");
+		const grantsEl = document.getElementById("hdb-grants");
 		if (priceEl) priceEl.addEventListener("input", updateHdbHints);
 		if (cpfEl) cpfEl.addEventListener("input", updateHdbHints);
+		if (grantsEl) grantsEl.addEventListener("input", updateHdbHints);
 		updateHdbHints();
 
 		form.addEventListener("submit", function (event) {
@@ -249,10 +263,12 @@
 
 			const price = Number(document.getElementById("hdb-price").value);
 			const cpfAvailable = Number(document.getElementById("hdb-cpf").value);
+			const grantsRaw = document.getElementById("hdb-grants").value;
+			const grants = grantsRaw === "" ? 0 : Number(grantsRaw);
 			const cash = Number(document.getElementById("hdb-cash").value);
 			const years = Number(document.getElementById("hdb-years").value);
 
-			if (!(price > 0) || cpfAvailable < 0 || cash < 0 || !(years > 0)) {
+			if (!(price > 0) || cpfAvailable < 0 || grants < 0 || cash < 0 || !(years > 0)) {
 				setStatus(status, "Please fill in every field with a valid number.", true);
 				resultBox.hidden = true;
 				return;
@@ -264,12 +280,12 @@
 				return;
 			}
 
-			const results = calculateHdbLoan({ price, cpfAvailable, cash, years });
+			const results = calculateHdbLoan({ price, cpfAvailable, grants, cash, years });
 
 			if (!results.sufficient) {
 				resultBox.innerHTML =
 					resultRow("Minimum downpayment needed (25%)", formatCurrency(results.requiredDownpayment)) +
-					resultRow("Your CPF + cash", formatCurrency(results.totalAvailable)) +
+					resultRow("Your CPF + grants + cash", formatCurrency(results.totalAvailable)) +
 					resultRow("Shortfall", formatCurrency(results.shortfall)) +
 					`<p class="calculator-note">Of that, about ${formatCurrency(results.otpCash)} is due in cash at the Option to Purchase, since CPF can't be used until the resale application is processed.</p>` +
 					`<p class="calculator-note">You'd need more CPF, more cash, or a lower-priced flat.</p>`;
@@ -281,7 +297,9 @@
 				headline("Monthly payment", formatCurrency(results.monthlyPayment), `${results.years} years at ${(HDB_LOAN_ANNUAL_RATE * 100).toFixed(1)}% p.a.`) +
 				resultRow("Minimum downpayment (25%)", formatCurrency(results.requiredDownpayment)) +
 				resultRow("Cash used", formatCurrency(results.cash)) +
-				resultRow("CPF used", `${formatCurrency(results.cpfUsed)} (${formatCurrency(results.cpfLeftover)} left untouched)`) +
+				(results.grants > 0
+					? resultRow("CPF + grants used", `${formatCurrency(results.cpfUsed)} (${formatCurrency(results.cpfLeftover)} left untouched, incl. ${formatCurrency(results.grants)} in grants)`)
+					: resultRow("CPF used", `${formatCurrency(results.cpfUsed)} (${formatCurrency(results.cpfLeftover)} left untouched)`)) +
 				resultRow("Total downpayment", formatCurrency(results.totalDownpayment)) +
 				resultRow("Loan amount", formatCurrency(results.loanAmount)) +
 				resultRow("Total repayment", formatCurrency(results.totalRepayment)) +
@@ -312,6 +330,9 @@
 
 		const totalCash = results.cash + results.bsdCashPortion;
 		html += `<p class="calculator-note"><strong>Cash you need in total: about ${formatCurrency(totalCash)}</strong>${results.bsdCashPortion > 0 ? " (incl. stamp duty your leftover CPF can't cover)" : ""}. Legal and admin fees add about $650 to $1,000 (CPF or cash).</p>`;
+		if (results.grants > 0) {
+			html += `<p class="calculator-note">Grants are credited to your CPF OA at completion, so they're treated the same as CPF here — they don't raise your loan limit, only reduce what you need to put in. Check your actual eligible amount on the CPF Housing Grants checker.</p>`;
+		}
 		html += `<p class="calculator-note">Uses today's HDB loan rate and the 25% downpayment rule. Doesn't check MSR, age limits or bank loans. The OTP fee split is negotiable, but it's cash only and capped at $5,000.</p>`;
 
 		return html;
