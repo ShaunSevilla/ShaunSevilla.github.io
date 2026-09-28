@@ -22,7 +22,6 @@ education, leadership experience, and contact information.
 - `js/software-github.js` — GitHub profile and repository preview
 - `js/booking.js` — availability and booking form behavior
 - `supabase/migrations/001_create_consultation_bookings.sql` — clean booking database installation
-- `supabase/functions/sync-booking-to-notion/index.ts` — one-way Notion booking synchronization
 
 ## Running locally
 

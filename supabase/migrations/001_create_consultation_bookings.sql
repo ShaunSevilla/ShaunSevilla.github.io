@@ -27,9 +27,6 @@ create table if not exists public.consultation_bookings (
   contact text not null check (char_length(contact) between 3 and 100),
   notes text check (notes is null or char_length(notes) <= 1000),
   status text not null default 'confirmed' check (status in ('confirmed', 'cancelled', 'completed', 'no-show')),
-  notion_page_id text,
-  notion_sync_status text not null default 'pending' check (notion_sync_status in ('pending', 'synced', 'failed')),
-  notion_sync_error text,
   created_at timestamptz not null default now()
 );
 
