@@ -114,11 +114,74 @@
 		el.classList.toggle("error", Boolean(isError));
 	}
 
+	// Live-updates the greyed helper text under the price/CPF/cash fields as the
+	// user types, before they've submitted the form, so they know the minimum
+	// (and maximum) downpayment split before committing to numbers.
+	function updateHdbHints() {
+		const priceHint = document.getElementById("hdb-price-hint");
+		const cpfHint = document.getElementById("hdb-cpf-hint");
+		const cashHint = document.getElementById("hdb-cash-hint");
+		if (!priceHint || !cpfHint || !cashHint) return;
+
+		const priceEl = document.getElementById("hdb-price");
+		const cpfEl = document.getElementById("hdb-cpf");
+		const price = Number(priceEl.value);
+
+		if (!(price > 0)) {
+			priceHint.textContent = "";
+			cpfHint.textContent = "";
+			cashHint.textContent = "";
+			return;
+		}
+
+		const requiredDownpayment = price * (1 - HDB_LOAN_LTV);
+		priceHint.textContent = `Minimum downpayment needed (25%): ${formatCurrency(requiredDownpayment)}`;
+
+		const cpfRaw = cpfEl.value;
+		const cpfAvailable = cpfRaw === "" ? null : Number(cpfRaw);
+
+		if (cpfAvailable === null || !Number.isFinite(cpfAvailable) || cpfAvailable < 0) {
+			cpfHint.textContent = `CPF usable toward downpayment: ${formatCurrency(0)} – ${formatCurrency(requiredDownpayment)} (depends on your CPF balance)`;
+			cashHint.textContent = `Cash needed: ${formatCurrency(0)} – ${formatCurrency(requiredDownpayment)} (depends on how much CPF you use)`;
+			return;
+		}
+
+		const maxCpfUsable = Math.min(cpfAvailable, requiredDownpayment);
+		const minCash = Math.max(0, requiredDownpayment - cpfAvailable);
+		cpfHint.textContent = `CPF usable toward downpayment: ${formatCurrency(0)} – ${formatCurrency(maxCpfUsable)}`;
+		cashHint.textContent = `Cash needed: ${formatCurrency(minCash)} – ${formatCurrency(requiredDownpayment)}`;
+	}
+
+	// Same idea for the vehicle calculator: OMV decides the LTV tier, so the
+	// minimum downpayment can be shown as soon as price + OMV are both typed in.
+	function updateVehicleHints() {
+		const omvHint = document.getElementById("vehicle-omv-hint");
+		if (!omvHint) return;
+
+		const price = Number(document.getElementById("vehicle-price").value);
+		const omv = Number(document.getElementById("vehicle-omv").value);
+
+		if (!(price > 0) || !(omv > 0)) {
+			omvHint.textContent = "";
+			return;
+		}
+
+		const maxLoanPercent = omv <= VEHICLE_LOAN_OMV_THRESHOLD ? VEHICLE_LOAN_LTV_LOW_OMV : VEHICLE_LOAN_LTV_HIGH_OMV;
+		const minDownpayment = price - price * maxLoanPercent;
+		omvHint.textContent = `Minimum downpayment required: ${formatCurrency(minDownpayment)} (max loan ${(maxLoanPercent * 100).toFixed(0)}% of price)`;
+	}
+
 	function initHdbCalculator() {
 		const form = document.getElementById("hdb-loan-form");
 		const resultBox = document.getElementById("hdb-result");
 		const status = document.getElementById("hdb-status");
 		if (!form) return;
+
+		const priceEl = document.getElementById("hdb-price");
+		const cpfEl = document.getElementById("hdb-cpf");
+		if (priceEl) priceEl.addEventListener("input", updateHdbHints);
+		if (cpfEl) cpfEl.addEventListener("input", updateHdbHints);
+		updateHdbHints();
 
 		form.addEventListener("submit", function (event) {
 			event.preventDefault();
@@ -173,6 +236,12 @@
 		const resultBox = document.getElementById("vehicle-result");
 		const status = document.getElementById("vehicle-status");
 		if (!form) return;
+
+		const priceEl = document.getElementById("vehicle-price");
+		const omvEl = document.getElementById("vehicle-omv");
+		if (priceEl) priceEl.addEventListener("input", updateVehicleHints);
+		if (omvEl) omvEl.addEventListener("input", updateVehicleHints);
+		updateVehicleHints();
 
 		form.addEventListener("submit", function (event) {
 			event.preventDefault();

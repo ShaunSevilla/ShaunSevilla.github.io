@@ -1624,6 +1624,14 @@ section {
 	margin-bottom: 0;
 }
 
+.calculator-field-hint {
+	color: var(--text-muted);
+	font-size: 0.78rem;
+	margin: -0.65rem 0 0.85rem;
+	min-height: 1.1em;
+	transition: var(--transition);
+}
+
 .calculator-result {
 	margin-top: 1.5rem;
 	padding-top: 1.25rem;

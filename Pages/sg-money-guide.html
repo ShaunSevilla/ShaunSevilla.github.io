@@ -67,8 +67,11 @@
 							<p class="calculator-card-note">Assumes the HDB concessionary loan (75% LTV / 25% downpayment, rate pegged 0.1% above CPF OA).</p>
 							<form class="booking-form calculator-form" id="hdb-loan-form">
 								<label><span>Flat purchase price ($)</span><input type="number" id="hdb-price" min="0" step="1000" placeholder="500000" required /></label>
+								<p class="calculator-field-hint" id="hdb-price-hint"></p>
 								<label><span>CPF Ordinary Account available ($)</span><input type="number" id="hdb-cpf" min="0" step="1000" placeholder="80000" required /></label>
+								<p class="calculator-field-hint" id="hdb-cpf-hint"></p>
 								<label><span>Cash for downpayment ($)</span><input type="number" id="hdb-cash" min="0" step="1000" placeholder="10000" required /></label>
+								<p class="calculator-field-hint" id="hdb-cash-hint"></p>
 								<label><span>Loan tenure (years, max 25)</span><input type="number" id="hdb-years" min="1" max="25" step="1" placeholder="25" required /></label>
 								<button type="submit" class="booking-submit">Calculate</button>
 								<p class="booking-status" id="hdb-status" role="status"></p>
@@ -82,6 +85,7 @@
 							<form class="booking-form calculator-form" id="vehicle-loan-form">
 								<label><span>Purchase price ($)</span><input type="number" id="vehicle-price" min="0" step="1000" placeholder="120000" required /></label>
 								<label><span>Open Market Value / OMV ($)</span><input type="number" id="vehicle-omv" min="0" step="500" placeholder="25000" required /></label>
+								<p class="calculator-field-hint" id="vehicle-omv-hint"></p>
 								<label><span>Downpayment ($)</span><input type="number" id="vehicle-downpayment" min="0" step="1000" placeholder="55000" required /></label>
 								<label><span>Loan tenure (years, max 7)</span><input type="number" id="vehicle-years" min="1" max="7" step="1" placeholder="7" required /></label>
 								<label><span>Quoted interest rate (% p.a., flat)</span><input type="number" id="vehicle-rate" min="0" step="0.01" placeholder="2.78" required /></label>
