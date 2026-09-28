@@ -22,6 +22,10 @@ education, leadership experience, and contact information.
 - `js/software-github.js` — GitHub profile and repository preview
 - `js/booking.js` — availability and booking form behavior
 - `supabase/migrations/001_create_consultation_bookings.sql` — clean booking database installation
+- `supabase/migrations/002_notify_telegram_on_booking.sql` — Telegram admin notification on new booking
+- `supabase/migrations/003_restore_notion_sync_trigger.sql` — Notion booking sync trigger
+- `supabase/functions/notify-telegram-booking/index.ts` — sends a Telegram message on new booking
+- `supabase/functions/sync-booking-to-notion/index.ts` — one-way Notion booking synchronization
 
 ## Running locally
 
