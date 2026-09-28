@@ -309,6 +309,9 @@
 						`<li>Full Retirement Sum &asymp; ${formatCurrency(frsCap)}</li>` +
 						`<li>Basic Healthcare Sum &asymp; ${formatCurrency(bhsCap)}</li>` +
 						`</ul>`) +
+				(saOrRaBalance === 0 || maBalance === 0
+					? `<p class="calculator-note">SA/RA and/or MediSave started from $0 since they were left blank — only their share of your wage contribution is projected, not any existing savings there.</p>`
+					: "") +
 				`<p class="calculator-note">Educational estimate only, not financial advice.</p>`;
 
 			resultBox.hidden = false;

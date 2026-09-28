@@ -97,8 +97,9 @@
 									<label><span>Current age</span><input type="number" id="cpf-age" min="16" max="90" step="1" placeholder="30" required /></label>
 									<label><span>Monthly income before CPF deductions ($)</span><input type="number" id="cpf-wage" min="0" step="1" placeholder="5000" required /></label>
 									<label><span>Current CPF Ordinary Account (OA) balance ($)</span><input type="number" id="cpf-oa" min="0" step="1" placeholder="20000" required /></label>
-									<label><span id="cpf-sa-label">Current CPF Special Account (SA) balance ($)</span><input type="number" id="cpf-sa" min="0" step="1" placeholder="15000" required /></label>
-									<label><span>Current MediSave Account (MA) balance ($)</span><input type="number" id="cpf-ma" min="0" step="1" placeholder="10000" required /></label>
+									<label><span id="cpf-sa-label">Current CPF Special Account (SA) balance ($) (optional)</span><input type="number" id="cpf-sa" min="0" step="1" placeholder="0" /></label>
+									<label><span>Current MediSave Account (MA) balance ($) (optional)</span><input type="number" id="cpf-ma" min="0" step="1" placeholder="0" /></label>
+									<p class="calculator-field-hint">Leave SA/MA blank (treated as $0) if you just want to project OA. Note: CPF doesn't let you voluntarily top up OA alone — only SA/RA (via RSTU) or MediSave individually, or all three together.</p>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="cpf-status" role="status"></p>
 								</form>
