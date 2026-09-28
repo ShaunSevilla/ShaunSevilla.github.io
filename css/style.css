@@ -692,7 +692,31 @@ section {
 /* DETAIL PAGES */
 .detail-hero {
 	padding: 5rem 0 2.5rem;
+	position: relative;
 	overflow: hidden;
+}
+
+.detail-hero .container {
+	position: relative;
+	z-index: 2;
+}
+
+/* Generic "me in the background" watermark photo, reused across page heroes.
+   Sized off height (not a fixed box) so the full-body cutout never gets
+   cropped or stretched, and kept low-opacity so it never fights the text. */
+.detail-hero-bg-photo {
+	position: absolute;
+	right: -1%;
+	bottom: 0;
+	z-index: 1;
+	height: min(62vh, 560px);
+	width: auto;
+	max-width: 46%;
+	object-fit: contain;
+	object-position: bottom right;
+	opacity: 0.9;
+	filter: saturate(0.9) contrast(1.03);
+	pointer-events: none;
 }
 
 .detail-hero-grid {
@@ -1302,6 +1326,13 @@ section {
 /* SOFTWARE */
 .software-hero {
 	padding: 5rem 0 3rem;
+	position: relative;
+	overflow: hidden;
+}
+
+.software-hero .container {
+	position: relative;
+	z-index: 2;
 }
 
 .software-hero h1 {
@@ -1951,6 +1982,12 @@ footer span {
 		order: -1;
 	}
 
+	.detail-hero-bg-photo {
+		height: min(42vh, 380px);
+		max-width: 60%;
+		opacity: 0.4;
+	}
+
 	.fitness-hero-grid {
 		grid-template-columns: 1fr;
 		min-height: auto;
@@ -2060,6 +2097,10 @@ footer span {
 	}
 
 	.money-guide-hero-photo {
+		display: none;
+	}
+
+	.detail-hero-bg-photo {
 		display: none;
 	}
 
