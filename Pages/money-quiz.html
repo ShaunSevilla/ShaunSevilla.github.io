@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>What's Your Money Persona? | Shaun Sevilla</title>
+		<meta name="description" content="15 quick taps, no numbers. Find out if you're a Kiasu Hoarder, a Crypto Kaki, a GrabFood Philanthropist or something worse." />
+		<meta name="theme-color" content="#080808" />
+		<link rel="canonical" href="https://shaunsevilla.github.io/Pages/money-quiz.html" />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Shaun Sevilla" />
+		<meta property="og:title" content="What's Your Money Persona?" />
+		<meta property="og:description" content="15 quick taps, no numbers. Find out if you're a Kiasu Hoarder, a Crypto Kaki, a GrabFood Philanthropist or something worse." />
+		<meta property="og:url" content="https://shaunsevilla.github.io/Pages/money-quiz.html" />
+		<meta property="og:image" content="https://shaunsevilla.github.io/assets/og-image.jpg" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<link rel="icon" type="image/png" sizes="64x64" href="../assets/favicon-64.png" />
+		<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
+		<link rel="stylesheet" href="../css/style.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+	</head>
+	<body data-root=".." data-page="quiz">
+		<nav id="site-nav"></nav>
+
+		<main class="quiz-page">
+			<section class="quiz-shell">
+				<div class="container quiz-container">
+					<div class="quiz-intro" id="quiz-intro">
+						<span class="section-label">Money Persona Quiz</span>
+						<h1>What's your money persona?</h1>
+						<p class="quiz-friend" id="quiz-friend" hidden></p>
+						<p>15 quick taps. No numbers, no sign-up, no judgement. Mostly.</p>
+						<button type="button" class="bot-cta-link bot-cta-primary quiz-start" id="quiz-start">Start the quiz <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+						<p class="quiz-alt">Prefer Telegram? <a href="https://t.me/ProsperityPath_bot?start=quiz" target="_blank" rel="noopener noreferrer">Take it in the bot</a>.</p>
+					</div>
+
+					<div class="quiz-question" id="quiz-question" hidden>
+						<div class="quiz-progress" aria-hidden="true"><span id="quiz-progress-bar"></span></div>
+						<p class="quiz-count" id="quiz-count"></p>
+						<h2 id="quiz-text"></h2>
+						<div class="quiz-options" id="quiz-options"></div>
+						<button type="button" class="quiz-back" id="quiz-back"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back</button>
+					</div>
+
+					<div class="quiz-result" id="quiz-result" hidden>
+						<div class="quiz-card" id="quiz-card">
+							<span class="quiz-card-label">My money persona is</span>
+							<span class="quiz-card-emoji" id="quiz-emoji"></span>
+							<h2 id="quiz-name"></h2>
+							<p class="quiz-roast" id="quiz-roast"></p>
+							<dl class="quiz-traits">
+								<div><dt>Superpower</dt><dd id="quiz-superpower"></dd></div>
+								<div><dt>Blind spot</dt><dd id="quiz-blindspot"></dd></div>
+								<div><dt>Try this</dt><dd id="quiz-tip"></dd></div>
+							</dl>
+							<p class="quiz-runner" id="quiz-runner"></p>
+							<span class="quiz-card-site">shaunsevilla.github.io/Pages/money-quiz.html</span>
+						</div>
+						<p class="quiz-cta" id="quiz-cta"></p>
+						<div class="quiz-actions">
+							<a href="booking.html?topic=Money%20persona" class="bot-cta-link bot-cta-primary" id="quiz-book">Book 15 minutes with Shaun <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+							<button type="button" class="bot-cta-link" id="quiz-share">Send to a friend <i class="fas fa-share" aria-hidden="true"></i></button>
+							<button type="button" class="bot-cta-link" id="quiz-restart">Take it again <i class="fas fa-rotate-left" aria-hidden="true"></i></button>
+						</div>
+						<p class="quiz-share-status" id="quiz-share-status" role="status"></p>
+						<p class="money-guide-disclaimer">Just for fun. Not a financial assessment or advice.</p>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<footer id="site-footer" class="site-footer"></footer>
+		<script src="../js/layout.js"></script>
+		<script src="../js/main.js"></script>
+		<script src="../js/shared/moneyQuiz.js"></script>
+		<script src="../js/money-quiz.js"></script>
+	</body>
+</html>

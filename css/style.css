@@ -2822,3 +2822,284 @@ footer span {
 .offset-scenario em + strong {
 	margin-top: 0.7rem;
 }
+
+/* Tax relief, affordability, insurance and the quiz teaser */
+.quiz-teaser {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	margin: 1.5rem 0 1.25rem;
+	padding: 1rem 1.25rem;
+	border: 1px solid var(--gold-dim);
+	background: var(--gold-faint);
+	color: var(--text);
+	text-decoration: none;
+	font-size: 0.9rem;
+	transition: border-color var(--transition);
+}
+
+.quiz-teaser:hover {
+	border-color: var(--gold);
+}
+
+.quiz-teaser strong {
+	color: var(--gold);
+}
+
+.quiz-teaser-emoji {
+	font-size: 1.8rem;
+	line-height: 1;
+}
+
+.quiz-teaser > i {
+	margin-left: auto;
+	color: var(--gold);
+}
+
+.tax-group-hint {
+	margin: 0.4rem 0 0.6rem;
+	color: var(--text);
+}
+
+.tax-savings,
+.afford-car {
+	margin-top: 1.3rem;
+	padding-top: 1.1rem;
+	border-top: 1px solid var(--border);
+}
+
+.calculator-note-callout {
+	padding: 0.8rem 1rem;
+	border-left: 2px solid var(--gold);
+	background: var(--gold-faint);
+	color: var(--text);
+}
+
+.insurance-alarm {
+	margin-bottom: 1.2rem;
+	padding: 1rem 1.2rem;
+	border: 1px solid var(--gold);
+	background: var(--gold-faint);
+}
+
+.insurance-alarm p {
+	margin: 0;
+	color: var(--text);
+	font-size: 1rem;
+	line-height: 1.55;
+}
+
+.insurance-alarm p + p {
+	margin-top: 0.5rem;
+	color: var(--text-muted);
+	font-size: 0.85rem;
+}
+
+.insurance-alarm strong {
+	color: var(--gold);
+}
+
+.booking-form [hidden] {
+	display: none !important;
+}
+
+/* Money persona quiz page */
+.quiz-shell {
+	min-height: calc(100vh - var(--nav-height));
+	padding: calc(var(--nav-height) + 3rem) 0 4rem;
+}
+
+.quiz-container {
+	max-width: 640px;
+}
+
+.quiz-intro h1 {
+	font-family: "Cormorant Garamond", serif;
+	font-size: clamp(2.4rem, 7vw, 3.6rem);
+	font-weight: 600;
+	line-height: 1.05;
+	margin: 0.8rem 0 1rem;
+}
+
+.quiz-intro p {
+	color: var(--text-muted);
+	margin-bottom: 1.5rem;
+}
+
+.quiz-friend {
+	color: var(--gold) !important;
+	font-weight: 500;
+}
+
+.quiz-start {
+	background: var(--gold);
+}
+
+.quiz-alt {
+	margin-top: 1.25rem;
+	font-size: 0.85rem;
+}
+
+.quiz-alt a {
+	color: var(--gold);
+}
+
+.quiz-progress {
+	height: 3px;
+	background: var(--border);
+	margin-bottom: 1.25rem;
+}
+
+.quiz-progress span {
+	display: block;
+	height: 100%;
+	width: 0;
+	background: var(--gold);
+	transition: width 0.25s ease;
+}
+
+.quiz-count {
+	font-size: 0.7rem;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--text-muted);
+}
+
+.quiz-question h2 {
+	font-family: "Cormorant Garamond", serif;
+	font-size: clamp(1.7rem, 5vw, 2.3rem);
+	font-weight: 600;
+	line-height: 1.2;
+	margin: 0.6rem 0 1.5rem;
+}
+
+.quiz-options {
+	display: grid;
+	gap: 0.7rem;
+}
+
+.quiz-option {
+	text-align: left;
+	padding: 1rem 1.15rem;
+	border: 1px solid var(--border);
+	background: var(--surface);
+	color: var(--text);
+	font: inherit;
+	font-size: 0.95rem;
+	cursor: pointer;
+	transition: border-color var(--transition), background var(--transition);
+}
+
+.quiz-option:hover,
+.quiz-option:focus-visible,
+.quiz-option.selected {
+	border-color: var(--gold);
+	background: var(--gold-faint);
+	outline: none;
+}
+
+.quiz-back {
+	margin-top: 1.25rem;
+	background: none;
+	border: none;
+	color: var(--text-muted);
+	font: inherit;
+	font-size: 0.85rem;
+	cursor: pointer;
+	padding: 0;
+}
+
+.quiz-card {
+	text-align: center;
+	padding: 2rem 1.5rem;
+	border: 1px solid var(--gold);
+	background: linear-gradient(160deg, var(--gold-faint), var(--surface) 70%);
+}
+
+.quiz-card-label {
+	display: block;
+	font-size: 0.7rem;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--text-muted);
+}
+
+.quiz-card-emoji {
+	display: block;
+	font-size: 4rem;
+	line-height: 1;
+	margin: 1rem 0 0.5rem;
+}
+
+.quiz-card h2 {
+	font-family: "Cormorant Garamond", serif;
+	font-size: clamp(1.9rem, 6vw, 2.6rem);
+	font-weight: 600;
+	color: var(--gold);
+	line-height: 1.1;
+	margin-bottom: 1rem;
+}
+
+.quiz-roast {
+	font-size: 1.02rem;
+	line-height: 1.6;
+	margin-bottom: 1.4rem;
+}
+
+.quiz-traits {
+	display: grid;
+	gap: 0.8rem;
+	text-align: left;
+	margin: 0 0 1.2rem;
+}
+
+.quiz-traits dt {
+	font-size: 0.66rem;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--gold);
+}
+
+.quiz-traits dd {
+	margin: 0.15rem 0 0;
+	font-size: 0.92rem;
+}
+
+.quiz-runner {
+	font-size: 0.85rem;
+	color: var(--text-muted);
+	margin-bottom: 1rem;
+}
+
+.quiz-card-site {
+	font-size: 0.68rem;
+	letter-spacing: 0.08em;
+	color: var(--text-muted);
+}
+
+.quiz-cta {
+	margin: 1.5rem 0 1rem;
+	font-size: 1rem;
+}
+
+.quiz-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.7rem;
+}
+
+.quiz-actions button,
+.quiz-start {
+	cursor: pointer;
+	background: none;
+	font: inherit;
+	font-size: 0.74rem;
+}
+
+.quiz-share-status {
+	min-height: 1.2em;
+	margin: 0.8rem 0;
+	font-size: 0.85rem;
+	color: var(--gold);
+	word-break: break-all;
+}

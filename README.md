@@ -18,10 +18,13 @@ education, leadership experience, and contact information.
 
 - `css/style.css` — site-wide theme, layout, components, and responsive styles
 - `js/layout.js` — shared navigation and footer
+- `js/tools.js` — Tax Relief, What Can I Afford? and Insurance calculators
+- `js/money-quiz.js` — the Money Persona Quiz page (`Pages/money-quiz.html`)
+- `js/shared/` — maths shared word for word with the Telegram bot (`Prosperity_Bot/src/shared/`); change both copies together
 - `js/main.js` — mobile navigation behavior
 - `js/software-github.js` — GitHub profile and repository preview
 - `js/booking.js` — availability, booking form, prefilled notes and calendar links
-- `js/calculator-ux.js` — calculator deep links (`#hdb`, `#cpf`, `#vehicle`, `#compound`), remembered inputs, and the "Discuss this with Shaun" handoff to booking
+- `js/calculator-ux.js` — calculator deep links (`#tax`, `#afford`, `#hdb`, `#cpf`, `#vehicle`, `#insurance`, `#compound`), remembered inputs, and the "Discuss this with Shaun" handoff to booking
 - `supabase/migrations/001_create_consultation_bookings.sql` — clean booking database installation
 - `supabase/migrations/002_notify_telegram_on_booking.sql` — Telegram admin notification on new booking
 - `supabase/migrations/003_restore_notion_sync_trigger.sql` — Notion booking sync trigger

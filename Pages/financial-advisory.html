@@ -3,14 +3,14 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Free HDB, CPF & Car Loan Calculators | Shaun Sevilla</title>
-		<meta name="description" content="Free Singapore calculators: HDB loan and downpayment (with grants), CPF growth to 65, vehicle loans under MAS rules, and compound interest. Then book a chat if you want a plan." />
+		<title>Free Tax Relief, HDB, CPF & Car Calculators | Shaun Sevilla</title>
+		<meta name="description" content="Free Singapore calculators: tax reliefs and how much you can still save, what home or car you can afford, HDB vs bank loans, CPF growth, insurance and car loans. Then book a chat if you want a plan." />
 		<meta name="theme-color" content="#080808" />
 		<link rel="canonical" href="https://shaunsevilla.github.io/Pages/financial-advisory.html" />
 		<meta property="og:type" content="website" />
 		<meta property="og:site_name" content="Shaun Sevilla" />
-		<meta property="og:title" content="Free HDB, CPF & Car Loan Calculators | Shaun Sevilla" />
-		<meta property="og:description" content="Free Singapore calculators: HDB loan and downpayment (with grants), CPF growth to 65, vehicle loans under MAS rules, and compound interest. Then book a chat if you want a plan." />
+		<meta property="og:title" content="Free Tax Relief, HDB, CPF & Car Calculators | Shaun Sevilla" />
+		<meta property="og:description" content="Free Singapore calculators: tax reliefs and how much you can still save, what home or car you can afford, HDB vs bank loans, CPF growth, insurance and car loans. Then book a chat if you want a plan." />
 		<meta property="og:url" content="https://shaunsevilla.github.io/Pages/financial-advisory.html" />
 		<meta property="og:image" content="https://shaunsevilla.github.io/assets/og-image.jpg" />
 		<meta property="og:image:width" content="1200" />
@@ -66,6 +66,137 @@
 					<span class="section-label">Try It Yourself</span>
 					<h2 class="calculators-heading">Run the numbers.</h2>
 					<p class="calculator-intro">Tap a calculator to open it. Your answers stay on this device, so you won&rsquo;t need to retype them next time. Prefer Telegram? <a href="https://t.me/ProsperityPath_bot?start=menu" target="_blank" rel="noopener noreferrer">Use the same calculators in the bot</a>.</p>
+
+					<a class="quiz-teaser" href="money-quiz.html">
+						<span class="quiz-teaser-emoji" aria-hidden="true">🎭</span>
+						<span><strong>What's your money persona?</strong> 15 quick taps, no numbers. Find out if you're a Kiasu Hoarder, a Crypto Kaki or something worse.</span>
+						<i class="fas fa-arrow-right" aria-hidden="true"></i>
+					</a>
+
+					<details class="calculator-dropdown" id="tax" data-calculator="Tax relief" data-bot-start="tax">
+						<summary>
+							<div>
+								<h3><i class="fas fa-receipt" aria-hidden="true"></i> Tax Relief Calculator</h3>
+								<p>Every relief you can claim, your tax, and how much you can still save before 31 Dec.</p>
+							</div>
+							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
+						</summary>
+						<div class="calculator-dropdown-body">
+							<article class="calculator-card">
+								<p class="calculator-card-note">For tax residents on a salary, using the rules for income earned this year. Assumes you claim the full child relief (you can split it with your spouse). Disability reliefs and special cases aren't included.</p>
+								<form class="booking-form calculator-form" id="tax-form">
+									<label><span>Monthly salary before CPF ($)</span><input type="number" id="tax-pay" min="0" step="1" placeholder="5000" required /></label>
+									<label><span>Bonus this year, incl. AWS ($) <em>Optional</em></span><input type="number" id="tax-bonus" min="0" step="1" placeholder="Blank = none" /></label>
+									<label><span>Age this year</span><input type="number" id="tax-age" min="16" max="100" step="1" placeholder="29" required /></label>
+									<label><span>Residency</span>
+										<select id="tax-residency">
+											<option value="local">Singapore Citizen / PR</option>
+											<option value="foreigner">Foreigner (working here)</option>
+										</select>
+									</label>
+									<label><span>Married?</span>
+										<select id="tax-marital">
+											<option value="single">Single</option>
+											<option value="married_low">Married, spouse earned under $8,000 last year</option>
+											<option value="married">Married, spouse earns more</option>
+										</select>
+									</label>
+									<label><span>Children under 16, or studying full-time <em>Optional</em></span><input type="number" id="tax-children" min="0" max="20" step="1" placeholder="Blank = none" /></label>
+									<div class="tax-mother-fields" id="tax-mother-fields" hidden>
+										<label><span>Are you their mother, and working?</span>
+											<select id="tax-working-mother">
+												<option value="no">No</option>
+												<option value="yes">Yes</option>
+											</select>
+										</label>
+										<div id="tax-mother-extra" hidden>
+											<label><span>How many were born in 2024 or later?</span><input type="number" id="tax-children-2024" min="0" max="20" step="1" placeholder="0" /></label>
+											<label><span>Does a grandparent look after a child aged 12 or under?</span>
+												<select id="tax-grandparent">
+													<option value="no">No</option>
+													<option value="yes">Yes</option>
+												</select>
+											</label>
+										</div>
+									</div>
+									<label><span>Parents or grandparents you support (55+, earned under $8,000 last year)</span>
+										<select id="tax-parents">
+											<option value="0_0">None</option>
+											<option value="1_0">1, lives with me</option>
+											<option value="2_0">2, live with me</option>
+											<option value="0_1">1, lives elsewhere</option>
+											<option value="0_2">2, live elsewhere</option>
+											<option value="1_1">1 with me, 1 elsewhere</option>
+										</select>
+									</label>
+									<label><span>NS</span>
+										<select id="tax-nsman">
+											<option value="none">None</option>
+											<option value="active">I'm an NSman, did in-camp or IPPT last year</option>
+											<option value="inactive">I'm an NSman, no NS activities last year</option>
+											<option value="family">My husband or son is an NSman</option>
+										</select>
+									</label>
+									<p class="calculator-field-hint tax-group-hint">Already done this year? Leave blank if not.</p>
+									<label><span>SRS contributions so far ($) <em>Optional</em></span><input type="number" id="tax-srs" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label><span>CPF cash top-ups to yourself so far ($) <em>Optional</em></span><input type="number" id="tax-topup-self" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label><span>CPF cash top-ups to family so far ($) <em>Optional</em></span><input type="number" id="tax-topup-family" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label id="tax-life-field" hidden><span>Life insurance premiums a year ($) <em>Optional</em></span><input type="number" id="tax-life" min="0" step="1" placeholder="Only counts when your CPF is under $5,000 a year" /></label>
+									<button type="submit" class="booking-submit">Calculate</button>
+									<p class="booking-status" id="tax-status" role="status"></p>
+								</form>
+								<div class="calculator-result" id="tax-result" hidden></div>
+							</article>
+						</div>
+					</details>
+
+					<details class="calculator-dropdown" id="afford" data-calculator="What can I afford" data-bot-start="afford">
+						<summary>
+							<div>
+								<h3><i class="fas fa-wallet" aria-hidden="true"></i> What Can I Afford?</h3>
+								<p>The home and/or car you can comfortably afford, using the rules banks actually use.</p>
+							</div>
+							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
+						</summary>
+						<div class="calculator-dropdown-body">
+							<article class="calculator-card">
+								<p class="calculator-card-note">Keeps an emergency buffer untouched first: 6 months of expenses, or 6 months of pay if people depend on you. Then applies the bank limits: housing instalment up to 30% of income and all debts up to 55%, tested at 3% (HDB loan) or 4% (bank) interest.</p>
+								<form class="booking-form calculator-form" id="afford-form">
+									<label><span>What are you thinking of buying?</span>
+										<select id="afford-want">
+											<option value="both">A home and a car</option>
+											<option value="house">A home</option>
+											<option value="car">A car</option>
+										</select>
+									</label>
+									<label><span>Age</span><input type="number" id="afford-age" min="18" max="100" step="1" placeholder="28" required /></label>
+									<label><span>Monthly salary before CPF ($)</span><input type="number" id="afford-pay" min="0" step="1" placeholder="5000" required /></label>
+									<div class="afford-home-fields">
+										<label><span>Buying with</span>
+											<select id="afford-with">
+												<option value="alone">Just me</option>
+												<option value="partner">My partner</option>
+											</select>
+										</label>
+										<label id="afford-partner-field" hidden><span>Partner's monthly salary before CPF ($)</span><input type="number" id="afford-partner-pay" min="0" step="1" placeholder="4500" /></label>
+									</div>
+									<label><span>Cash in the bank ($)</span><input type="number" id="afford-savings" min="0" step="1" placeholder="40000" required /></label>
+									<label class="afford-home-fields"><span>CPF Ordinary Account balance ($) <em>Optional</em></span><input type="number" id="afford-cpf" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label><span>Does anyone depend on you financially?</span>
+										<select id="afford-dependants">
+											<option value="no">No</option>
+											<option value="yes">Yes (kids, parents)</option>
+										</select>
+									</label>
+									<label id="afford-expenses-field"><span>Monthly spending, all in ($) <em>Optional</em></span><input type="number" id="afford-expenses" min="0" step="1" placeholder="Blank = half your pay" /></label>
+									<label><span>Other loan repayments a month ($) <em>Optional</em></span><input type="number" id="afford-debt" min="0" step="1" placeholder="Car, study loan, instalments. Blank = none" /></label>
+									<button type="submit" class="booking-submit">Calculate</button>
+									<p class="booking-status" id="afford-status" role="status"></p>
+								</form>
+								<div class="calculator-result" id="afford-result" hidden></div>
+							</article>
+						</div>
+					</details>
 
 					<details class="calculator-dropdown" id="hdb" data-calculator="HDB loan" data-bot-start="hdbloan">
 						<summary>
@@ -149,6 +280,27 @@
 						</div>
 					</details>
 
+					<details class="calculator-dropdown" id="insurance" data-calculator="Insurance" data-bot-start="insurance">
+						<summary>
+							<div>
+								<h3><i class="fas fa-umbrella" aria-hidden="true"></i> Insurance Calculator</h3>
+								<p>How much cover you should have, and a sensible budget for it.</p>
+							</div>
+							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
+						</summary>
+						<div class="calculator-dropdown-body">
+							<article class="calculator-card">
+								<p class="calculator-card-note">A simple benchmark based on your income, using the life insurance industry's guideline (9x annual income for death and total permanent disability, 4x for critical illness).</p>
+								<form class="booking-form calculator-form" id="insurance-form">
+									<label><span>Monthly income ($)</span><input type="number" id="insurance-income" min="0" step="1" placeholder="4000" required /></label>
+									<button type="submit" class="booking-submit">Calculate</button>
+									<p class="booking-status" id="insurance-status" role="status"></p>
+								</form>
+								<div class="calculator-result" id="insurance-result" hidden></div>
+							</article>
+						</div>
+					</details>
+
 					<details class="calculator-dropdown" id="compound" data-calculator="Compound interest" data-bot-start="compound">
 						<summary>
 							<div>
@@ -196,6 +348,9 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 		<script src="../js/cpf-calculator.js"></script>
 		<script src="../js/compound-calculator.js"></script>
+		<script src="../js/shared/taxRelief.js"></script>
+		<script src="../js/shared/affordability.js"></script>
+		<script src="../js/tools.js"></script>
 		<script src="../js/calculator-ux.js"></script>
 	</body>
 </html>
