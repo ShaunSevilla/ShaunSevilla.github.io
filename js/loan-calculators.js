@@ -10,6 +10,15 @@
 	const HDB_LOAN_LTV = 0.75;
 	const HDB_LOAN_MAX_YEARS = 25;
 
+	// Bank loan on an HDB flat: same 75% LTV, but at least 5% of the price
+	// in cash (the other 20% can be CPF or cash), tenure up to 30 years.
+	// Blank rate = 1.6% p.a., where 2-year fixed and SORA-floating HDB
+	// packages cluster in Sep 2026 (propertynet.sg, misslobang.com). Keep in
+	// sync with the bot's calculatorConstants.js.
+	const BANK_HOME_LOAN_TYPICAL_RATE = 1.6;
+	const BANK_HOME_LOAN_MIN_CASH_RATE = 0.05;
+	const BANK_HOME_LOAN_MAX_YEARS = 30;
+
 	// Motor vehicle loans: MAS caps the loan at 70% of purchase price when
 	// OMV is $20,000 or below, and 60% when OMV is above $20,000, with a
 	// maximum tenure of 7 years.
@@ -135,6 +144,55 @@
 		};
 	}
 
+	// Same flat, same cash and tenure, financed by a bank instead. Mirrors
+	// calculateBankHomeLoan in the bot.
+	function calculateBankHomeLoan({ price, cpfAvailable, grants = 0, cash, years, ratePercent }) {
+		const cpfPool = cpfAvailable + grants;
+		const requiredDownpayment = price * (1 - HDB_LOAN_LTV);
+		const minimumCash = Math.ceil(price * BANK_HOME_LOAN_MIN_CASH_RATE
+			+ Math.max(0, requiredDownpayment - price * BANK_HOME_LOAN_MIN_CASH_RATE - cpfPool));
+		const bankCash = Math.max(cash, minimumCash);
+		const cpfUsed = Math.min(cpfPool, Math.max(0, requiredDownpayment - bankCash));
+		const loanAmount = Math.max(0, price - bankCash - cpfUsed);
+		const monthlyPayment = amortisedMonthlyPayment(loanAmount, ratePercent / 100, years);
+		const totalRepayment = monthlyPayment * years * 12;
+		return {
+			ratePercent,
+			years,
+			minimumCash,
+			cash: bankCash,
+			cashRaised: bankCash > cash,
+			loanAmount,
+			monthlyPayment,
+			totalInterest: totalRepayment - loanAmount,
+		};
+	}
+
+	function signedDifference(amount) {
+		const rounded = Math.round(amount);
+		if (rounded === 0) return "about the same as HDB";
+		return `${formatCurrency(Math.abs(rounded))} ${rounded < 0 ? "less" : "more"} than HDB`;
+	}
+
+	function buildBankComparison(hdb, bank) {
+		// Compare the rounded figures people actually see.
+		const monthlyDiff = Math.round(bank.monthlyPayment) - Math.round(hdb.monthlyPayment);
+		const interestDiff = Math.round(bank.totalInterest) - Math.round(hdb.totalInterest);
+		let html = `<div class="bank-compare">`;
+		html += `<p class="calculator-note bank-compare-title"><strong>Same flat with a bank loan</strong><br>${bank.years} years at ${bank.ratePercent}% p.a.${bank.rateIsTypical ? " (typical bank rate today)" : ""}</p>`;
+		html += resultRow("Bank monthly payment", `${formatCurrency(bank.monthlyPayment)} (${signedDifference(monthlyDiff)})`);
+		html += resultRow("Bank interest paid", `${formatCurrency(bank.totalInterest)} (${signedDifference(interestDiff)})`);
+		html += resultRow("Bank loan amount", formatCurrency(bank.loanAmount));
+		html += resultRow("Bank cash needed", bank.cashRaised
+			? `${formatCurrency(bank.cash)} (banks need 5% of the price in cash, more than your ${formatCurrency(hdb.cash)})`
+			: `${formatCurrency(bank.cash)} (bank minimum ${formatCurrency(bank.minimumCash)})`);
+		html += `<ul class="calculator-note-list">`;
+		html += `<li><strong>HDB loan:</strong> 2.6%, pegged to the CPF rate so it rarely moves. The whole 25% can come from CPF, no early repayment penalty, but only if your household earns up to $14,000 a month ($7,000 for singles).</li>`;
+		html += `<li><strong>Bank loan:</strong> ${bank.ratePercent < 2.6 ? "cheaper at this rate" : "no cheaper at this rate"}, and up to ${BANK_HOME_LOAN_MAX_YEARS} years, but the rate is only fixed for 2 to 3 years, then it floats. If bank rates average above 2.6% over your loan, HDB ends up cheaper. Once you leave the HDB loan you can't switch back.</li>`;
+		html += `</ul></div>`;
+		return html;
+	}
+
 	// OMV is optional: dealers selling from stock don't always disclose it,
 	// and it isn't needed for the loan math itself — only to check it
 	// against MAS's LTV cap. When omv is null, that check is skipped.
@@ -193,20 +251,29 @@
 	}
 
 	// A "Loan offsetting" button under a loan result that reveals the panel.
-	function buildLoanOffsettingBlock(rawTotalInterest, years, loanLabel) {
-		// Same rounded figure the result shows (and the bot uses).
-		const totalInterest = Math.round(rawTotalInterest);
-		if (!(totalInterest > 0)) return "";
-		const scenarios = calculateLoanOffsetting(totalInterest, years)
-			.map(function (s) {
-				return `<div class="offset-scenario"><span>At ${s.ratePercent}% a year</span><strong>${formatCurrency(s.monthly)}<small>/month</small></strong><em>or ${formatCurrency(s.lumpSum)} once, today</em></div>`;
-			})
-			.join("");
+	// loans: [{ label, totalInterest }] sharing one tenure (HDB vs bank).
+	function buildLoanOffsettingBlock(rawTotalInterest, years, loanLabel, loans) {
+		// Same rounded figures the result shows (and the bot uses).
+		const list = (loans || [{ label: loanLabel, totalInterest: rawTotalInterest }])
+			.map(function (loan) { return { label: loan.label, totalInterest: Math.round(loan.totalInterest) }; })
+			.filter(function (loan) { return loan.totalInterest > 0; });
+		if (!list.length) return "";
+		const multi = list.length > 1;
+		const scenarios = LOAN_OFFSET_RATES.map(function (rate, index) {
+			const lines = list.map(function (loan) {
+				const s = calculateLoanOffsetting(loan.totalInterest, years)[index];
+				return `<strong>${multi ? `<span class="offset-loan">${loan.label}</span>` : ""}${formatCurrency(s.monthly)}<small>/month</small></strong><em>or ${formatCurrency(s.lumpSum)} once, today</em>`;
+			}).join("");
+			return `<div class="offset-scenario"><span>At ${rate * 100}% a year</span>${lines}</div>`;
+		}).join("");
+		const intro = multi
+			? `Interest over ${years} years: ${list.map(function (loan) { return `${loan.label} <strong>${formatCurrency(loan.totalInterest)}</strong>`; }).join(", ")}.`
+			: `Your ${list[0].label} costs <strong>${formatCurrency(list[0].totalInterest)}</strong> in interest over ${years} years.`;
 		return (
 			`<div class="loan-offset">` +
 			`<button type="button" class="bot-cta-link loan-offset-toggle" aria-expanded="false">Loan offsetting <i class="fas fa-lightbulb" aria-hidden="true"></i></button>` +
 			`<div class="loan-offset-panel" hidden>` +
-			`<p class="calculator-note">Your ${loanLabel} costs <strong>${formatCurrency(totalInterest)}</strong> in interest over ${years} years. To have your investment returns cover all of it, invest either:</p>` +
+			`<p class="calculator-note">${intro} To have your investment returns cover all of it, invest either:</p>` +
 			`<div class="offset-scenarios">${scenarios}</div>` +
 			`<p class="calculator-note">Only the returns count toward the interest. The money you put in is still yours. Your loan interest is guaranteed, investment returns aren't. Illustration only, not advice.</p>` +
 			`</div></div>`
@@ -340,6 +407,15 @@
 				return;
 			}
 
+			const bankRateRaw = document.getElementById("hdb-bank-rate") ? document.getElementById("hdb-bank-rate").value : "";
+			const bankRateIsTypical = bankRateRaw === "";
+			const bankRatePercent = bankRateIsTypical ? BANK_HOME_LOAN_TYPICAL_RATE : Number(bankRateRaw);
+			if (!(bankRatePercent >= 0) || bankRatePercent > 15) {
+				setStatus(status, "Please enter the bank's rate as a percentage, or leave it blank.", true);
+				resultBox.hidden = true;
+				return;
+			}
+
 			const results = calculateHdbLoan({ price, cpfAvailable, grants, cash, years });
 
 			if (!results.sufficient) {
@@ -353,8 +429,13 @@
 				return;
 			}
 
+			const bank = Object.assign(
+				calculateBankHomeLoan({ price, cpfAvailable, grants, cash, years, ratePercent: bankRatePercent }),
+				{ rateIsTypical: bankRateIsTypical },
+			);
+
 			resultBox.innerHTML =
-				headline("Monthly payment", formatCurrency(results.monthlyPayment), `${results.years} years at ${(HDB_LOAN_ANNUAL_RATE * 100).toFixed(1)}% p.a.`) +
+				headline("HDB loan: monthly payment", formatCurrency(results.monthlyPayment), `${results.years} years at ${(HDB_LOAN_ANNUAL_RATE * 100).toFixed(1)}% p.a.`) +
 				resultRow("Minimum downpayment (25%)", formatCurrency(results.requiredDownpayment)) +
 				resultRow("Cash used", formatCurrency(results.cash)) +
 				(results.grants > 0
@@ -364,8 +445,12 @@
 				resultRow("Loan amount", formatCurrency(results.loanAmount)) +
 				resultRow("Total repayment", formatCurrency(results.totalRepayment)) +
 				resultRow("Total interest paid", formatCurrency(results.totalInterest)) +
+				buildBankComparison(results, bank) +
 				buildHdbPaymentTimeline(results) +
-				buildLoanOffsettingBlock(results.totalInterest, results.years, "HDB loan");
+				buildLoanOffsettingBlock(null, results.years, null, [
+					{ label: "HDB loan", totalInterest: results.totalInterest },
+					{ label: "Bank loan", totalInterest: bank.totalInterest },
+				]);
 			resultBox.hidden = false;
 		});
 	}
@@ -392,9 +477,9 @@
 		const totalCash = results.cash + results.bsdCashPortion;
 		html += `<p class="calculator-note"><strong>Cash you need in total: about ${formatCurrency(totalCash)}</strong>${results.bsdCashPortion > 0 ? " (incl. stamp duty your leftover CPF can't cover)" : ""}. Legal and admin fees add about $650 to $1,000 (CPF or cash).</p>`;
 		if (results.grants > 0) {
-			html += `<p class="calculator-note">Grants are credited to your CPF OA at completion, so they're treated the same as CPF here — they don't raise your loan limit, only reduce what you need to put in. Check your actual eligible amount on the CPF Housing Grants checker.</p>`;
+			html += `<p class="calculator-note">Grants are credited to your CPF OA at completion, so they're treated the same as CPF here. They don't raise your loan limit, only reduce what you need to put in. Check your actual eligible amount on the CPF Housing Grants checker.</p>`;
 		}
-		html += `<p class="calculator-note">Uses today's HDB loan rate and the 25% downpayment rule. Doesn't check MSR, age limits or bank loans. The OTP fee split is negotiable, but it's cash only and capped at $5,000.</p>`;
+		html += `<p class="calculator-note">Uses today's rates and the 25% downpayment rule. Doesn't check MSR, TDSR or age limits. The OTP fee split is negotiable, but it's cash only and capped at $5,000.</p>`;
 
 		return html;
 	}

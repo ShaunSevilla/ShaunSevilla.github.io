@@ -2800,3 +2800,25 @@ footer span {
 		grid-template-columns: 1fr;
 	}
 }
+
+/* HDB loan vs bank loan comparison, and two-loan offsetting */
+.bank-compare {
+	margin-top: 1.3rem;
+	padding-top: 1.1rem;
+	border-top: 1px solid var(--border);
+}
+
+.bank-compare-title strong {
+	color: var(--text);
+}
+
+.offset-scenario .offset-loan {
+	display: block;
+	font-family: "Inter", sans-serif;
+	font-weight: 400;
+	margin-bottom: 0.1rem;
+}
+
+.offset-scenario em + strong {
+	margin-top: 0.7rem;
+}

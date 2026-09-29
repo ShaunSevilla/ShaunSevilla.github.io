@@ -71,13 +71,13 @@
 						<summary>
 							<div>
 								<h3><i class="fas fa-house" aria-hidden="true"></i> HDB Loan Calculator</h3>
-								<p>Concessionary loan downpayment, CPF usable and monthly instalment.</p>
+								<p>HDB loan vs bank loan: downpayment, CPF usable and monthly instalment.</p>
 							</div>
 							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
 						</summary>
 						<div class="calculator-dropdown-body">
 							<article class="calculator-card">
-								<p class="calculator-card-note">Assumes the HDB concessionary loan (75% LTV / 25% downpayment, rate pegged 0.1% above CPF OA). Doesn't check your Mortgage Servicing Ratio, Total Debt Servicing Ratio or age-based tenure limits.</p>
+								<p class="calculator-card-note">Works out the HDB concessionary loan (2.6%, 25% downpayment) and compares it with a bank loan on the same flat (at least 5% of the price in cash). Doesn't check your Mortgage Servicing Ratio, Total Debt Servicing Ratio or age-based tenure limits.</p>
 								<form class="booking-form calculator-form" id="hdb-loan-form">
 									<label><span>Flat purchase price ($)</span><input type="number" id="hdb-price" min="0" step="1" placeholder="500000" required /></label>
 									<p class="calculator-field-hint" id="hdb-price-hint"></p>
@@ -88,6 +88,7 @@
 									<label><span>Cash for downpayment ($) <em>Optional</em></span><input type="number" id="hdb-cash" min="0" step="1" placeholder="Blank = minimum needed" /></label>
 									<p class="calculator-field-hint" id="hdb-cash-hint"></p>
 									<label><span>Loan tenure (years, max 25) <em>Optional</em></span><input type="number" id="hdb-years" min="1" max="25" step="1" placeholder="Blank = 25" /></label>
+									<label><span>Bank loan rate (% p.a.) <em>Optional</em></span><input type="number" id="hdb-bank-rate" min="0" max="15" step="0.01" placeholder="Don't know? Blank = typical 1.6%" /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="hdb-status" role="status"></p>
 								</form>
