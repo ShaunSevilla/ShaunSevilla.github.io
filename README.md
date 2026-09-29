@@ -20,7 +20,8 @@ education, leadership experience, and contact information.
 - `js/layout.js` — shared navigation and footer
 - `js/main.js` — mobile navigation behavior
 - `js/software-github.js` — GitHub profile and repository preview
-- `js/booking.js` — availability and booking form behavior
+- `js/booking.js` — availability, booking form, prefilled notes and calendar links
+- `js/calculator-ux.js` — calculator deep links (`#hdb`, `#cpf`, `#vehicle`, `#compound`), remembered inputs, and the "Discuss this with Shaun" handoff to booking
 - `supabase/migrations/001_create_consultation_bookings.sql` — clean booking database installation
 - `supabase/migrations/002_notify_telegram_on_booking.sql` — Telegram admin notification on new booking
 - `supabase/migrations/003_restore_notion_sync_trigger.sql` — Notion booking sync trigger

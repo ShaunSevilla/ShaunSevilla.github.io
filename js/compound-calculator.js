@@ -41,7 +41,8 @@
 			setStatus(status, "", false);
 
 			const principal = Number(document.getElementById("compound-principal").value);
-			const annualAddition = Number(document.getElementById("compound-addition").value);
+			// Blank yearly addition = nothing added.
+			const annualAddition = Number(document.getElementById("compound-addition").value || 0);
 			const years = Number(document.getElementById("compound-years").value);
 			const ratePercent = Number(document.getElementById("compound-rate").value);
 

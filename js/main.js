@@ -1,3 +1,24 @@
+// "Tap to copy" links (e.g. a Discord username, which has no web link).
+document.addEventListener("click", function (event) {
+	const trigger = event.target.closest("[data-copy]");
+	if (!trigger) return;
+	event.preventDefault();
+	const value = trigger.getAttribute("data-copy");
+	const feedback = trigger.querySelector("[data-copy-feedback]");
+	const done = function () {
+		if (!feedback) return;
+		feedback.textContent = "Copied!";
+		window.setTimeout(function () {
+			feedback.textContent = value;
+		}, 1600);
+	};
+	if (navigator.clipboard && navigator.clipboard.writeText) {
+		navigator.clipboard.writeText(value).then(done, done);
+	} else {
+		done();
+	}
+});
+
 document.addEventListener("DOMContentLoaded", function () {
 	const hamburger = document.getElementById("nav-hamburger");
 	const navLinks = document.getElementById("nav-links");

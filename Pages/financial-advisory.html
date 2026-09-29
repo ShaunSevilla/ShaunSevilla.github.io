@@ -3,7 +3,21 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Financial Advisory | Shaun Sevilla</title>
+		<title>Free HDB, CPF & Car Loan Calculators | Shaun Sevilla</title>
+		<meta name="description" content="Free Singapore calculators: HDB loan and downpayment (with grants), CPF growth to 65, vehicle loans under MAS rules, and compound interest. Then book a chat if you want a plan." />
+		<meta name="theme-color" content="#080808" />
+		<link rel="canonical" href="https://shaunsevilla.github.io/Pages/financial-advisory.html" />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Shaun Sevilla" />
+		<meta property="og:title" content="Free HDB, CPF & Car Loan Calculators | Shaun Sevilla" />
+		<meta property="og:description" content="Free Singapore calculators: HDB loan and downpayment (with grants), CPF growth to 65, vehicle loans under MAS rules, and compound interest. Then book a chat if you want a plan." />
+		<meta property="og:url" content="https://shaunsevilla.github.io/Pages/financial-advisory.html" />
+		<meta property="og:image" content="https://shaunsevilla.github.io/assets/og-image.jpg" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<link rel="icon" type="image/png" sizes="64x64" href="../assets/favicon-64.png" />
+		<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
 		<link rel="stylesheet" href="../css/style.css" />
 		<link
 			rel="stylesheet"
@@ -31,7 +45,7 @@
 						</p>
 					</div>
 					<figure class="page-hero-photo">
-						<img src="../assets/advisor-personality-cutout.png" alt="Shaun Sevilla" />
+						<img src="../assets/advisor-personality-cutout.webp" alt="Shaun Sevilla" />
 					</figure>
 				</div>
 			</section>
@@ -47,13 +61,13 @@
 				</div>
 			</section>
 
-			<section class="compound-calculator-section">
+			<section class="compound-calculator-section" id="calculators">
 				<div class="container">
 					<span class="section-label">Try It Yourself</span>
 					<h2 class="calculators-heading">Run the numbers.</h2>
-					<p class="calculator-intro">Same rates and rules as the ProsperityPath bot. Tap a calculator to open it.</p>
+					<p class="calculator-intro">Tap a calculator to open it. Your answers stay on this device, so you won&rsquo;t need to retype them next time. Prefer Telegram? <a href="https://t.me/ProsperityPath_bot?start=menu" target="_blank" rel="noopener noreferrer">Use the same calculators in the bot</a>.</p>
 
-					<details class="calculator-dropdown">
+					<details class="calculator-dropdown" id="hdb" data-calculator="HDB loan" data-bot-start="hdbloan">
 						<summary>
 							<div>
 								<h3><i class="fas fa-house" aria-hidden="true"></i> HDB Loan Calculator</h3>
@@ -69,11 +83,11 @@
 									<p class="calculator-field-hint" id="hdb-price-hint"></p>
 									<label><span>CPF Ordinary Account available ($)</span><input type="number" id="hdb-cpf" min="0" step="1" placeholder="80000" required /></label>
 									<p class="calculator-field-hint" id="hdb-cpf-hint"></p>
-									<label><span>Grants you expect (EHG, CPF Housing Grant, PHG, etc.) ($)</span><input type="number" id="hdb-grants" min="0" step="1" placeholder="0" /></label>
+									<label><span>Grants you expect (EHG, CPF Housing Grant, PHG, etc.) ($) <em>Optional</em></span><input type="number" id="hdb-grants" min="0" step="1" placeholder="Blank = none" /></label>
 									<p class="calculator-field-hint" id="hdb-grants-hint">Credited to your CPF OA at completion, so treated the same as CPF here. Leave blank or 0 if none.</p>
-									<label><span>Cash for downpayment ($)</span><input type="number" id="hdb-cash" min="0" step="1" placeholder="10000" required /></label>
+									<label><span>Cash for downpayment ($) <em>Optional</em></span><input type="number" id="hdb-cash" min="0" step="1" placeholder="Blank = minimum needed" /></label>
 									<p class="calculator-field-hint" id="hdb-cash-hint"></p>
-									<label><span>Loan tenure (years, max 25)</span><input type="number" id="hdb-years" min="1" max="25" step="1" placeholder="25" required /></label>
+									<label><span>Loan tenure (years, max 25) <em>Optional</em></span><input type="number" id="hdb-years" min="1" max="25" step="1" placeholder="Blank = 25" /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="hdb-status" role="status"></p>
 								</form>
@@ -82,7 +96,7 @@
 						</div>
 					</details>
 
-					<details class="calculator-dropdown">
+					<details class="calculator-dropdown" id="cpf" data-calculator="CPF growth" data-bot-start="cpf">
 						<summary>
 							<div>
 								<h3><i class="fas fa-piggy-bank" aria-hidden="true"></i> CPF Growth Calculator</h3>
@@ -97,8 +111,8 @@
 									<label><span>Current age</span><input type="number" id="cpf-age" min="16" max="90" step="1" placeholder="30" required /></label>
 									<label><span>Monthly income before CPF deductions ($)</span><input type="number" id="cpf-wage" min="0" step="1" placeholder="5000" required /></label>
 									<label><span>Current CPF Ordinary Account (OA) balance ($)</span><input type="number" id="cpf-oa" min="0" step="1" placeholder="20000" required /></label>
-									<label><span id="cpf-sa-label">Current CPF Special Account (SA) balance ($) (optional)</span><input type="number" id="cpf-sa" min="0" step="1" placeholder="0" /></label>
-									<label><span>Current MediSave Account (MA) balance ($) (optional)</span><input type="number" id="cpf-ma" min="0" step="1" placeholder="0" /></label>
+									<label><span id="cpf-sa-label">Current CPF Special Account (SA) balance ($) <em>Optional</em></span><input type="number" id="cpf-sa" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label><span>Current MediSave Account (MA) balance ($) <em>Optional</em></span><input type="number" id="cpf-ma" min="0" step="1" placeholder="Blank = $0" /></label>
 									<p class="calculator-field-hint">Leave SA/MA blank (treated as $0) if you just want to project OA. Note: CPF doesn't let you voluntarily top up OA alone — only SA/RA (via RSTU) or MediSave individually, or all three together.</p>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="cpf-status" role="status"></p>
@@ -108,7 +122,7 @@
 						</div>
 					</details>
 
-					<details class="calculator-dropdown">
+					<details class="calculator-dropdown" id="vehicle" data-calculator="Vehicle loan" data-bot-start="carloan">
 						<summary>
 							<div>
 								<h3><i class="fas fa-car" aria-hidden="true"></i> Vehicle Loan Calculator</h3>
@@ -124,7 +138,7 @@
 									<label><span>Open Market Value / OMV ($) <em>Optional</em></span><input type="number" id="vehicle-omv" min="0" step="1" placeholder="Leave blank if you don't have it" /></label>
 									<p class="calculator-field-hint" id="vehicle-omv-hint"></p>
 									<label><span>Downpayment ($)</span><input type="number" id="vehicle-downpayment" min="0" step="1" placeholder="55000" required /></label>
-									<label><span>Loan tenure (years, max 7)</span><input type="number" id="vehicle-years" min="1" max="7" step="1" placeholder="7" required /></label>
+									<label><span>Loan tenure (years, max 7) <em>Optional</em></span><input type="number" id="vehicle-years" min="1" max="7" step="1" placeholder="Blank = 7" /></label>
 									<label><span>Quoted interest rate (% p.a., flat)</span><input type="number" id="vehicle-rate" min="0" step="0.01" placeholder="2.78" required /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="vehicle-status" role="status"></p>
@@ -134,7 +148,7 @@
 						</div>
 					</details>
 
-					<details class="calculator-dropdown">
+					<details class="calculator-dropdown" id="compound" data-calculator="Compound interest" data-bot-start="compound">
 						<summary>
 							<div>
 								<h3><i class="fas fa-chart-line" aria-hidden="true"></i> Compound Interest Calculator</h3>
@@ -146,7 +160,7 @@
 							<article class="calculator-card">
 								<form class="booking-form calculator-form" id="compound-form">
 									<label><span>Starting amount ($)</span><input type="number" id="compound-principal" min="0" step="1" placeholder="10000" required /></label>
-									<label><span>Amount added each year ($)</span><input type="number" id="compound-addition" min="0" step="1" placeholder="3000" required /></label>
+									<label><span>Amount added each year ($) <em>Optional</em></span><input type="number" id="compound-addition" min="0" step="1" placeholder="Blank = $0" /></label>
 									<label><span>Number of years</span><input type="number" id="compound-years" min="1" step="1" placeholder="20" required /></label>
 									<label><span>Expected annual return (%)</span><input type="number" id="compound-rate" min="0" step="0.1" placeholder="6" required /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
@@ -181,5 +195,6 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 		<script src="../js/cpf-calculator.js"></script>
 		<script src="../js/compound-calculator.js"></script>
+		<script src="../js/calculator-ux.js"></script>
 	</body>
 </html>

@@ -199,9 +199,9 @@
 		const label = document.getElementById("cpf-sa-label");
 		if (!ageEl || !label) return;
 		const age = Number(ageEl.value);
-		label.textContent = age >= 55
+		label.innerHTML = (age >= 55
 			? "Current CPF Retirement Account (RA) balance ($)"
-			: "Current CPF Special Account (SA) balance ($)";
+			: "Current CPF Special Account (SA) balance ($)") + " <em>Optional</em>";
 	}
 
 	let cpfChartInstance = null;

@@ -2528,3 +2528,203 @@ footer span {
 		justify-content: stretch;
 	}
 }
+
+/* FREE TOOLS (homepage) */
+.tools-section {
+	border-top: 1px solid var(--border);
+}
+
+.tools-intro {
+	max-width: 620px;
+	margin: -1.75rem 0 2rem;
+	color: var(--text-muted);
+	font-size: 0.95rem;
+}
+
+.tools-grid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: var(--component-gap);
+}
+
+.tool-card {
+	display: flex;
+	flex-direction: column;
+	gap: 0.6rem;
+	padding: 1.6rem 1.4rem;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	color: inherit;
+	transition:
+		background var(--transition),
+		border-color var(--transition),
+		transform var(--transition);
+}
+
+.tool-card:hover,
+.tool-card:focus-visible {
+	background: var(--surface-2);
+	border-color: var(--gold-dim);
+	transform: translateY(-2px);
+}
+
+.tool-card > i {
+	color: var(--gold);
+	font-size: 1.1rem;
+}
+
+.tool-card h3 {
+	font-size: var(--card-title-size);
+}
+
+.tool-card p {
+	flex: 1;
+	color: var(--text-muted);
+	font-size: 0.86rem;
+	line-height: 1.6;
+}
+
+.tool-card span {
+	color: var(--gold);
+	font-size: 0.68rem;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+}
+
+@media (max-width: 980px) {
+	.tools-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 560px) {
+	.tools-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.tools-intro {
+		margin-top: -1rem;
+	}
+}
+
+/* Footer "free tools" row */
+.footer-tools {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0.4rem 1.2rem;
+	font-size: 0.72rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--text-muted);
+}
+
+.footer-tools a {
+	color: var(--gold);
+}
+
+.footer-tools a:hover {
+	text-decoration: underline;
+}
+
+/* Calculator result actions (added by calculator-ux.js) */
+.calculator-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	margin-top: 1.4rem;
+	padding-top: 1.2rem;
+	border-top: 1px solid var(--border);
+}
+
+.calculator-intro a,
+.booking-alt a,
+.booking-prefill-note a {
+	color: var(--gold);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+/* Calculators opened from a link land below the fixed nav, not under it. */
+.calculator-dropdown,
+#calculators {
+	scroll-margin-top: calc(var(--nav-height) + 1rem);
+}
+
+.calculator-result {
+	scroll-margin-top: calc(var(--nav-height) + 1rem);
+}
+
+/* Booking: prefill note, retry, calendar links */
+.booking-alt {
+	margin-top: 0.75rem;
+	font-size: 0.9rem;
+}
+
+.booking-prefill-note {
+	padding: 0.8rem 1rem;
+	border: 1px solid var(--gold-dim);
+	background: var(--gold-faint);
+	color: var(--text);
+	font-size: 0.82rem;
+	line-height: 1.55;
+}
+
+.booking-status a {
+	color: var(--gold);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.booking-status strong {
+	display: block;
+	margin-bottom: 0.25rem;
+	color: var(--text);
+}
+
+.booking-retry {
+	background: none;
+	border: 1px solid currentColor;
+	color: inherit;
+	font: inherit;
+	padding: 0.1rem 0.55rem;
+	cursor: pointer;
+}
+
+.booking-calendar-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 1.2rem;
+	margin-top: 0.75rem;
+}
+
+.booking-empty a {
+	color: var(--gold);
+	text-decoration: underline;
+}
+
+/* Contact page quick actions */
+.contact-cta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	margin: -1.5rem 0 2rem;
+}
+
+/* Money guide: "use the tool for this" links under topic headings */
+.guide-tool-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	margin-top: 1rem;
+	margin-right: 1.25rem;
+	color: var(--gold);
+	font-size: 0.7rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	transition: gap var(--transition);
+}
+
+.guide-tool-link:hover {
+	gap: 0.7rem;
+}

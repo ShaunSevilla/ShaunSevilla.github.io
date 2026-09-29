@@ -221,7 +221,7 @@
 		const maxCpfUsable = Math.min(cpfPool, requiredDownpayment);
 		const minCash = Math.max(0, requiredDownpayment - cpfPool);
 		cpfHint.textContent = `${poolLabel} usable toward downpayment: ${formatCurrency(0)} – ${formatCurrency(maxCpfUsable)}`;
-		cashHint.textContent = `Cash needed: ${formatCurrency(minCash)} – ${formatCurrency(requiredDownpayment)}`;
+		cashHint.textContent = `Cash needed: ${formatCurrency(minCash)} – ${formatCurrency(requiredDownpayment)}. Leave blank to use the minimum.`;
 	}
 
 	// Same idea for the vehicle calculator: OMV decides the LTV tier, so the
@@ -265,8 +265,12 @@
 			const cpfAvailable = Number(document.getElementById("hdb-cpf").value);
 			const grantsRaw = document.getElementById("hdb-grants").value;
 			const grants = grantsRaw === "" ? 0 : Number(grantsRaw);
-			const cash = Number(document.getElementById("hdb-cash").value);
-			const years = Number(document.getElementById("hdb-years").value);
+			// Blank cash = the minimum cash needed; blank tenure = 25 years.
+			const cashRaw = document.getElementById("hdb-cash").value;
+			const minimumCash = Math.max(0, price * (1 - HDB_LOAN_LTV) - (cpfAvailable + grants));
+			const cash = cashRaw === "" ? minimumCash : Number(cashRaw);
+			const yearsRaw = document.getElementById("hdb-years").value;
+			const years = yearsRaw === "" ? HDB_LOAN_MAX_YEARS : Number(yearsRaw);
 
 			if (!(price > 0) || cpfAvailable < 0 || grants < 0 || cash < 0 || !(years > 0)) {
 				setStatus(status, "Please fill in every field with a valid number.", true);
@@ -358,7 +362,9 @@
 			const omvRaw = document.getElementById("vehicle-omv").value;
 			const omv = omvRaw === "" ? null : Number(omvRaw);
 			const downpayment = Number(document.getElementById("vehicle-downpayment").value);
-			const years = Number(document.getElementById("vehicle-years").value);
+			// Blank tenure = the 7-year maximum.
+			const yearsRaw = document.getElementById("vehicle-years").value;
+			const years = yearsRaw === "" ? VEHICLE_LOAN_MAX_YEARS : Number(yearsRaw);
 			const ratePercent = Number(document.getElementById("vehicle-rate").value);
 
 			if (!(price > 0) || (omv !== null && !(omv > 0)) || downpayment < 0 || !(years > 0) || ratePercent < 0) {

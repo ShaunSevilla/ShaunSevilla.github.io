@@ -22,6 +22,11 @@
 				href: `${root}/Pages/financial-advisory.html`,
 			},
 			{
+				key: "guide",
+				label: "Money Guide",
+				href: `${root}/Pages/sg-money-guide.html`,
+			},
+			{
 				key: "fitness",
 				label: "Fitness",
 				href: `${root}/Pages/fitness-sports.html`,
@@ -53,9 +58,16 @@
 		`;
 	}
 
-	function buildFooter() {
+	function buildFooter(root) {
 		return `
 			<div class="container">
+				<p class="footer-tools">
+					<span>Free tools:</span>
+					<a href="${root}/Pages/financial-advisory.html#calculators">Calculators</a>
+					<a href="${root}/Pages/sg-money-guide.html">Money Guide</a>
+					<a href="https://t.me/ProsperityPath_bot?start=menu" target="_blank" rel="noopener noreferrer">Telegram Bot</a>
+					<a href="${root}/Pages/booking.html">Book a Chat</a>
+				</p>
 				<div class="footer-contact-links">
 					<a href="mailto:00shaun.sevilla@gmail.com"><i class="fas fa-envelope"></i>Email</a>
 					<a href="https://www.linkedin.com/in/shaunsevilla/" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin"></i>LinkedIn</a>
@@ -81,7 +93,7 @@
 
 		const footer = document.getElementById("site-footer");
 		if (footer) {
-			footer.innerHTML = buildFooter();
+			footer.innerHTML = buildFooter(root);
 		}
 	});
 })();

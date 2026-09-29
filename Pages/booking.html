@@ -4,6 +4,20 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Book a Consultation | Shaun Sevilla</title>
+		<meta name="description" content="Pick a live two-hour slot with Shaun Sevilla, Financial Advisor at AIA Singapore. Times shown in Singapore Time." />
+		<meta name="theme-color" content="#080808" />
+		<link rel="canonical" href="https://shaunsevilla.github.io/Pages/booking.html" />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Shaun Sevilla" />
+		<meta property="og:title" content="Book a Consultation | Shaun Sevilla" />
+		<meta property="og:description" content="Pick a live two-hour slot with Shaun Sevilla, Financial Advisor at AIA Singapore. Times shown in Singapore Time." />
+		<meta property="og:url" content="https://shaunsevilla.github.io/Pages/booking.html" />
+		<meta property="og:image" content="https://shaunsevilla.github.io/assets/og-image.jpg" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<link rel="icon" type="image/png" sizes="64x64" href="../assets/favicon-64.png" />
+		<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
 		<link rel="stylesheet" href="../css/style.css" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 	</head>
@@ -21,9 +35,13 @@
 							Choose a two-hour consultation window and tell me what you would
 							like to discuss. Available times update automatically.
 						</p>
+						<p class="detail-intro booking-alt">
+							Prefer Telegram? <a href="https://t.me/ProsperityPath_bot?start=book" target="_blank" rel="noopener noreferrer">Book in the ProsperityPath bot</a>
+							or message me at <a href="https://t.me/ShaunSevilla" target="_blank" rel="noopener noreferrer">@ShaunSevilla</a>.
+						</p>
 					</div>
 					<figure class="page-hero-photo">
-						<img src="../assets/booking-cutout.png" alt="Shaun Sevilla" />
+						<img src="../assets/booking-cutout.webp" alt="Shaun Sevilla" />
 					</figure>
 				</div>
 			</section>
@@ -67,16 +85,17 @@
 							<span>Phone number or Telegram handle</span>
 							<input type="text" name="contact" autocomplete="tel" minlength="3" maxlength="100" placeholder="9123 4567 or @username" required />
 						</label>
+						<p class="booking-prefill-note" id="booking-prefill-note" hidden></p>
 						<label>
 							<span>What would you like to discuss? <em>Optional</em></span>
-							<textarea name="notes" rows="4" maxlength="1000"></textarea>
+							<textarea name="notes" rows="4" maxlength="1000" placeholder="e.g. buying a resale flat next year, reviewing my insurance"></textarea>
 						</label>
 						<label class="booking-honeypot" aria-hidden="true">
 							<span>Website</span>
 							<input type="text" name="website" tabindex="-1" autocomplete="off" />
 						</label>
 						<button id="booking-submit" class="booking-submit" type="submit" disabled>
-							Confirm Consultation
+							Choose a time first
 						</button>
 						<p id="booking-status" class="booking-status" role="status" aria-live="polite"></p>
 					</form>
