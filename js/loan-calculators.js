@@ -18,6 +18,11 @@
 	const VEHICLE_LOAN_LTV_LOW_OMV = 0.70;
 	const VEHICLE_LOAN_LTV_HIGH_OMV = 0.60;
 	const VEHICLE_LOAN_MAX_YEARS = 7;
+	// Used when the rate is left blank (most people only know their monthly
+	// instalment). 2.48% flat is where most bank car loans cluster in 2026;
+	// source: moneysmart.sg/car-loan, Sep 2026. Keep in sync with the bot's
+	// calculatorConstants.js.
+	const VEHICLE_LOAN_TYPICAL_FLAT_RATE = 2.48;
 
 	// HDB resale: Option Fee + Option Exercise Fee are cash-only (CPF can't
 	// be used until the resale application is processed) and combined must
@@ -417,7 +422,9 @@
 			// Blank tenure = the 7-year maximum.
 			const yearsRaw = document.getElementById("vehicle-years").value;
 			const years = yearsRaw === "" ? VEHICLE_LOAN_MAX_YEARS : Number(yearsRaw);
-			const ratePercent = Number(document.getElementById("vehicle-rate").value);
+			const rateRaw = document.getElementById("vehicle-rate").value;
+			const rateIsTypical = rateRaw === "";
+			const ratePercent = rateIsTypical ? VEHICLE_LOAN_TYPICAL_FLAT_RATE : Number(rateRaw);
 
 			if (!(price > 0) || (omv !== null && !(omv > 0)) || downpayment < 0 || !(years > 0) || ratePercent < 0) {
 				setStatus(status, "Please fill in every field with a valid number (OMV can be left blank).", true);
@@ -445,7 +452,7 @@
 			}
 
 			resultBox.innerHTML =
-				headline("Monthly payment", formatCurrency(results.monthlyPayment), `${results.years} years at ${results.ratePercent}% p.a. flat`) +
+				headline("Monthly payment", formatCurrency(results.monthlyPayment), `${results.years} years at ${results.ratePercent}% p.a. flat${rateIsTypical ? " (typical bank rate)" : ""}`) +
 				(results.hasOmv
 					? resultRow("Max loan allowed", `${results.maxLoanPercent}% of price`)
 					: resultRow("Max loan allowed", "Not checked (no OMV given)")) +
@@ -453,6 +460,9 @@
 				resultRow("Loan amount", formatCurrency(results.loanAmount)) +
 				resultRow("Total repayment", formatCurrency(results.totalRepayment)) +
 				resultRow("Total interest paid", formatCurrency(results.totalInterest)) +
+				(rateIsTypical
+					? `<p class="calculator-note">You left the rate blank, so this uses ${VEHICLE_LOAN_TYPICAL_FLAT_RATE}% flat, where most bank car loans sit in 2026. Used cars are often higher. Your bank will confirm your actual rate.</p>`
+					: "") +
 				(results.hasOmv
 					? `<p class="calculator-note">Car loans quote a flat rate, so the real (effective) rate is roughly 1.8 to 2x higher.</p>`
 					: `<p class="calculator-note">No OMV given, so the MAS loan limit wasn't checked. Your dealer or bank will confirm how much they'll finance. Car loans quote a flat rate, so the real rate is roughly 1.8 to 2x higher.</p>`) +
