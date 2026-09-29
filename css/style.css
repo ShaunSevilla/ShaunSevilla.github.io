@@ -2728,3 +2728,75 @@ footer span {
 .guide-tool-link:hover {
 	gap: 0.7rem;
 }
+
+/* Loan offsetting (under HDB and car loan results) */
+.loan-offset {
+	margin-top: 1.4rem;
+}
+
+.loan-offset-toggle {
+	cursor: pointer;
+	background: none;
+	font: inherit;
+	font-size: 0.74rem;
+}
+
+.loan-offset-toggle[aria-expanded="true"] {
+	border-color: var(--gold);
+}
+
+.loan-offset-panel {
+	margin-top: 1rem;
+	padding: 1.1rem 1.25rem;
+	border: 1px solid var(--gold-dim);
+	background: var(--gold-faint);
+}
+
+.offset-scenarios {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.75rem;
+	margin: 0.9rem 0;
+}
+
+.offset-scenario {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	padding: 0.9rem 1rem;
+	border: 1px solid var(--border);
+	background: var(--surface);
+}
+
+.offset-scenario span {
+	font-size: 0.66rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--text-muted);
+}
+
+.offset-scenario strong {
+	font-family: "Cormorant Garamond", serif;
+	font-size: 1.8rem;
+	font-weight: 600;
+	color: var(--gold);
+}
+
+.offset-scenario strong small {
+	font-family: "Inter", sans-serif;
+	font-size: 0.75rem;
+	color: var(--text-muted);
+	margin-left: 0.2rem;
+}
+
+.offset-scenario em {
+	font-style: normal;
+	font-size: 0.8rem;
+	color: var(--text);
+}
+
+@media (max-width: 480px) {
+	.offset-scenarios {
+		grid-template-columns: 1fr;
+	}
+}

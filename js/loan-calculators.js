@@ -168,6 +168,57 @@
 		};
 	}
 
+	// Loan offsetting: how much to invest so the investment's RETURNS alone
+	// (not the money put in) add up to the loan's total interest by the end
+	// of the loan, at 4% and 6% a year. Keep in sync with the bot's
+	// loanCalculatorService.js (calculateLoanOffsetting).
+	const LOAN_OFFSET_RATES = [0.04, 0.06];
+
+	function calculateLoanOffsetting(totalInterest, years) {
+		const months = Math.round(years * 12);
+		return LOAN_OFFSET_RATES.map(function (annualRate) {
+			const monthlyRate = Math.pow(1 + annualRate, 1 / 12) - 1;
+			const growthFactor = (Math.pow(1 + monthlyRate, months) - 1) / monthlyRate;
+			return {
+				ratePercent: annualRate * 100,
+				monthly: Math.ceil(totalInterest / (growthFactor - months)),
+				lumpSum: Math.ceil(totalInterest / (Math.pow(1 + annualRate, years) - 1)),
+			};
+		});
+	}
+
+	// A "Loan offsetting" button under a loan result that reveals the panel.
+	function buildLoanOffsettingBlock(rawTotalInterest, years, loanLabel) {
+		// Same rounded figure the result shows (and the bot uses).
+		const totalInterest = Math.round(rawTotalInterest);
+		if (!(totalInterest > 0)) return "";
+		const scenarios = calculateLoanOffsetting(totalInterest, years)
+			.map(function (s) {
+				return `<div class="offset-scenario"><span>At ${s.ratePercent}% a year</span><strong>${formatCurrency(s.monthly)}<small>/month</small></strong><em>or ${formatCurrency(s.lumpSum)} once, today</em></div>`;
+			})
+			.join("");
+		return (
+			`<div class="loan-offset">` +
+			`<button type="button" class="bot-cta-link loan-offset-toggle" aria-expanded="false">Loan offsetting <i class="fas fa-lightbulb" aria-hidden="true"></i></button>` +
+			`<div class="loan-offset-panel" hidden>` +
+			`<p class="calculator-note">Your ${loanLabel} costs <strong>${formatCurrency(totalInterest)}</strong> in interest over ${years} years. To have your investment returns cover all of it, invest either:</p>` +
+			`<div class="offset-scenarios">${scenarios}</div>` +
+			`<p class="calculator-note">Only the returns count toward the interest. The money you put in is still yours. Your loan interest is guaranteed, investment returns aren't. Illustration only, not advice.</p>` +
+			`</div></div>`
+		);
+	}
+
+	// One listener for every offsetting button (results are re-rendered on
+	// each calculation).
+	document.addEventListener("click", function (event) {
+		const toggle = event.target.closest(".loan-offset-toggle");
+		if (!toggle) return;
+		const panel = toggle.parentElement.querySelector(".loan-offset-panel");
+		const open = panel.hidden;
+		panel.hidden = !open;
+		toggle.setAttribute("aria-expanded", String(open));
+	});
+
 	function headline(label, value, sub) {
 		return `<div class="calculator-result-headline"><span>${label}</span><strong>${value}</strong>${sub ? `<em>${sub}</em>` : ""}</div>`;
 	}
@@ -308,7 +359,8 @@
 				resultRow("Loan amount", formatCurrency(results.loanAmount)) +
 				resultRow("Total repayment", formatCurrency(results.totalRepayment)) +
 				resultRow("Total interest paid", formatCurrency(results.totalInterest)) +
-				buildHdbPaymentTimeline(results);
+				buildHdbPaymentTimeline(results) +
+				buildLoanOffsettingBlock(results.totalInterest, results.years, "HDB loan");
 			resultBox.hidden = false;
 		});
 	}
@@ -403,7 +455,8 @@
 				resultRow("Total interest paid", formatCurrency(results.totalInterest)) +
 				(results.hasOmv
 					? `<p class="calculator-note">Car loans quote a flat rate, so the real (effective) rate is roughly 1.8 to 2x higher.</p>`
-					: `<p class="calculator-note">No OMV given, so the MAS loan limit wasn't checked. Your dealer or bank will confirm how much they'll finance. Car loans quote a flat rate, so the real rate is roughly 1.8 to 2x higher.</p>`);
+					: `<p class="calculator-note">No OMV given, so the MAS loan limit wasn't checked. Your dealer or bank will confirm how much they'll finance. Car loans quote a flat rate, so the real rate is roughly 1.8 to 2x higher.</p>`) +
+				buildLoanOffsettingBlock(results.totalInterest, results.years, "car loan");
 			resultBox.hidden = false;
 		});
 	}
