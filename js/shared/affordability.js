@@ -73,7 +73,9 @@
 	const OTP_RATE = 0.01;
 	const OTP_CAP = 5000;
 	const BTO_KEY_YEARS = 3;
-	const BTO_SIGNING_SHARE = 0.05;
+	// Due by signing the Agreement for Lease: 10% of the price with an HDB
+	// loan, 20% with a bank loan (HDB's standard split).
+	const BTO_SIGNING_SHARE = { hdb: 0.1, bank: 0.2 };
 	const BTO_OPTION_FEE = 2000;
 	const CPF_OW_CEILING = 8000;
 	const BSD_TIERS = [
@@ -223,8 +225,9 @@
 				// and one-off, so it may come out of the emergency buffer (the
 				// result says so) rather than blocking the flat altogether.
 				if (cash < BTO_OPTION_FEE && o.cashAll < BTO_OPTION_FEE) return false;
-				// Signing the Agreement for Lease: 5% now, from today's cash + CPF.
-				if (cash + o.cpfNow < price * BTO_SIGNING_SHARE) return false;
+				// Signing the Agreement for Lease: 10% (HDB loan) or 20% (bank
+				// loan) plus stamp duty, from today's cash + CPF.
+				if (cash + o.cpfNow < price * BTO_SIGNING_SHARE[bank ? "bank" : "hdb"] + bsd(price)) return false;
 			} else {
 				// Resale option fees (up to $5,000) are cash-only too; same rule.
 				const otp = Math.min(price * OTP_RATE, OTP_CAP);
@@ -594,7 +597,7 @@
 				summary.notes.push(`The ${money(BTO_OPTION_FEE)} BTO option fee has to be paid in cash, so it comes out of your emergency buffer. Top the buffer back up before key collection.`);
 			}
 			if (home.type === "bto") {
-				summary.notes.push("BTO: most of the 25% downpayment is due at key collection, so the CPF you build up while waiting counts. Buying resale instead? Pick a resale option (and its grants) to compare.");
+				summary.notes.push("BTO: with an HDB loan you pay 10% of the price when you sign the Agreement for Lease and 15% at key collection, so the CPF you build up while waiting counts. Young couples on the Staggered Downpayment Scheme can pay 5% at signing instead. Buying resale instead? Pick a resale option (and its grants) to compare.");
 			}
 		}
 		if (home.singleUnder35) {

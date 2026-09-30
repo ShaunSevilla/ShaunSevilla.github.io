@@ -5,10 +5,12 @@
 //   ShaunSevilla.github.io/js/shared/hdbPayments.js
 //
 // Rules (HDB / CPF Board, Sep 2026):
-//   BTO, HDB loan:  booking option fee (cash) → 5% at Agreement for Lease
-//                   → 20% at key collection
-//   BTO, bank loan: option fee (cash) → 10% at AFL, at least 5% of the price
-//                   in cash → 15% at key collection
+//   BTO, HDB loan:  booking option fee (cash) → 10% at Agreement for Lease
+//                   → 15% at key collection (HDB's standard split; young
+//                   couples on the Staggered Downpayment Scheme can pay 5%
+//                   at AFL and 20% at keys instead)
+//   BTO, bank loan: option fee (cash) → 20% at AFL, at least 5% of the price
+//                   in cash → 5% at key collection
 //   Resale:         Option to Purchase fees (cash, up to $5,000, often ~1%)
 //                   → rest of the 25% at completion. Bank loans need at least
 //                   5% of the price in cash in total.
@@ -28,6 +30,8 @@
 	const OTP_CAP = 5000;
 	const BTO_OPTION_FEE = 2000; // 4-room and bigger ($1,000 3-room, $500 2-room)
 	const BANK_MIN_CASH = 0.05;
+	// Share of the price due by signing the Agreement for Lease (BTO).
+	const AFL_SHARE = { hdb: 0.1, bank: 0.2 };
 	const LEGAL_FEES = { hdb: 1000, bank: 3000 }; // rough, conveyancing + admin
 	const BSD_TIERS = [
 		[180000, 0.01],
@@ -67,7 +71,8 @@
 		const stages = [];
 		if (bto) {
 			const fee = Math.min(BTO_OPTION_FEE, downpayment);
-			const signing = price * (bank ? 0.1 : 0.05) - fee;
+			const aflShare = AFL_SHARE[bank ? "bank" : "hdb"];
+			const signing = price * aflShare - fee;
 			stages.push({ key: "booking", label: "Booking the flat", when: "when you pick your flat", parts: [["Option fee", fee]], cashOnly: fee });
 			stages.push({
 				key: "afl",
@@ -76,7 +81,7 @@
 				parts: [["Downpayment", signing], ["Stamp duty", stampDuty], ["Legal fees (about)", legal]],
 				cashOnly: bank ? Math.max(0, bankCash - fee) : 0,
 			});
-			stages.push({ key: "keys", label: "Key collection", when: "about 3 to 4 years later", parts: [["Downpayment", downpayment - price * (bank ? 0.1 : 0.05)]], cashOnly: 0, grantsHere: true, oaTopUp: oaLater - oaNow });
+			stages.push({ key: "keys", label: "Key collection", when: "about 3 to 4 years later", parts: [["Downpayment", downpayment - price * aflShare]], cashOnly: 0, grantsHere: true, oaTopUp: oaLater - oaNow });
 		} else {
 			const otp = Math.min(price * OTP_RATE, OTP_CAP);
 			stages.push({ key: "otp", label: "Option to Purchase", when: "when the seller grants you the option", parts: [["Option fees", otp]], cashOnly: otp });

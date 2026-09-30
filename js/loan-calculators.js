@@ -318,7 +318,7 @@
 		html += `</ol>`;
 		html += `<div class="pay-plan-totals"><div><span>Cash you need</span><strong>${formatCurrency(plan.totalCash)}</strong></div><div><span>CPF OA you need</span><strong>${formatCurrency(plan.totalOa)}</strong></div>${plan.totalGrants > 0 ? `<div><span>Covered by grants</span><strong>${formatCurrency(plan.totalGrants)}</strong></div>` : ""}</div>`;
 		if (plan.type === "bto") {
-			html += `<p class="calculator-note">Uses the CPF OA you have today. Your monthly CPF contributions over the 3 to 4 years before key collection will add to it, so the cash at key collection is likely lower. The $2,000 booking fee is for 4-room and bigger ($1,000 for 3-room, $500 for 2-room).</p>`;
+			html += `<p class="calculator-note">Uses the CPF OA you have today. Your monthly CPF contributions over the 3 to 4 years before key collection will add to it, so the cash at key collection is likely lower. The $2,000 booking fee is for 4-room and bigger ($1,000 for 3-room, $500 for 2-room). Young couples on HDB's Staggered Downpayment Scheme can pay 5% at signing and 20% at key collection instead.</p>`;
 		} else {
 			html += `<p class="calculator-note">The option fees must be cash, because CPF can't be used until HDB accepts the resale application. They're negotiable with the seller but capped at $5,000. Any Cash-Over-Valuation (COV) is extra and cash only.</p>`;
 		}
