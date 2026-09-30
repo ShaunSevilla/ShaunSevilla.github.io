@@ -3,8 +3,9 @@
 // Each answer gives points to one or two personas; the highest total wins
 // (ties go to the persona listed first in PERSONA_ORDER).
 // The Quiet Millionaire-in-Training is the rare one: it's only on the table
-// if every answer you gave was the good-habit one (every question that has a
-// Quiet Millionaire option). One slip and the next-highest persona wins.
+// if you gave the good-habit answer on every question that has a Quiet
+// Millionaire option, with one slip allowed. Two slips and the next-highest
+// persona wins.
 (function (root, factory) {
 	if (typeof module === "object" && module.exports) {
 		module.exports = factory();
@@ -86,6 +87,9 @@
 			cta: "Want a second opinion that the plan holds up? Book a check-up.",
 		},
 	};
+
+	// How many non-good answers the Quiet Millionaire-in-Training allows.
+	const MAX_QUIET_SLIPS = 1;
 
 	const PERSONA_ORDER = ["grabfood", "cpf", "crypto", "yolo", "monk", "hoarder", "quiet", "ostrich"];
 
@@ -193,17 +197,30 @@
 			if (!option) return;
 			Object.entries(option[1]).forEach(([key, points]) => { totals[key] += points; });
 		});
-		const earnedQuiet = QUESTIONS.every((question, index) => {
+		// Quiet Millionaire needs the good-habit answer on every question that
+		// has one, with at most one slip. If they slipped, that one answer
+		// decides the runner-up ("with a pinch of ... in me").
+		const slips = [];
+		QUESTIONS.forEach((question, index) => {
 			const hasGoodAnswer = question[1].some((option) => option[1].quiet);
-			if (!hasGoodAnswer) return true;
+			if (!hasGoodAnswer) return;
 			const option = question[1][(answers || [])[index]];
-			return Boolean(option && option[1].quiet);
+			if (!option || !option[1].quiet) slips.push(option ? option[1] : {});
 		});
-		const eligible = earnedQuiet ? PERSONA_ORDER : PERSONA_ORDER.filter((key) => key !== "quiet");
-		const ranked = eligible.slice().sort((a, b) => totals[b] - totals[a] || PERSONA_ORDER.indexOf(a) - PERSONA_ORDER.indexOf(b));
-		const top = earnedQuiet ? "quiet" : ranked[0];
-		if (earnedQuiet) ranked.splice(ranked.indexOf("quiet"), 1);
-		const second = earnedQuiet ? ranked[0] : ranked[1];
+		const earnedQuiet = slips.length <= MAX_QUIET_SLIPS;
+		const byScore = (a, b) => totals[b] - totals[a] || PERSONA_ORDER.indexOf(a) - PERSONA_ORDER.indexOf(b);
+		let top;
+		let second;
+		if (earnedQuiet) {
+			top = "quiet";
+			const slipKeys = slips.length ? Object.keys(slips[0]).filter((key) => key !== "quiet") : [];
+			const pool = slipKeys.length ? slipKeys : PERSONA_ORDER.filter((key) => key !== "quiet");
+			second = pool.slice().sort(byScore)[0];
+		} else {
+			const ranked = PERSONA_ORDER.filter((key) => key !== "quiet").sort(byScore);
+			top = ranked[0];
+			second = ranked[1];
+		}
 		const runnerUp = totals[second] > 0 ? second : null;
 		return { key: top, rare: top === "quiet", persona: PERSONAS[top], runnerUp, runnerUpPersona: runnerUp ? PERSONAS[runnerUp] : null, totals };
 	}
