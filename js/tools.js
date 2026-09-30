@@ -137,6 +137,14 @@
 		});
 	}
 
+
+	// Cash / CPF OA needed for the suggested flat (see shared/hdbPayments.js).
+	function paymentRows(home, Pay) {
+		if (!Pay || !home || home.price <= 0) return [];
+		const plan = Pay.schedule({ price: home.price, type: home.type, loan: home.best.loan, oa: home.cpfNow, oaAtKeys: home.cpfAtKeys, grants: home.grants.total });
+		return Pay.summaryRows(plan);
+	}
+
 	// -------------------------------------------------------------- Afford
 	function initAfford() {
 		const form = document.getElementById("afford-form");
@@ -146,8 +154,11 @@
 
 		function updateVisibility() {
 			const wantsHome = value("afford-want") !== "car";
-			form.querySelectorAll(".afford-home-fields").forEach(function (el) {
+			form.closest(".calculator-card").querySelectorAll(".afford-home-fields").forEach(function (el) {
 				el.hidden = !wantsHome;
+			});
+			form.closest(".calculator-card").querySelectorAll(".afford-car-note").forEach(function (el) {
+				el.hidden = value("afford-want") === "house";
 			});
 			document.getElementById("afford-partner-field").hidden = !wantsHome || value("afford-with") !== "partner";
 			document.getElementById("afford-expenses-field").hidden = value("afford-dependants") === "yes";
@@ -223,6 +234,7 @@
 
 			if (r.home) {
 				const summary = window.Affordability.homeSummary(r);
+				summary.rows.unshift(...paymentRows(r.home, window.HdbPayments));
 				html += headline(summary.headlineLabel, summary.headline, summary.sub);
 				summary.rows.forEach(function (row) {
 					html += resultRow(row[0], row[1]);
@@ -233,20 +245,11 @@
 			}
 
 			if (r.car) {
-				const car = r.car;
-				if (car.realistic) {
-					html += `<div class="afford-car">` + headline("Car: comfortable up to", formatCurrency(car.price), `All in, about ${formatCurrency(car.monthlyAllIn)}/month`);
-					html += resultRow("Loan instalment", `${formatCurrency(car.instalment)}/month`);
-					html += resultRow("Downpayment (30%)", formatCurrency(car.downpayment));
-					html += resultRow("Stretch (car costs at 20% of pay)", formatCurrency(car.stretchPrice));
-					html += `</div>`;
-				} else {
-					html += `<div class="afford-car">` + headline("Car", "Not comfortably yet", `To own a ${formatCurrency(car.examplePrice)} car comfortably, you'd need about ${formatCurrency(car.neededPayForExample)}/month.`);
-					html += note(car.limitedBy === "savings"
-						? "After your emergency buffer, there isn't enough for the 30% downpayment."
-						: `Comfortable means all car costs within 15% of your pay, which is ${formatCurrency(r.income * 0.15)}/month. Running costs alone are about ${formatCurrency(car.runningCost)}.`);
-					html += `</div>`;
-				}
+				const cs = window.Affordability.carSummary(r);
+				html += `<div class="afford-car">` + headline(cs.headlineLabel, cs.headline, cs.sub);
+				cs.rows.forEach(function (row) { html += resultRow(row[0], row[1]); });
+				cs.notes.forEach(function (text) { html += note(text); });
+				html += `</div>`;
 			}
 
 			if (r.carCostsYouOfHome > 0) {

@@ -33,13 +33,6 @@
 	// calculatorConstants.js.
 	const VEHICLE_LOAN_TYPICAL_FLAT_RATE = 2.48;
 
-	// HDB resale: Option Fee + Option Exercise Fee are cash-only (CPF can't
-	// be used until the resale application is processed) and combined must
-	// not exceed $5,000 — commonly quoted as ~1% of price, capped at $5,000.
-	// Source: cpf.gov.sg, hdb.gov.sg.
-	const HDB_OTP_DEPOSIT_RATE = 0.01;
-	const HDB_OTP_DEPOSIT_CAP = 5000;
-
 	// Buyer's Stamp Duty (BSD), residential, effective 15 Feb 2023 — payable
 	// via CPF OA or cash. Source: iras.gov.sg.
 	const BSD_RESIDENTIAL_TIERS = [
@@ -81,93 +74,6 @@
 		return (loanAmount * monthlyRate * factor) / (factor - 1);
 	}
 
-	function calculateHdbLoan({ price, cpfAvailable, grants = 0, cash, years }) {
-		// Grants (EHG, CPF Housing Grant, PHG, etc.) are credited to the
-		// buyer's CPF OA at completion, not handed over as cash — so for
-		// this math they pool with CPF: same OTP-cash restriction, same
-		// effect on the required downpayment.
-		const cpfPool = cpfAvailable + grants;
-		const requiredDownpayment = price * (1 - HDB_LOAN_LTV);
-		const otpCash = Math.min(price * HDB_OTP_DEPOSIT_RATE, HDB_OTP_DEPOSIT_CAP);
-		const bsd = computeBsd(price);
-		const totalAvailable = cpfPool + cash;
-
-		if (totalAvailable < requiredDownpayment) {
-			return {
-				sufficient: false,
-				requiredDownpayment,
-				otpCash,
-				totalAvailable,
-				shortfall: requiredDownpayment - totalAvailable,
-				grants,
-			};
-		}
-
-		const cpfNeeded = Math.max(0, requiredDownpayment - cash);
-		const cpfUsed = Math.min(cpfPool, cpfNeeded);
-		const cpfLeftover = cpfPool - cpfUsed;
-		const totalDownpayment = cash + cpfUsed;
-		const loanAmount = price - totalDownpayment;
-
-		const monthlyPayment = amortisedMonthlyPayment(loanAmount, HDB_LOAN_ANNUAL_RATE, years);
-		const totalRepayment = monthlyPayment * years * 12;
-		const totalInterest = totalRepayment - loanAmount;
-
-		// otpCash must come out of cash specifically (CPF can't pay it); the
-		// rest is settled at completion/key collection alongside BSD.
-		const cashShortfallForOtp = Math.max(0, otpCash - cash);
-		const completionCash = Math.max(0, cash - otpCash);
-		const completionDownpayment = Math.max(0, requiredDownpayment - otpCash);
-		const bsdCpfPortion = Math.min(cpfLeftover, bsd);
-		const bsdCashPortion = bsd - bsdCpfPortion;
-
-		return {
-			sufficient: true,
-			requiredDownpayment,
-			cash,
-			grants,
-			cpfUsed,
-			cpfLeftover,
-			totalDownpayment,
-			loanAmount,
-			years,
-			monthlyPayment,
-			totalRepayment,
-			totalInterest,
-			otpCash,
-			cashShortfallForOtp,
-			completionCash,
-			completionDownpayment,
-			bsd,
-			bsdCpfPortion,
-			bsdCashPortion,
-		};
-	}
-
-	// Same flat, same cash and tenure, financed by a bank instead. Mirrors
-	// calculateBankHomeLoan in the bot.
-	function calculateBankHomeLoan({ price, cpfAvailable, grants = 0, cash, years, ratePercent }) {
-		const cpfPool = cpfAvailable + grants;
-		const requiredDownpayment = price * (1 - HDB_LOAN_LTV);
-		const minimumCash = Math.ceil(price * BANK_HOME_LOAN_MIN_CASH_RATE
-			+ Math.max(0, requiredDownpayment - price * BANK_HOME_LOAN_MIN_CASH_RATE - cpfPool));
-		const bankCash = Math.max(cash, minimumCash);
-		const cpfUsed = Math.min(cpfPool, Math.max(0, requiredDownpayment - bankCash));
-		const loanAmount = Math.max(0, price - bankCash - cpfUsed);
-		const monthlyPayment = amortisedMonthlyPayment(loanAmount, ratePercent / 100, years);
-		const totalRepayment = monthlyPayment * years * 12;
-		return {
-			ratePercent,
-			years,
-			minimumCash,
-			cash: bankCash,
-			cashRaised: bankCash > cash,
-			loanAmount,
-			monthlyPayment,
-			totalInterest: totalRepayment - loanAmount,
-		};
-	}
-
 	function signedDifference(amount) {
 		const rounded = Math.round(amount);
 		if (rounded === 0) return "about the same as HDB";
@@ -178,14 +84,12 @@
 		// Compare the rounded figures people actually see.
 		const monthlyDiff = Math.round(bank.monthlyPayment) - Math.round(hdb.monthlyPayment);
 		const interestDiff = Math.round(bank.totalInterest) - Math.round(hdb.totalInterest);
+		const cashDiff = Math.round(bank.cash) - Math.round(hdb.cash);
 		let html = `<div class="bank-compare">`;
 		html += `<p class="calculator-note bank-compare-title"><strong>Same flat with a bank loan</strong><br>${bank.years} years at ${bank.ratePercent}% p.a.${bank.rateIsTypical ? " (typical bank rate today)" : ""}</p>`;
 		html += resultRow("Bank monthly payment", `${formatCurrency(bank.monthlyPayment)} (${signedDifference(monthlyDiff)})`);
 		html += resultRow("Bank interest paid", `${formatCurrency(bank.totalInterest)} (${signedDifference(interestDiff)})`);
-		html += resultRow("Bank loan amount", formatCurrency(bank.loanAmount));
-		html += resultRow("Bank cash needed", bank.cashRaised
-			? `${formatCurrency(bank.cash)} (banks need 5% of the price in cash, more than your ${formatCurrency(hdb.cash)})`
-			: `${formatCurrency(bank.cash)} (bank minimum ${formatCurrency(bank.minimumCash)})`);
+		html += resultRow("Cash you'd need", `${formatCurrency(bank.cash)}${cashDiff > 0 ? ` (${formatCurrency(cashDiff)} more: banks need 5% of the price in cash)` : ""}`);
 		html += `<ul class="calculator-note-list">`;
 		html += `<li><strong>HDB loan:</strong> 2.6%, pegged to the CPF rate so it rarely moves. The whole 25% can come from CPF, no early repayment penalty, but only if your household earns up to $16,000 a month ($8,000 for singles).</li>`;
 		html += `<li><strong>Bank loan:</strong> ${bank.ratePercent < 2.6 ? "cheaper at this rate" : "no cheaper at this rate"}, and up to ${BANK_HOME_LOAN_MAX_YEARS} years, but the rate is only fixed for 2 to 3 years, then it floats. If bank rates average above 2.6% over your loan, HDB ends up cheaper. Once you leave the HDB loan you can't switch back.</li>`;
@@ -304,47 +208,14 @@
 		el.classList.toggle("error", Boolean(isError));
 	}
 
-	// Live-updates the greyed helper text under the price/CPF/cash fields as the
-	// user types, before they've submitted the form, so they know the minimum
-	// (and maximum) downpayment split before committing to numbers.
+	// Live helper text under the price field: the 25% downpayment.
 	function updateHdbHints() {
 		const priceHint = document.getElementById("hdb-price-hint");
 		const cpfHint = document.getElementById("hdb-cpf-hint");
-		const cashHint = document.getElementById("hdb-cash-hint");
-		if (!priceHint || !cpfHint || !cashHint) return;
-
-		const priceEl = document.getElementById("hdb-price");
-		const cpfEl = document.getElementById("hdb-cpf");
-		const grantsEl = document.getElementById("hdb-grants");
-		const price = Number(priceEl.value);
-
-		if (!(price > 0)) {
-			priceHint.textContent = "";
-			cpfHint.textContent = "";
-			cashHint.textContent = "";
-			return;
-		}
-
-		const requiredDownpayment = price * (1 - HDB_LOAN_LTV);
-		priceHint.textContent = `Minimum downpayment needed (25%): ${formatCurrency(requiredDownpayment)}`;
-
-		const cpfRaw = cpfEl.value;
-		const cpfAvailable = cpfRaw === "" ? null : Number(cpfRaw);
-		const grantsRaw = grantsEl ? grantsEl.value : "";
-		const grants = grantsRaw === "" || !Number.isFinite(Number(grantsRaw)) || Number(grantsRaw) < 0 ? 0 : Number(grantsRaw);
-		const poolLabel = grants > 0 ? "CPF + grants" : "CPF";
-
-		if (cpfAvailable === null || !Number.isFinite(cpfAvailable) || cpfAvailable < 0) {
-			cpfHint.textContent = `${poolLabel} usable toward downpayment: ${formatCurrency(0)} – ${formatCurrency(requiredDownpayment)} (depends on your CPF balance)`;
-			cashHint.textContent = `Cash needed: ${formatCurrency(0)} – ${formatCurrency(requiredDownpayment)} (depends on how much ${poolLabel} you use)`;
-			return;
-		}
-
-		const cpfPool = cpfAvailable + grants;
-		const maxCpfUsable = Math.min(cpfPool, requiredDownpayment);
-		const minCash = Math.max(0, requiredDownpayment - cpfPool);
-		cpfHint.textContent = `${poolLabel} usable toward downpayment: ${formatCurrency(0)} – ${formatCurrency(maxCpfUsable)}`;
-		cashHint.textContent = `Cash needed: ${formatCurrency(minCash)} – ${formatCurrency(requiredDownpayment)}. Leave blank to use the minimum.`;
+		if (!priceHint || !cpfHint) return;
+		const price = Number(document.getElementById("hdb-price").value);
+		cpfHint.textContent = "";
+		priceHint.textContent = price > 0 ? `Downpayment (25%): ${formatCurrency(price * (1 - HDB_LOAN_LTV))}, plus stamp duty ${formatCurrency(computeBsd(price))}` : "";
 	}
 
 	// Same idea for the vehicle calculator: OMV decides the LTV tier, so the
@@ -384,29 +255,25 @@
 			event.preventDefault();
 			setStatus(status, "", false);
 
+			const Pay = window.HdbPayments;
+			const type = document.getElementById("hdb-type").value;
 			const price = Number(document.getElementById("hdb-price").value);
 			const cpfAvailable = Number(document.getElementById("hdb-cpf").value);
 			const grantsRaw = document.getElementById("hdb-grants").value;
 			const grants = grantsRaw === "" ? 0 : Number(grantsRaw);
-			// Blank cash = the minimum cash needed; blank tenure = 25 years.
-			const cashRaw = document.getElementById("hdb-cash").value;
-			const minimumCash = Math.max(0, price * (1 - HDB_LOAN_LTV) - (cpfAvailable + grants));
-			const cash = cashRaw === "" ? minimumCash : Number(cashRaw);
 			const yearsRaw = document.getElementById("hdb-years").value;
 			const years = yearsRaw === "" ? HDB_LOAN_MAX_YEARS : Number(yearsRaw);
 
-			if (!(price > 0) || cpfAvailable < 0 || grants < 0 || cash < 0 || !(years > 0)) {
-				setStatus(status, "Please fill in every field with a valid number.", true);
+			if (!(price > 0) || cpfAvailable < 0 || grants < 0 || !(years > 0)) {
+				setStatus(status, "Please fill in the price and your CPF OA.", true);
 				resultBox.hidden = true;
 				return;
 			}
-
 			if (years > HDB_LOAN_MAX_YEARS) {
 				setStatus(status, `HDB loans are capped at ${HDB_LOAN_MAX_YEARS} years.`, true);
 				resultBox.hidden = true;
 				return;
 			}
-
 			const bankRateRaw = document.getElementById("hdb-bank-rate") ? document.getElementById("hdb-bank-rate").value : "";
 			const bankRateIsTypical = bankRateRaw === "";
 			const bankRatePercent = bankRateIsTypical ? BANK_HOME_LOAN_TYPICAL_RATE : Number(bankRateRaw);
@@ -416,71 +283,49 @@
 				return;
 			}
 
-			const results = calculateHdbLoan({ price, cpfAvailable, grants, cash, years });
-
-			if (!results.sufficient) {
-				resultBox.innerHTML =
-					resultRow("Minimum downpayment needed (25%)", formatCurrency(results.requiredDownpayment)) +
-					resultRow("Your CPF + grants + cash", formatCurrency(results.totalAvailable)) +
-					resultRow("Shortfall", formatCurrency(results.shortfall)) +
-					`<p class="calculator-note">Of that, about ${formatCurrency(results.otpCash)} is due in cash at the Option to Purchase, since CPF can't be used until the resale application is processed.</p>` +
-					`<p class="calculator-note">You'd need more CPF, more cash, or a lower-priced flat.</p>`;
-				resultBox.hidden = false;
-				return;
-			}
-
-			const bank = Object.assign(
-				calculateBankHomeLoan({ price, cpfAvailable, grants, cash, years, ratePercent: bankRatePercent }),
-				{ rateIsTypical: bankRateIsTypical },
-			);
+			const hdbPlan = Pay.schedule({ price, type, loan: "hdb", oa: cpfAvailable, grants });
+			const bankPlan = Pay.schedule({ price, type, loan: "bank", oa: cpfAvailable, grants });
+			const loanAmount = hdbPlan.loan;
+			const monthlyPayment = amortisedMonthlyPayment(loanAmount, HDB_LOAN_ANNUAL_RATE, years);
+			const totalInterest = monthlyPayment * years * 12 - loanAmount;
+			const bankMonthly = amortisedMonthlyPayment(loanAmount, bankRatePercent / 100, years);
+			const bankInterest = bankMonthly * years * 12 - loanAmount;
 
 			resultBox.innerHTML =
-				headline("HDB loan: monthly payment", formatCurrency(results.monthlyPayment), `${results.years} years at ${(HDB_LOAN_ANNUAL_RATE * 100).toFixed(1)}% p.a.`) +
-				resultRow("Minimum downpayment (25%)", formatCurrency(results.requiredDownpayment)) +
-				resultRow("Cash used", formatCurrency(results.cash)) +
-				(results.grants > 0
-					? resultRow("CPF + grants used", `${formatCurrency(results.cpfUsed)} (${formatCurrency(results.cpfLeftover)} left untouched, incl. ${formatCurrency(results.grants)} in grants)`)
-					: resultRow("CPF used", `${formatCurrency(results.cpfUsed)} (${formatCurrency(results.cpfLeftover)} left untouched)`)) +
-				resultRow("Total downpayment", formatCurrency(results.totalDownpayment)) +
-				resultRow("Loan amount", formatCurrency(results.loanAmount)) +
-				resultRow("Total repayment", formatCurrency(results.totalRepayment)) +
-				resultRow("Total interest paid", formatCurrency(results.totalInterest)) +
-				buildBankComparison(results, bank) +
-				buildHdbPaymentTimeline(results) +
-				buildLoanOffsettingBlock(null, results.years, null, [
-					{ label: "HDB loan", totalInterest: results.totalInterest },
-					{ label: "Bank loan", totalInterest: bank.totalInterest },
+				headline("HDB loan: monthly payment", formatCurrency(monthlyPayment), `${years} years at ${(HDB_LOAN_ANNUAL_RATE * 100).toFixed(1)}% p.a. on a ${formatCurrency(loanAmount)} loan`) +
+				buildPaymentPlan(hdbPlan, cpfAvailable) +
+				resultRow("Total interest paid", formatCurrency(totalInterest)) +
+				buildBankComparison(
+					{ monthlyPayment, totalInterest, cash: hdbPlan.totalCash },
+					{ years, ratePercent: bankRatePercent, rateIsTypical: bankRateIsTypical, monthlyPayment: bankMonthly, totalInterest: bankInterest, cash: bankPlan.totalCash },
+				) +
+				buildLoanOffsettingBlock(null, years, null, [
+					{ label: "HDB loan", totalInterest },
+					{ label: "Bank loan", totalInterest: bankInterest },
 				]);
 			resultBox.hidden = false;
 		});
 	}
 
-	// A simple proportional bar (no chart library needed) showing the cash
-	// due at OTP vs. what's settled at Key Collection, plus a point-form
-	// breakdown of each stage.
-	function buildHdbPaymentTimeline(results) {
-		const otpPct = Math.max(2, (results.otpCash / results.requiredDownpayment) * 100);
-		const completionPct = 100 - otpPct;
-
-		let html = `<p class="calculator-note" style="margin-top:1.2rem;"><strong style="color:var(--text);">When you pay</strong></p>`;
-		html += `<div class="hdb-timeline-bar"><span class="hdb-timeline-otp" style="width:${otpPct}%;"></span><span class="hdb-timeline-completion" style="width:${completionPct}%;"></span></div>`;
-		html += `<div class="hdb-timeline-legend"><span><i class="hdb-timeline-swatch hdb-timeline-swatch-otp"></i>At OTP</span><span><i class="hdb-timeline-swatch hdb-timeline-swatch-completion"></i>At key collection</span></div>`;
-		html += `<ul class="calculator-note-list">`;
-		html += `<li>At OTP (cash only): ${formatCurrency(results.otpCash)}</li>`;
-		html += `<li>At key collection (~8 to 10 weeks later): ${formatCurrency(results.completionDownpayment)} (cash ${formatCurrency(results.completionCash)} + CPF ${formatCurrency(results.cpfUsed)}), plus stamp duty of about ${formatCurrency(results.bsd)} (CPF or cash)</li>`;
-		html += `</ul>`;
-
-		if (results.cashShortfallForOtp > 0) {
-			html += `<p class="calculator-note" style="color:var(--gold);">Your planned cash (${formatCurrency(results.cash)}) is less than the ${formatCurrency(results.otpCash)} due at OTP. That part must be cash, since CPF can't be used yet.</p>`;
+	// Each payment stage, and how much of it is cash vs CPF OA vs grants.
+	function buildPaymentPlan(plan, oaToday) {
+		const Pay = window.HdbPayments;
+		let html = `<div class="pay-plan"><p class="pay-plan-title">What you pay, and when</p><ol class="pay-plan-stages">`;
+		plan.stages.forEach(function (stage) {
+			const parts = stage.parts.length > 1 ? `<span class="pay-plan-parts">${stage.parts.map(function (part) { return `${part[0]} ${formatCurrency(part[1])}`; }).join(" + ")}</span>` : "";
+			html += `<li><div class="pay-plan-head"><strong>${stage.label}</strong><span>${formatCurrency(stage.total)}</span></div><span class="pay-plan-when">${stage.when}</span>${parts}<span class="pay-plan-source">${Pay.sourceLine(stage)}</span></li>`;
+		});
+		html += `</ol>`;
+		html += `<div class="pay-plan-totals"><div><span>Cash you need</span><strong>${formatCurrency(plan.totalCash)}</strong></div><div><span>CPF OA you need</span><strong>${formatCurrency(plan.totalOa)}</strong></div>${plan.totalGrants > 0 ? `<div><span>Covered by grants</span><strong>${formatCurrency(plan.totalGrants)}</strong></div>` : ""}</div>`;
+		if (plan.type === "bto") {
+			html += `<p class="calculator-note">Uses the CPF OA you have today. Your monthly CPF contributions over the 3 to 4 years before key collection will add to it, so the cash at key collection is likely lower. The $2,000 booking fee is for 4-room and bigger ($1,000 for 3-room, $500 for 2-room).</p>`;
+		} else {
+			html += `<p class="calculator-note">The option fees must be cash, because CPF can't be used until HDB accepts the resale application. They're negotiable with the seller but capped at $5,000. Any Cash-Over-Valuation (COV) is extra and cash only.</p>`;
 		}
-
-		const totalCash = results.cash + results.bsdCashPortion;
-		html += `<p class="calculator-note"><strong>Cash you need in total: about ${formatCurrency(totalCash)}</strong>${results.bsdCashPortion > 0 ? " (incl. stamp duty your leftover CPF can't cover)" : ""}. Legal and admin fees add about $650 to $1,000 (CPF or cash).</p>`;
-		if (results.grants > 0) {
-			html += `<p class="calculator-note">Grants are credited to your CPF OA at completion, so they're treated the same as CPF here. They don't raise your loan limit, only reduce what you need to put in. Check your actual eligible amount on the CPF Housing Grants checker.</p>`;
+		if (plan.oaLeft > 0) {
+			html += `<p class="calculator-note">${formatCurrency(plan.oaLeft)} of your CPF OA is left over. CPF suggests keeping some as a buffer (you can keep up to $20,000 when taking an HDB loan).</p>`;
 		}
-		html += `<p class="calculator-note">Uses today's rates and the 25% downpayment rule. Doesn't check MSR, TDSR or age limits. The OTP fee split is negotiable, but it's cash only and capped at $5,000.</p>`;
-
+		html += `</div>`;
 		return html;
 	}
 

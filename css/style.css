@@ -3302,3 +3302,101 @@ footer span {
 	border-color: var(--gold);
 	background: var(--gold-faint);
 }
+
+
+/* HDB loan: payment stages with cash / CPF OA split. */
+.pay-plan {
+	margin: 1.25rem 0;
+	padding: 1rem 1.1rem;
+	border: 1px solid var(--gold-dim);
+	background: var(--gold-faint);
+}
+
+.pay-plan-title {
+	font-size: 0.72rem;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--gold);
+	margin-bottom: 0.75rem;
+}
+
+.pay-plan-stages {
+	list-style: none;
+	counter-reset: stage;
+	margin: 0 0 1rem;
+	padding: 0;
+}
+
+.pay-plan-stages li {
+	counter-increment: stage;
+	position: relative;
+	padding: 0 0 0.9rem 2rem;
+	border-left: 1px solid var(--gold-dim);
+	margin-left: 0.7rem;
+}
+
+.pay-plan-stages li:last-child {
+	border-left-color: transparent;
+	padding-bottom: 0;
+}
+
+.pay-plan-stages li::before {
+	content: counter(stage);
+	position: absolute;
+	left: -0.72rem;
+	top: 0;
+	width: 1.4rem;
+	height: 1.4rem;
+	border-radius: 50%;
+	background: var(--gold);
+	color: #0a0a0a;
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-align: center;
+	line-height: 1.4rem;
+}
+
+.pay-plan-head {
+	display: flex;
+	justify-content: space-between;
+	gap: 0.75rem;
+	color: var(--text);
+}
+
+.pay-plan-when,
+.pay-plan-parts,
+.pay-plan-source {
+	display: block;
+	font-size: 0.82rem;
+	color: var(--text-muted);
+	margin-top: 0.15rem;
+}
+
+.pay-plan-source {
+	color: var(--gold);
+}
+
+.pay-plan-totals {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+	gap: 0.6rem;
+}
+
+.pay-plan-totals div {
+	padding: 0.6rem 0.75rem;
+	border: 1px solid var(--gold-dim);
+	background: rgba(0, 0, 0, 0.25);
+}
+
+.pay-plan-totals span {
+	display: block;
+	font-size: 0.7rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--text-muted);
+}
+
+.pay-plan-totals strong {
+	font-size: 1.15rem;
+	color: var(--text);
+}

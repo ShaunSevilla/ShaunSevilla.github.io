@@ -33,8 +33,8 @@
 // 4 km (singles $15,000 / $10,000). HDB confirms the exact EHG in the HFE
 // letter; the per-band amounts below are the published indicative table.
 //
-// CAR: "comfortable" means ALL car costs (not just the instalment) stay
-// within 15% of gross income; 20% is a stretch (ownershipguide.com, 2026).
+// CAR (Shaun's guide): the loan instalment stays under 10% of take-home
+// pay, and owning the car all in costs about 1.3x to 1.5x the instalment.
 (function (root, factory) {
 	if (typeof module === "object" && module.exports) {
 		module.exports = factory();
@@ -44,7 +44,9 @@
 })(typeof self !== "undefined" ? self : this, function () {
 	const MSR = 0.3;
 	const TDSR = 0.55;
-	const COMFORT_SHARE = 0.25;
+	// Shaun's guide: keep housing repayments within 30% of gross income (the
+	// same line HDB's Mortgage Servicing Ratio draws).
+	const COMFORT_SHARE = 0.3;
 	const MIN_SAVINGS_RATE = 0.2;
 	const TAKE_HOME_SHARE = 0.8; // after 20% employee CPF
 	const DEFAULT_SPEND_SHARE = 0.5; // of take-home, when spending isn't given
@@ -85,17 +87,17 @@
 	const FAMILY_GRANT = { couple: 80000, single: 40000 };
 	const PROXIMITY_GRANT = { couple: { with: 30000, near: 20000 }, single: { with: 15000, near: 10000 } };
 
-	const CAR_COMFORT_SHARE = 0.15;
-	const CAR_STRETCH_SHARE = 0.2;
-	// Insurance ~$150, road tax ~$60, petrol ~$260, parking ~$150,
-	// servicing/tyres ~$100, ERP/tolls ~$80 a month for a mass-market car.
-	const CAR_RUNNING_COST = 800;
-	const CAR_LIFE_MONTHS = 120; // COE is 10 years
+	// Shaun's guide: keep the car loan instalment under 10% of take-home pay;
+	// owning the car all in (insurance, road tax, petrol, parking,
+	// servicing) costs about 1.3x to 1.5x the instalment.
+	const CAR_COMFORT_SHARE = 0.1; // of take-home
+	const CAR_STRETCH_SHARE = 0.15; // of take-home
+	const CAR_ALL_IN_LOW = 1.3;
+	const CAR_ALL_IN_HIGH = 1.5;
 	const CAR_LOAN_SHARE = 0.7; // MAS: up to 70% if OMV <= $20,000
 	const CAR_FLAT_RATE = 0.0248;
 	const CAR_LOAN_YEARS = 7;
 	const CAR_DOWNPAYMENT = 1 - CAR_LOAN_SHARE;
-	const CAR_COST_PER_DOLLAR = 1 / CAR_LIFE_MONTHS + (CAR_LOAN_SHARE * CAR_FLAT_RATE * CAR_LOAN_YEARS) / CAR_LIFE_MONTHS;
 	const CAR_INSTALMENT_PER_DOLLAR = (CAR_LOAN_SHARE * (1 + CAR_FLAT_RATE * CAR_LOAN_YEARS)) / (CAR_LOAN_YEARS * 12);
 	const CAR_EXAMPLE_PRICE = 120000;
 	const CAR_MIN_REALISTIC = 80000;
@@ -278,6 +280,7 @@
 			grants,
 			oaInflow: Math.round(oaInflow),
 			cpfAtKeys: Math.round(cpfAtKeys),
+			cpfNow: Math.round(cpf),
 			keyYears: BTO_KEY_YEARS,
 			hdbEligible,
 			ceiling,
@@ -287,24 +290,60 @@
 	}
 
 	function car({ income, cash, otherDebt }) {
-		const byIncome = (share) => Math.max(0, (income * share - CAR_RUNNING_COST) / CAR_COST_PER_DOLLAR);
+		const takeHome = income * TAKE_HOME_SHARE;
+		const byIncome = (share) => Math.max(0, (takeHome * share) / CAR_INSTALMENT_PER_DOLLAR);
 		const byCash = cash / CAR_DOWNPAYMENT;
 		const byTdsr = Math.max(0, (income * TDSR - otherDebt) / CAR_INSTALMENT_PER_DOLLAR);
 		const comfortable = Math.min(byIncome(CAR_COMFORT_SHARE), byCash, byTdsr);
 		const stretch = Math.min(byIncome(CAR_STRETCH_SHARE), byCash, byTdsr);
 		const price = roundDown(comfortable, 1000);
-		const neededPay = Math.ceil((CAR_RUNNING_COST + CAR_EXAMPLE_PRICE * CAR_COST_PER_DOLLAR) / CAR_COMFORT_SHARE / 100) * 100;
+		const instalment = price * CAR_INSTALMENT_PER_DOLLAR;
+		const exampleInstalment = CAR_EXAMPLE_PRICE * CAR_INSTALMENT_PER_DOLLAR;
 		return {
 			price,
 			stretchPrice: roundDown(stretch, 1000),
 			realistic: price >= CAR_MIN_REALISTIC,
 			limitedBy: byCash < byIncome(CAR_COMFORT_SHARE) ? "savings" : "income",
 			downpayment: Math.round(price * CAR_DOWNPAYMENT),
-			instalment: Math.round(price * CAR_INSTALMENT_PER_DOLLAR),
-			monthlyAllIn: Math.round(CAR_RUNNING_COST + price * CAR_COST_PER_DOLLAR),
-			runningCost: CAR_RUNNING_COST,
-			neededPayForExample: neededPay,
+			instalment: Math.round(instalment),
+			instalmentCap: Math.round(takeHome * CAR_COMFORT_SHARE),
+			allInLow: Math.round(instalment * CAR_ALL_IN_LOW),
+			allInHigh: Math.round(instalment * CAR_ALL_IN_HIGH),
+			monthlyAllIn: Math.round(instalment * (CAR_ALL_IN_LOW + CAR_ALL_IN_HIGH) / 2),
 			examplePrice: CAR_EXAMPLE_PRICE,
+			// Gross pay whose take-home keeps the example car's instalment under 10%.
+			neededPayForExample: Math.ceil(exampleInstalment / CAR_COMFORT_SHARE / TAKE_HOME_SHARE / 100) * 100,
+			exampleDownpayment: Math.round(CAR_EXAMPLE_PRICE * CAR_DOWNPAYMENT),
+		};
+	}
+
+	// Plain-language car result, shared by the bot and the website.
+	function carSummary(result) {
+		const c = result.car;
+		const money = (value) => `$${Math.round(value).toLocaleString("en-SG")}`;
+		if (c.realistic) {
+			return {
+				ok: true,
+				headlineLabel: "Car: comfortable up to",
+				headline: money(c.price),
+				sub: `Instalment about ${money(c.instalment)}/month, under 10% of your take-home pay.`,
+				rows: [
+					["Downpayment (30%)", money(c.downpayment)],
+					["All-in monthly cost", `${money(c.allInLow)} to ${money(c.allInHigh)} (1.3 to 1.5x the instalment)`],
+					["Stretch (instalment at 15% of take-home)", money(c.stretchPrice)],
+				],
+				notes: [],
+			};
+		}
+		return {
+			ok: false,
+			headlineLabel: "Car",
+			headline: "Not comfortably yet",
+			sub: c.limitedBy === "savings"
+				? "After your emergency buffer, there isn't enough for the 30% downpayment."
+				: `Keeping the instalment under 10% of take-home means about ${money(c.instalmentCap)}/month for you, which covers a car of about ${money(c.price)}.`,
+			rows: [],
+			notes: [`A ${money(c.examplePrice)} car needs about ${money(c.exampleDownpayment)} down, and pay of about ${money(c.neededPayForExample)}/month to keep its instalment under 10% of take-home.`],
 		};
 	}
 
@@ -419,7 +458,7 @@
 			}
 			summary.rows.push([
 				"What's holding you back",
-				best.limitedBy === "savings" ? "Savings for the downpayment" : `Your income (instalment kept within 25% of pay, ${money(best.comfortMonthly)}/month)`,
+				best.limitedBy === "savings" ? "Savings for the downpayment" : `Your income (instalment kept within 30% of pay, ${money(best.comfortMonthly)}/month)`,
 			]);
 			if (home.maxPrice > home.price) {
 				summary.rows.push(["Most the rules allow, using every dollar", `${money(home.maxPrice)} (a stretch)`]);
@@ -457,14 +496,14 @@
 	function footnote(result) {
 		const parts = [];
 		if (result.home) {
-			parts.push("Comfortable keeps the instalment within 25% of pay: a buffer below HDB's 30% cap, so you can keep saving (CPF also suggests paying more in cash to protect your retirement savings). Loans are stress-tested at 3% (HDB) or 4% (bank), and bank loans are planned at 3% since today's ~1.6% packages only last 2 to 3 years.");
+			parts.push("Comfortable keeps the home loan instalment within 30% of gross pay, the limit HDB itself uses. Loans are stress-tested at 3% (HDB) or 4% (bank), and bank loans are planned at 3% since today's ~1.6% packages only last 2 to 3 years.");
 		}
 		if (result.car) {
-			parts.push("Car costs include 10 years of depreciation, interest, insurance, road tax, petrol and parking.");
+			parts.push("Car instalments assume a 7-year loan at 2.48% flat with 30% down; all-in costs cover insurance, road tax, petrol, parking and servicing.");
 		}
 		parts.push("Estimates only, not personalised advice.");
 		return parts.join(" ");
 	}
 
-	return { calculate, homeSummary, footnote, bsd, ehgAmount, CAR_RUNNING_COST, CAR_COMFORT_SHARE, MSR, TDSR, HDB_INCOME_CEILING_FAMILY, HDB_INCOME_CEILING_SINGLE };
+	return { calculate, homeSummary, carSummary, footnote, bsd, ehgAmount, CAR_COMFORT_SHARE, MSR, TDSR, HDB_INCOME_CEILING_FAMILY, HDB_INCOME_CEILING_SINGLE };
 });

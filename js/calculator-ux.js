@@ -96,8 +96,17 @@
 		compound: ["Where to invest", "A regular investing plan", "Investing my SRS"],
 	};
 
+	// What Can I Afford: topics follow what they're buying.
+	function topicsFor(details) {
+		if (details.id !== "afford") return TOPICS[details.id] || [];
+		const want = (details.querySelector("#afford-want") || {}).value;
+		if (want === "car") return ["Can I afford this car?", "Cash vs car loan", "Loan offsetting"];
+		if (want === "both") return ["Home and car together", "Grants check", "HDB vs bank loan", "Loan offsetting"];
+		return TOPICS.afford;
+	}
+
 	function topicChips(details, summary) {
-		const topics = TOPICS[details.id] || [];
+		const topics = topicsFor(details);
 		if (!topics.length) return "";
 		const chips = topics.map(function (topic) {
 			const params = new URLSearchParams({
