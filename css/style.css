@@ -2923,6 +2923,55 @@ footer span {
 	margin: 0.8rem 0 1rem;
 }
 
+/* All eight personas in a row, like the link-preview banner. */
+.quiz-lineup {
+	display: flex;
+	justify-content: center;
+	align-items: flex-end;
+	margin: 0.5rem 0 1.75rem;
+	padding: 1.5rem 0.75rem 1rem;
+	border: 1px solid var(--gold-dim);
+	background: radial-gradient(ellipse at 50% 100%, rgba(201, 168, 76, 0.2), transparent 70%);
+}
+
+.quiz-lineup img {
+	flex: 1 1 0;
+	min-width: 0;
+	max-width: 120px;
+	height: auto;
+	aspect-ratio: 6 / 7;
+	object-fit: contain;
+	object-position: bottom;
+	margin: 0 -1.2%;
+	animation: quiz-bob 3.2s ease-in-out infinite;
+}
+
+.quiz-lineup img:nth-child(2n) { animation-delay: -1.6s; }
+.quiz-lineup img:nth-child(3n) { animation-delay: -0.8s; }
+
+@media (max-width: 600px) {
+	.quiz-lineup {
+		flex-wrap: wrap;
+		row-gap: 0.5rem;
+		padding: 1rem 0.5rem 0.75rem;
+	}
+
+	.quiz-lineup img {
+		flex: 0 0 25%;
+		max-width: 25%;
+		margin: 0;
+	}
+}
+
+@keyframes quiz-bob {
+	0%, 100% { transform: translateY(0); }
+	50% { transform: translateY(-5px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.quiz-lineup img { animation: none; }
+}
+
 .quiz-intro p {
 	color: var(--text-muted);
 	margin-bottom: 1.5rem;
