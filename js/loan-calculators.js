@@ -187,7 +187,7 @@
 			? `${formatCurrency(bank.cash)} (banks need 5% of the price in cash, more than your ${formatCurrency(hdb.cash)})`
 			: `${formatCurrency(bank.cash)} (bank minimum ${formatCurrency(bank.minimumCash)})`);
 		html += `<ul class="calculator-note-list">`;
-		html += `<li><strong>HDB loan:</strong> 2.6%, pegged to the CPF rate so it rarely moves. The whole 25% can come from CPF, no early repayment penalty, but only if your household earns up to $14,000 a month ($7,000 for singles).</li>`;
+		html += `<li><strong>HDB loan:</strong> 2.6%, pegged to the CPF rate so it rarely moves. The whole 25% can come from CPF, no early repayment penalty, but only if your household earns up to $16,000 a month ($8,000 for singles).</li>`;
 		html += `<li><strong>Bank loan:</strong> ${bank.ratePercent < 2.6 ? "cheaper at this rate" : "no cheaper at this rate"}, and up to ${BANK_HOME_LOAN_MAX_YEARS} years, but the rate is only fixed for 2 to 3 years, then it floats. If bank rates average above 2.6% over your loan, HDB ends up cheaper. Once you leave the HDB loan you can't switch back.</li>`;
 		html += `</ul></div>`;
 		return html;

@@ -4,19 +4,37 @@
 //   Prosperity_Bot/src/shared/affordability.js
 //   ShaunSevilla.github.io/js/shared/affordability.js
 //
-// Home: the limits banks and HDB actually apply (Sep 2026):
+// HOME, using the limits banks and HDB apply (Sep 2026):
 //   • MSR: housing instalment <= 30% of gross monthly income (HDB flats/ECs)
 //   • TDSR: all debt instalments <= 55% of gross monthly income
-//   • both are tested at a stress rate, not your real rate: 3% p.a. for the
-//     HDB concessionary loan, 4% p.a. for bank loans (MAS/HDB, 30 Sep 2022)
+//   • both tested at a stress rate, not your real rate: 3% p.a. for the HDB
+//     loan, 4% p.a. for bank loans (MAS/HDB, 30 Sep 2022)
 //   • LTV 75%: 25% downpayment (CPF or cash); bank loans need >= 5% in cash
 //   • tenure: HDB 25 years, bank 30, and loans shouldn't run past age 65
-//   • HDB loan income ceiling: $14,000 household / $7,000 singles
+//   • HDB loan / BTO income ceiling: $16,000 families, $8,000 singles
+//     (raised from $14,000 / $7,000 on 24 Aug 2026)
 //   • singles can buy an HDB flat on their own only from age 35
-// Car: "comfortable" means ALL car costs (not just the instalment) stay
+// "Comfortable" on top of that:
+//   • instalment within 25% of gross income (CPF Board's own guideline)
+//   • if spending is known, still saving at least 20% of take-home pay after
+//     the part of the instalment CPF doesn't cover
+//   • long-run planning rates: 2.6% (HDB loan), 3% (bank; today's ~1.6%
+//     packages only last 2 to 3 years)
+//   • an emergency buffer left untouched in the bank: 6 months of expenses,
+//     or 6 months of pay if people depend on you
+// BTO vs resale: BTO is the default. Ticking a resale grant (CPF Housing
+// Grant / Proximity Housing Grant) switches the answer to resale. For BTO,
+// most of the downpayment is due at key collection (taken as 3 years away),
+// so the CPF OA contributions until then count.
+// Grants (HDB/CPF, Sep 2026): EHG up to $120,000 (income <= $9,000;
+// singles half, <= $4,500), BTO or resale. CPF Housing Grant (Family Grant)
+// for resale: $80,000 couples / $40,000 singles (2- to 4-room). Proximity
+// Housing Grant for resale: $30,000 living with parents / $20,000 within
+// 4 km (singles $15,000 / $10,000). HDB confirms the exact EHG in the HFE
+// letter; the per-band amounts below are the published indicative table.
+//
+// CAR: "comfortable" means ALL car costs (not just the instalment) stay
 // within 15% of gross income; 20% is a stretch (ownershipguide.com, 2026).
-// "Comfortable" also leaves an emergency buffer untouched in the bank:
-// 6 months of expenses, or 6 months of pay if you have dependants.
 (function (root, factory) {
 	if (typeof module === "object" && module.exports) {
 		module.exports = factory();
@@ -26,20 +44,29 @@
 })(typeof self !== "undefined" ? self : this, function () {
 	const MSR = 0.3;
 	const TDSR = 0.55;
+	const COMFORT_SHARE = 0.25;
+	const MIN_SAVINGS_RATE = 0.2;
+	const TAKE_HOME_SHARE = 0.8; // after 20% employee CPF
+	const DEFAULT_SPEND_SHARE = 0.5; // of take-home, when spending isn't given
 	const HDB_STRESS_RATE = 0.03;
 	const BANK_STRESS_RATE = 0.04;
-	const HDB_ACTUAL_RATE = 0.026;
+	const HDB_RATE = 0.026;
+	const BANK_PLANNING_RATE = 0.03;
 	const LTV = 0.75;
 	const BANK_MIN_CASH = 0.05;
 	const HDB_MAX_YEARS = 25;
 	const BANK_MAX_YEARS = 30;
 	const MAX_LOAN_AGE = 65;
-	const HDB_INCOME_CEILING_FAMILY = 14000;
-	const HDB_INCOME_CEILING_SINGLE = 7000;
+	const HDB_INCOME_CEILING_FAMILY = 16000;
+	const HDB_INCOME_CEILING_SINGLE = 8000;
 	const SINGLES_MIN_AGE = 35;
 	const LEGAL_AND_FEES = 3000;
 	const OTP_RATE = 0.01;
 	const OTP_CAP = 5000;
+	const BTO_KEY_YEARS = 3;
+	const BTO_SIGNING_SHARE = 0.05;
+	const BTO_OPTION_FEE = 2000;
+	const CPF_OW_CEILING = 8000;
 	const BSD_TIERS = [
 		[180000, 0.01],
 		[360000, 0.02],
@@ -48,6 +75,15 @@
 		[3000000, 0.05],
 		[Infinity, 0.06],
 	];
+	// EHG (families), by average monthly household income.
+	const EHG_FAMILY = [
+		[1500, 120000], [2000, 110000], [2500, 105000], [3000, 95000],
+		[3500, 90000], [4000, 80000], [4500, 70000], [5000, 65000],
+		[5500, 55000], [6000, 50000], [6500, 40000], [7000, 30000],
+		[7500, 25000], [8000, 20000], [8500, 15000], [9000, 10000],
+	];
+	const FAMILY_GRANT = { couple: 80000, single: 40000 };
+	const PROXIMITY_GRANT = { couple: { with: 30000, near: 20000 }, single: { with: 15000, near: 10000 } };
 
 	const CAR_COMFORT_SHARE = 0.15;
 	const CAR_STRETCH_SHARE = 0.2;
@@ -59,8 +95,6 @@
 	const CAR_FLAT_RATE = 0.0248;
 	const CAR_LOAN_YEARS = 7;
 	const CAR_DOWNPAYMENT = 1 - CAR_LOAN_SHARE;
-	// Monthly cost per $1 of car price: value lost over 10 years plus loan
-	// interest spread over the same 10 years.
 	const CAR_COST_PER_DOLLAR = 1 / CAR_LIFE_MONTHS + (CAR_LOAN_SHARE * CAR_FLAT_RATE * CAR_LOAN_YEARS) / CAR_LIFE_MONTHS;
 	const CAR_INSTALMENT_PER_DOLLAR = (CAR_LOAN_SHARE * (1 + CAR_FLAT_RATE * CAR_LOAN_YEARS)) / (CAR_LOAN_YEARS * 12);
 	const CAR_EXAMPLE_PRICE = 120000;
@@ -95,16 +129,42 @@
 		return Math.max(0, Math.floor(value / step) * step);
 	}
 
-	// Highest price where the loan, the downpayment and the cash-only parts
-	// all fit. Binary search, since stamp duty depends on the price.
-	function maxHomePrice({ maxLoan, cash, cpf, bank }) {
-		const fits = (price) => {
-			if (price * LTV > maxLoan) return false;
-			const otp = Math.min(price * OTP_RATE, OTP_CAP);
-			const cashOnly = bank ? Math.max(price * BANK_MIN_CASH, otp) : otp;
-			if (cash < cashOnly) return false;
-			return cash + cpf >= price * (1 - LTV) + bsd(price) + LEGAL_AND_FEES;
-		};
+	// Share of wages that goes into the Ordinary Account, 2026 rates.
+	function oaRate(age) {
+		if (age <= 35) return 0.23;
+		if (age <= 45) return 0.21;
+		if (age <= 50) return 0.19;
+		if (age <= 55) return 0.15;
+		if (age <= 60) return 0.12;
+		return 0.035;
+	}
+
+	function ehgAmount(income, alone) {
+		// Singles: half the family amount, at half the income.
+		const lookup = alone ? income * 2 : income;
+		const band = EHG_FAMILY.find(([upTo]) => lookup <= upTo);
+		if (!band) return 0;
+		return alone ? band[1] / 2 : band[1];
+	}
+
+	function grantsFor({ income, alone, ehg, familyGrant, proximity }) {
+		const who = alone ? "single" : "couple";
+		const items = [];
+		if (ehg) items.push({ key: "ehg", label: "Enhanced CPF Housing Grant", amount: ehgAmount(income, alone) });
+		if (familyGrant) items.push({ key: "family", label: "CPF Housing Grant (resale)", amount: FAMILY_GRANT[who] });
+		if (proximity === "with" || proximity === "near") {
+			items.push({
+				key: "phg",
+				label: `Proximity Housing Grant (${proximity === "with" ? "living with parents" : "within 4 km of parents"})`,
+				amount: PROXIMITY_GRANT[who][proximity],
+			});
+		}
+		return { items, total: items.reduce((sum, item) => sum + item.amount, 0) };
+	}
+
+	// Highest price that passes every check. Binary search, since stamp duty
+	// depends on the price.
+	function searchPrice(fits) {
 		let low = 0;
 		let high = 5000000;
 		for (let i = 0; i < 60; i += 1) {
@@ -115,38 +175,109 @@
 		return low;
 	}
 
-	function homeOption({ bank, monthlyCap, years, cash, cpf }) {
-		const stressRate = bank ? BANK_STRESS_RATE : HDB_STRESS_RATE;
-		const maxLoan = presentValue(monthlyCap, stressRate, years);
-		const price = maxHomePrice({ maxLoan, cash, cpf, bank });
-		const byLoanOnly = maxHomePrice({ maxLoan, cash: 1e9, cpf: 0, bank });
-		const loan = price * LTV;
+	// One loan type (HDB or bank) for one scenario (BTO or resale).
+	function homeOption(o) {
+		const bank = o.loan === "bank";
+		const years = Math.max(0, Math.min(bank ? BANK_MAX_YEARS : HDB_MAX_YEARS, MAX_LOAN_AGE - o.ageAtLoan));
+		const stressCap = Math.max(0, Math.min(o.income * MSR, o.income * TDSR - o.otherDebt));
+		const maxLoanAllowed = presentValue(stressCap, bank ? BANK_STRESS_RATE : HDB_STRESS_RATE, years);
+		const planningRate = bank ? BANK_PLANNING_RATE : HDB_RATE;
+
+		let comfortMonthly = Math.min(stressCap, o.income * COMFORT_SHARE);
+		if (o.expensesKnown) {
+			// Keep saving at least 20% of take-home after the part of the
+			// instalment that CPF OA contributions don't cover.
+			const cashRoom = Math.max(0, o.takeHome * (1 - MIN_SAVINGS_RATE) - o.expenses);
+			comfortMonthly = Math.min(comfortMonthly, o.oaInflow + cashRoom);
+		}
+		const comfortLoan = Math.min(maxLoanAllowed, presentValue(comfortMonthly, planningRate, years));
+
+		const fitsFunds = (price, cash) => {
+			const due = price * (1 - LTV) + bsd(price) + LEGAL_AND_FEES;
+			if (o.bto) {
+				if (cash < BTO_OPTION_FEE) return false;
+				// Signing the Agreement for Lease: 5% now, from today's cash + CPF.
+				if (cash + o.cpfNow < price * BTO_SIGNING_SHARE) return false;
+			} else if (cash < Math.min(price * OTP_RATE, OTP_CAP)) {
+				return false;
+			}
+			if (bank && cash < price * BANK_MIN_CASH) return false;
+			return cash + o.cpfAtKeys + o.grants >= due;
+		};
+
+		const priceFor = (loanLimit, cash) => searchPrice((price) => price * LTV <= loanLimit && fitsFunds(price, cash));
+		const comfortable = priceFor(comfortLoan, o.cashComfort);
+		const byIncomeOnly = searchPrice((price) => price * LTV <= comfortLoan);
+		const max = priceFor(maxLoanAllowed, o.cashAll);
+		const loan = comfortable * LTV;
+		const monthly = instalment(loan, planningRate, years);
+
 		return {
-			type: bank ? "bank" : "hdb",
+			loan: bank ? "bank" : "hdb",
 			years,
-			maxLoan: Math.round(maxLoan),
-			price: roundDown(price, 1000),
-			limitedBy: byLoanOnly - price > 1000 ? "savings" : "income",
-			monthly: Math.round(instalment(loan, bank ? 0.016 : HDB_ACTUAL_RATE, years)),
+			ratePercent: planningRate * 100,
+			price: roundDown(comfortable, 1000),
+			maxPrice: roundDown(max, 1000),
+			monthly: Math.round(monthly),
+			cpfCovers: Math.round(Math.min(monthly, o.oaInflow)),
+			limitedBy: byIncomeOnly - comfortable > 1000 ? "savings" : "income",
+			comfortMonthly: Math.round(comfortMonthly),
 		};
 	}
 
-	function home({ age, income, cash, cpf, otherDebt, alone }) {
-		const years = Math.max(0, MAX_LOAN_AGE - age);
-		const monthlyCap = Math.max(0, Math.min(income * MSR, income * TDSR - otherDebt));
-		const hdbCeiling = alone ? HDB_INCOME_CEILING_SINGLE : HDB_INCOME_CEILING_FAMILY;
-		const hdbEligible = income <= hdbCeiling;
+	function home(input) {
+		const { age, income, incomes, alone, cash, cashAll, cpf, otherDebt, expenses, expensesKnown } = input;
+		const ceiling = alone ? HDB_INCOME_CEILING_SINGLE : HDB_INCOME_CEILING_FAMILY;
+		// Above the ceiling: no BTO, no HDB loan, no CPF Housing Grant (EHG is
+		// already $0 above $9,000). Resale with a bank loan still works, and the
+		// Proximity Housing Grant has no income ceiling.
+		const hdbEligible = income <= ceiling;
+		const grants = grantsFor({
+			income,
+			alone,
+			ehg: input.ehg && hdbEligible,
+			familyGrant: input.familyGrant && hdbEligible,
+			proximity: input.proximity,
+		});
+		const bto = hdbEligible && !input.resale && !grants.items.some((item) => item.key === "family" || item.key === "phg");
+		const oaInflow = incomes.reduce((sum, pay) => sum + Math.min(pay, CPF_OW_CEILING) * oaRate(age), 0);
+		const cpfAtKeys = cpf + (bto ? oaInflow * 12 * BTO_KEY_YEARS : 0);
+		const base = {
+			income,
+			takeHome: income * TAKE_HOME_SHARE,
+			expenses,
+			expensesKnown,
+			oaInflow,
+			otherDebt,
+			bto,
+			ageAtLoan: age + (bto ? BTO_KEY_YEARS : 0),
+			cpfNow: cpf,
+			cpfAtKeys,
+			grants: grants.total,
+			cashComfort: cash,
+			cashAll,
+		};
 		const options = [];
-		if (hdbEligible) options.push(homeOption({ bank: false, monthlyCap, years: Math.min(HDB_MAX_YEARS, years), cash, cpf }));
-		options.push(homeOption({ bank: true, monthlyCap, years: Math.min(BANK_MAX_YEARS, years), cash, cpf }));
+		if (hdbEligible) options.push(homeOption({ ...base, loan: "hdb" }));
+		options.push(homeOption({ ...base, loan: "bank" }));
 		const best = options.reduce((a, b) => (b.price > a.price ? b : a));
+		const savingsRateAfter = expensesKnown
+			? (base.takeHome - expenses - Math.max(0, best.monthly - oaInflow)) / base.takeHome
+			: null;
 		return {
+			type: bto ? "bto" : "resale",
 			price: best.price,
+			maxPrice: Math.max(...options.map((option) => option.maxPrice)),
 			best,
 			options,
-			monthlyCap: Math.round(monthlyCap),
+			grants,
+			oaInflow: Math.round(oaInflow),
+			cpfAtKeys: Math.round(cpfAtKeys),
+			keyYears: BTO_KEY_YEARS,
 			hdbEligible,
+			ceiling,
 			singleUnder35: alone && age < SINGLES_MIN_AGE,
+			savingsRateAfter,
 		};
 	}
 
@@ -172,21 +303,34 @@
 		};
 	}
 
-	// input: { age, monthlyPay, partnerPay, alone, savings, cpfOa,
-	//          monthlyExpenses, hasDependants, otherDebt, want: house|car|both }
+	// input: { want: house|car|both, age, monthlyPay, alone, partnerPay,
+	//          savings, cpfOa, hasDependants, monthlyExpenses (optional),
+	//          otherDebt, ehg, familyGrant, proximity: none|near|with }
 	function calculate(input) {
 		const age = Math.max(18, Number(input.age) || 30);
 		const alone = input.alone !== false;
-		const income = Math.max(0, Number(input.monthlyPay) || 0) + (alone ? 0 : Math.max(0, Number(input.partnerPay) || 0));
+		const pay = Math.max(0, Number(input.monthlyPay) || 0);
+		const partnerPay = alone ? 0 : Math.max(0, Number(input.partnerPay) || 0);
+		const incomes = alone ? [pay] : [pay, partnerPay];
+		const income = pay + partnerPay;
 		const savings = Math.max(0, Number(input.savings) || 0);
 		const cpf = Math.max(0, Number(input.cpfOa) || 0);
 		const otherDebt = Math.max(0, Number(input.otherDebt) || 0);
-		const expenses = Number(input.monthlyExpenses) > 0 ? Number(input.monthlyExpenses) : income * 0.5;
+		const expensesKnown = Number(input.monthlyExpenses) > 0;
+		const expenses = expensesKnown ? Number(input.monthlyExpenses) : income * TAKE_HOME_SHARE * DEFAULT_SPEND_SHARE;
 		const buffer = Math.round(input.hasDependants ? income * 6 : expenses * 6);
 		const spare = Math.max(0, savings - buffer);
 		const want = input.want || "both";
 
-		const result = { age, income, buffer, bufferBasis: input.hasDependants ? "pay" : "expenses", spare, want };
+		const result = {
+			age,
+			income,
+			buffer,
+			bufferBasis: input.hasDependants ? "pay" : expensesKnown ? "expenses" : "estimated",
+			expenses: Math.round(expenses),
+			spare,
+			want,
+		};
 
 		let carResult = null;
 		if (want === "car" || want === "both") {
@@ -194,17 +338,31 @@
 			result.car = carResult;
 		}
 		if (want === "house" || want === "both") {
-			const withoutCar = home({ age, income, cash: spare, cpf, otherDebt, alone });
+			const homeInput = {
+				age,
+				income,
+				incomes,
+				alone,
+				cash: spare,
+				cashAll: savings,
+				cpf,
+				otherDebt,
+				expenses,
+				expensesKnown,
+				ehg: Boolean(input.ehg),
+				familyGrant: Boolean(input.familyGrant),
+				proximity: input.proximity || "none",
+				resale: Boolean(input.resale),
+			};
+			const withoutCar = home(homeInput);
 			result.home = withoutCar;
-			result.homeStretch = home({ age, income, cash: savings, cpf, otherDebt, alone });
 			if (want === "both" && carResult && carResult.realistic) {
 				const withCar = home({
-					age,
-					income,
+					...homeInput,
 					cash: Math.max(0, spare - carResult.downpayment),
-					cpf,
+					cashAll: Math.max(0, savings - carResult.downpayment),
 					otherDebt: otherDebt + carResult.instalment,
-					alone,
+					expenses: expenses + carResult.monthlyAllIn,
 				});
 				result.homeWithCar = withCar;
 				result.carCostsYouOfHome = Math.max(0, withoutCar.price - withCar.price);
@@ -213,5 +371,72 @@
 		return result;
 	}
 
-	return { calculate, bsd, CAR_RUNNING_COST, CAR_COMFORT_SHARE, MSR, TDSR };
+	function money(value) {
+		return `$${Math.round(Number(value) || 0).toLocaleString("en-SG")}`;
+	}
+
+	// Plain-language summary of the home result, shared by the bot (text)
+	// and the website (HTML) so both say exactly the same thing.
+	function homeSummary(result) {
+		const home = result.home;
+		const best = home.best;
+		const flat = home.type === "bto" ? "BTO flat" : "resale flat";
+		const summary = {
+			title: home.type === "bto" ? "Home (BTO)" : "Home (resale)",
+			headlineLabel: `Comfortable: a ${flat} up to`,
+			headline: money(home.price),
+			sub: "",
+			rows: [],
+			notes: [],
+		};
+		if (home.price <= 0) {
+			summary.headlineLabel = "Home";
+			summary.headline = "Not yet";
+			summary.sub = "Once your emergency buffer is set aside, there isn't enough left for the downpayment.";
+		} else {
+			const loanName = best.loan === "hdb" ? "HDB loan" : "Bank loan";
+			const cpfLine = best.cpfCovers >= best.monthly
+				? `your CPF OA (about ${money(home.oaInflow)}/month) covers all of it`
+				: `your CPF OA covers about ${money(best.cpfCovers)}, cash ${money(best.monthly - best.cpfCovers)}`;
+			summary.sub = `${loanName} over ${best.years} years: about ${money(best.monthly)}/month at ${best.ratePercent}%, and ${cpfLine}.`;
+			const other = home.options.find((option) => option !== best);
+			if (other) {
+				summary.rows.push([
+					other.loan === "hdb" ? "With an HDB loan instead" : "With a bank loan instead",
+					other.loan === "bank" && other.price < best.price ? `${money(other.price)} (banks need 5% of the price in cash)` : money(other.price),
+				]);
+			}
+			if (home.grants.items.length) {
+				home.grants.items.forEach((item) => summary.rows.push([item.label, item.amount > 0 ? money(item.amount) : "$0 at your income"]));
+			}
+			if (home.type === "bto") {
+				summary.rows.push(["Your CPF OA by key collection (~3 years)", `about ${money(home.cpfAtKeys)}`]);
+			}
+			summary.rows.push([
+				"What's holding you back",
+				best.limitedBy === "savings" ? "Savings for the downpayment" : `Your income (keeping the instalment within 25% of pay, ${money(best.comfortMonthly)}/month)`,
+			]);
+			if (home.maxPrice > home.price) {
+				summary.rows.push(["Most the rules allow, using every dollar", `${money(home.maxPrice)} (a stretch)`]);
+			}
+			if (home.savingsRateAfter !== null) {
+				summary.notes.push(`After the instalment you'd still save about ${Math.max(0, Math.round(home.savingsRateAfter * 100))}% of your take-home pay.`);
+			}
+			if (home.type === "bto") {
+				summary.notes.push("BTO: most of the 25% downpayment is due at key collection, so the CPF you build up while waiting counts. Buying resale instead? Pick a resale option (and its grants) to compare.");
+			}
+		}
+		if (home.singleUnder35) {
+			summary.notes.push("Singles can only buy an HDB flat on their own from age 35. Before that, it's with a partner or family, or private property.");
+		}
+		if (!home.hdbEligible) {
+			summary.notes.push(`Your household income is above HDB's ${money(home.ceiling)} ceiling, so no BTO, HDB loan or CPF Housing Grant. This is a resale flat with a bank loan.`);
+		}
+		if (home.price > 1000000) {
+			summary.notes.push("That's above most HDB resale prices, so you're into condo territory.");
+		}
+		return summary;
+	}
+
+	return { calculate, homeSummary, bsd, ehgAmount, CAR_RUNNING_COST, CAR_COMFORT_SHARE, MSR, TDSR, HDB_INCOME_CEILING_FAMILY, HDB_INCOME_CEILING_SINGLE };
 });

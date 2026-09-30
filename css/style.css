@@ -3103,3 +3103,58 @@ footer span {
 	color: var(--gold);
 	word-break: break-all;
 }
+
+/* Grant ticks in the affordability calculator */
+.afford-grants {
+	border: 1px solid var(--border);
+	padding: 0.9rem 1rem 0.2rem;
+	margin: 0 0 1rem;
+}
+
+.afford-grants legend {
+	padding: 0 0.4rem;
+	font-size: 0.85rem;
+	color: var(--text);
+}
+
+.afford-grants legend em,
+.afford-grants small,
+.booking-form label small {
+	font-style: normal;
+	font-size: 0.78rem;
+	color: var(--text-muted);
+}
+
+.booking-form .check-row {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.6rem;
+	margin-bottom: 0.9rem;
+	cursor: pointer;
+}
+
+.booking-form .check-row input {
+	width: auto;
+	margin-top: 0.2rem;
+	accent-color: var(--gold);
+}
+
+.booking-form label.check-row {
+	flex-direction: row;
+}
+
+.booking-form label.check-row > span {
+	color: var(--text);
+	font-size: 0.86rem;
+	letter-spacing: 0;
+	text-transform: none;
+	line-height: 1.45;
+}
+
+.booking-form label small {
+	display: inline;
+	font-size: 0.74rem;
+	letter-spacing: 0;
+	text-transform: none;
+	font-weight: 400;
+}

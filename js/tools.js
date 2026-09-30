@@ -150,8 +150,17 @@
 			});
 			document.getElementById("afford-partner-field").hidden = !wantsHome || value("afford-with") !== "partner";
 			document.getElementById("afford-expenses-field").hidden = value("afford-dependants") === "yes";
+			const pay = (numberValue("afford-pay") || 0) + (value("afford-with") === "partner" ? numberValue("afford-partner-pay") || 0 : 0);
+			const hint = document.getElementById("afford-ehg-hint");
+			if (pay > 0) {
+				const amount = window.Affordability.ehgAmount(pay, value("afford-with") !== "partner");
+				hint.textContent = amount > 0 ? `(about ${formatCurrency(amount)} at your income)` : "($0 at your income, the ceiling is $9,000 for couples, $4,500 for singles)";
+			} else {
+				hint.textContent = "(up to $120,000, household income up to $9,000)";
+			}
 		}
 		form.addEventListener("change", updateVisibility);
+		form.addEventListener("input", updateVisibility);
 		updateVisibility();
 
 		form.addEventListener("submit", function (event) {
@@ -178,30 +187,27 @@
 				hasDependants: value("afford-dependants") === "yes",
 				monthlyExpenses: numberValue("afford-expenses") || 0,
 				otherDebt: numberValue("afford-debt") || 0,
+				ehg: wantsHome && document.getElementById("afford-ehg").checked,
+				familyGrant: wantsHome && document.getElementById("afford-family-grant").checked,
+				proximity: wantsHome ? value("afford-proximity") : "none",
 			});
 
-			let html = note(`Kept aside first: <strong>${formatCurrency(r.buffer)}</strong> emergency buffer (6 months of ${r.bufferBasis === "pay" ? "pay, since people depend on you" : "expenses"}). Everything below leaves it untouched.`);
+			const bufferBasis = {
+				pay: "pay, since people depend on you",
+				expenses: `your ${formatCurrency(r.expenses)} monthly spending`,
+				estimated: `spending, estimated at ${formatCurrency(r.expenses)}/month. Enter your real spending for a sharper number`,
+			}[r.bufferBasis];
+			let html = note(`Kept aside first: <strong>${formatCurrency(r.buffer)}</strong> emergency buffer (6 months of ${bufferBasis}). Everything below leaves it untouched.`);
 
 			if (r.home) {
-				const home = r.home;
-				if (home.price > 0) {
-					const loan = home.best.type === "hdb"
-						? `HDB loan over ${home.best.years} years, about ${formatCurrency(home.best.monthly)}/month at 2.6%`
-						: `Bank loan over ${home.best.years} years, about ${formatCurrency(home.best.monthly)}/month at today's ~1.6%`;
-					html += headline("Home: comfortable up to", formatCurrency(home.price), loan);
-					html += resultRow("What's holding you back", home.best.limitedBy === "savings" ? "Savings for the downpayment, not your income" : `Your income (banks cap your instalment at ${formatCurrency(home.monthlyCap)}/month)`);
-					if (r.homeStretch && r.homeStretch.price > home.price) {
-						html += resultRow("If you used every dollar you have", `${formatCurrency(r.homeStretch.price)} (not recommended)`);
-					}
-				} else {
-					html += headline("Home", "Not yet", "Once your emergency buffer is set aside, there isn't enough left for the 25% downpayment.");
-				}
-				if (home.singleUnder35) {
-					html += note("Singles can only buy an HDB flat on their own from age 35. Before that, it's with a partner or family, or private property.", "calculator-note-callout");
-				}
-				if (!home.hdbEligible) {
-					html += note("Your income is above the HDB loan ceiling, so this uses a bank loan.");
-				}
+				const summary = window.Affordability.homeSummary(r);
+				html += headline(summary.headlineLabel, summary.headline, summary.sub);
+				summary.rows.forEach(function (row) {
+					html += resultRow(row[0], row[1]);
+				});
+				summary.notes.forEach(function (text) {
+					html += note(text, "calculator-note-callout");
+				});
 			}
 
 			if (r.car) {
@@ -224,7 +230,7 @@
 			if (r.carCostsYouOfHome > 0) {
 				html += note(`<strong>Buying the car first shrinks your home budget by ${formatCurrency(r.carCostsYouOfHome)}.</strong>`, "calculator-note-callout");
 			}
-			html += note("Car costs include value lost over 10 years, loan interest, insurance, road tax, petrol and parking. Estimates only, not personalised advice.");
+			html += note("Comfortable means the instalment stays within 25% of your pay (CPF's own guideline) and within the bank limits: 30% of income for housing and 55% for all debts, tested at 3% (HDB loan) or 4% (bank). Bank loans are planned at 3%, since today's ~1.6% packages only last 2 to 3 years. Grant amounts are HDB's published figures; HDB confirms yours in your HFE letter. Car costs include value lost over 10 years, loan interest, insurance, road tax, petrol and parking. Estimates only, not personalised advice.");
 			resultBox.innerHTML = html;
 			resultBox.hidden = false;
 		});

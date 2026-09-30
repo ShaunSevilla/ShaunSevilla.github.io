@@ -160,7 +160,7 @@
 						</summary>
 						<div class="calculator-dropdown-body">
 							<article class="calculator-card">
-								<p class="calculator-card-note">Keeps an emergency buffer untouched first: 6 months of expenses, or 6 months of pay if people depend on you. Then applies the bank limits: housing instalment up to 30% of income and all debts up to 55%, tested at 3% (HDB loan) or 4% (bank) interest.</p>
+								<p class="calculator-card-note">Keeps an emergency buffer untouched first: 6 months of spending, or 6 months of pay if people depend on you. "Comfortable" keeps the home loan instalment within 25% of your pay, and within the bank limits. Shows a BTO by default; tick a resale grant to see resale instead.</p>
 								<form class="booking-form calculator-form" id="afford-form">
 									<label><span>What are you thinking of buying?</span>
 										<select id="afford-want">
@@ -182,13 +182,25 @@
 									</div>
 									<label><span>Cash in the bank ($)</span><input type="number" id="afford-savings" min="0" step="1" placeholder="40000" required /></label>
 									<label class="afford-home-fields"><span>CPF Ordinary Account balance ($) <em>Optional</em></span><input type="number" id="afford-cpf" min="0" step="1" placeholder="Blank = $0" /></label>
-									<label><span>Does anyone depend on you financially?</span>
+									<fieldset class="afford-home-fields afford-grants">
+										<legend>Grants <em>Tick what applies. Leave the resale ones empty for a BTO.</em></legend>
+										<label class="check-row"><input type="checkbox" id="afford-ehg" /><span>First HDB flat: Enhanced CPF Housing Grant <small id="afford-ehg-hint">(up to $120,000, household income up to $9,000)</small></span></label>
+										<label class="check-row"><input type="checkbox" id="afford-family-grant" /><span>Resale, first flat: CPF Housing Grant <small>($80,000 couples, $40,000 singles)</small></span></label>
+										<label><span>Resale near parents: Proximity Housing Grant</span>
+											<select id="afford-proximity">
+												<option value="none">No</option>
+												<option value="with">Living with parents ($30,000 couples, $15,000 singles)</option>
+												<option value="near">Within 4 km of parents ($20,000 couples, $10,000 singles)</option>
+											</select>
+										</label>
+									</fieldset>
+									<label><span>Does anyone depend on you financially? <small>(sets your emergency buffer: 6 months of pay if yes, 6 months of spending if not)</small></span>
 										<select id="afford-dependants">
 											<option value="no">No</option>
 											<option value="yes">Yes (kids, parents)</option>
 										</select>
 									</label>
-									<label id="afford-expenses-field"><span>Monthly spending, all in ($) <em>Optional</em></span><input type="number" id="afford-expenses" min="0" step="1" placeholder="Blank = half your pay" /></label>
+									<label id="afford-expenses-field"><span>Monthly spending, all in ($) <em>Optional</em></span><input type="number" id="afford-expenses" min="0" step="1" placeholder="Blank = estimated from your pay" /></label>
 									<label><span>Other loan repayments a month ($) <em>Optional</em></span><input type="number" id="afford-debt" min="0" step="1" placeholder="Car, study loan, instalments. Blank = none" /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="afford-status" role="status"></p>
