@@ -2931,6 +2931,11 @@ footer span {
 	font-weight: 500;
 }
 
+.quiz-friend:not([hidden]) {
+	display: flex;
+	align-items: center;
+}
+
 .quiz-start {
 	background: var(--gold);
 }
@@ -3024,11 +3029,23 @@ footer span {
 	color: var(--text-muted);
 }
 
-.quiz-card-emoji {
+.quiz-card-art {
 	display: block;
-	font-size: 4rem;
-	line-height: 1;
-	margin: 1rem 0 0.5rem;
+	width: min(260px, 70%);
+	height: auto;
+	aspect-ratio: 1;
+	object-fit: contain;
+	margin: 1rem auto 0.75rem;
+	border-radius: 18px;
+}
+
+.quiz-friend-art {
+	width: 44px;
+	height: 44px;
+	object-fit: cover;
+	border-radius: 10px;
+	flex-shrink: 0;
+	margin-right: 0.75rem;
 }
 
 .quiz-card h2 {
@@ -3157,4 +3174,10 @@ footer span {
 	letter-spacing: 0;
 	text-transform: none;
 	font-weight: 400;
+}
+
+/* Affordability grants: the side not picked (BTO vs resale) is greyed out. */
+.afford-grants label.is-disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
 }

@@ -105,10 +105,11 @@
 					? `in tax, ${percent(result.effectiveRate)} of your ${formatCurrency(result.income)} income. The bill comes next year, and IRAS lets you spread it over up to 12 interest-free GIRO payments (about ${formatCurrency(result.tax / 12)}/month).`
 					: `in tax on ${formatCurrency(result.income)} of income.`,
 			);
+			html += `<p class="calculator-note"><strong>Your reliefs: ${formatCurrency(result.totalRelief)}</strong>${result.capped ? " (capped at $80,000)" : ""}</p><ul class="calculator-note-list">`;
 			result.items.forEach(function (item) {
-				html += resultRow(item.label, formatCurrency(item.amount));
+				html += `<li>${item.label}: <strong>${formatCurrency(item.amount)}</strong>${item.auto ? " (automatic)" : ""}</li>`;
 			});
-			html += resultRow("Total reliefs", formatCurrency(result.totalRelief) + (result.capped ? " (capped at $80,000)" : ""));
+			html += "</ul>";
 			html += resultRow("Taxable after reliefs", `${formatCurrency(result.chargeable)} (top rate ${percent(result.marginalRate)})`);
 			html += note(`Without reliefs you'd pay ${formatCurrency(result.taxWithoutReliefs)}, so they already save you <strong>${formatCurrency(result.reliefSaved)}</strong>.`);
 
@@ -159,6 +160,26 @@
 				hint.textContent = "(up to $120,000, household income up to $9,000)";
 			}
 		}
+
+		// BTO and resale grants are either/or: ticking one side locks the other.
+		const btoTick = document.getElementById("afford-ehg");
+		const resaleTick = document.getElementById("afford-family-grant");
+		const proximitySelect = document.getElementById("afford-proximity");
+		function lockGrants() {
+			const resalePicked = resaleTick.checked || proximitySelect.value !== "none";
+			resaleTick.disabled = btoTick.checked;
+			proximitySelect.disabled = btoTick.checked;
+			btoTick.disabled = resalePicked;
+			[btoTick, resaleTick, proximitySelect].forEach(function (el) {
+				const row = el.closest("label");
+				if (row) row.classList.toggle("is-disabled", el.disabled);
+			});
+		}
+		[btoTick, resaleTick, proximitySelect].forEach(function (el) {
+			el.addEventListener("change", lockGrants);
+		});
+		lockGrants();
+
 		form.addEventListener("change", updateVisibility);
 		form.addEventListener("input", updateVisibility);
 		updateVisibility();
@@ -187,7 +208,8 @@
 				hasDependants: value("afford-dependants") === "yes",
 				monthlyExpenses: numberValue("afford-expenses") || 0,
 				otherDebt: numberValue("afford-debt") || 0,
-				ehg: wantsHome && document.getElementById("afford-ehg").checked,
+				// First-timers get the EHG on resale too, so the resale tick carries it.
+				ehg: wantsHome && (btoTick.checked || resaleTick.checked),
 				familyGrant: wantsHome && document.getElementById("afford-family-grant").checked,
 				proximity: wantsHome ? value("afford-proximity") : "none",
 			});

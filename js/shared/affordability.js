@@ -422,6 +422,9 @@
 			if (home.savingsRateAfter !== null) {
 				summary.notes.push(`After the instalment you'd still save about ${Math.max(0, Math.round(home.savingsRateAfter * 100))}% of your take-home pay.`);
 			}
+			if (home.type === "resale" && home.grants.items.some((item) => item.key === "ehg" && item.amount > 0)) {
+				summary.notes.push("Enhanced CPF Housing Grant on resale: at least one of you needs to have been working for the 12 months before you apply.");
+			}
 			if (home.type === "bto") {
 				summary.notes.push("BTO: most of the 25% downpayment is due at key collection, so the CPF you build up while waiting counts. Buying resale instead? Pick a resale option (and its grants) to compare.");
 			}
