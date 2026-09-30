@@ -91,6 +91,13 @@
 	// How many non-good answers the Quiet Millionaire-in-Training allows.
 	const MAX_QUIET_SLIPS = 1;
 
+	// Balancing weights, so no persona is handed out too often. Each persona's
+	// points are multiplied by its weight before ranking. Tuned with
+	// tools/quiz-sim.js against a simulated crowd so the Spreadsheet Monk is
+	// uncommon (~6%) and the rest share out roughly evenly. Re-run the
+	// simulation after changing questions or points.
+	const WEIGHTS = { grabfood: 1.11, cpf: 1.2, crypto: 1.23, yolo: 1.34, monk: 0.47, hoarder: 0.8, quiet: 1, ostrich: 0.92 };
+
 	const PERSONA_ORDER = ["grabfood", "cpf", "crypto", "yolo", "monk", "hoarder", "quiet", "ostrich"];
 
 	// [question, [[answer, { persona: points }], ...]]
@@ -197,6 +204,7 @@
 			if (!option) return;
 			Object.entries(option[1]).forEach(([key, points]) => { totals[key] += points; });
 		});
+		PERSONA_ORDER.forEach((key) => { totals[key] *= WEIGHTS[key]; });
 		// Quiet Millionaire needs the good-habit answer on every question that
 		// has one, with at most one slip. If they slipped, that one answer
 		// decides the runner-up ("with a pinch of ... in me").
@@ -240,5 +248,5 @@
 		return `With a pinch of ${who} in me.`;
 	}
 
-	return { PERSONAS, PERSONA_ORDER, QUESTIONS, score, runnerUpLine };
+	return { PERSONAS, PERSONA_ORDER, QUESTIONS, WEIGHTS, score, runnerUpLine };
 });

@@ -3042,10 +3042,9 @@ footer span {
 }
 
 .quiz-friend-art {
-	width: 44px;
-	height: 44px;
-	object-fit: cover;
-	border-radius: 10px;
+	width: 52px;
+	height: 52px;
+	object-fit: contain;
 	flex-shrink: 0;
 	margin-right: 0.75rem;
 }
@@ -3105,6 +3104,21 @@ footer span {
 	font-style: italic;
 	color: var(--text-muted);
 	margin: -0.5rem 0 1.1rem;
+}
+
+.quiz-odds {
+	display: inline-block;
+	margin: 0 0 1.2rem;
+	padding: 0.35rem 0.85rem;
+	border: 1px solid var(--gold-dim);
+	border-radius: 999px;
+	color: var(--gold);
+	font-size: 0.8rem;
+	letter-spacing: 0.02em;
+}
+
+.quiz-odds:empty {
+	display: none;
 }
 
 .quiz-runner:empty {

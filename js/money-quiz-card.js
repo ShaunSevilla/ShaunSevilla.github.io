@@ -166,6 +166,13 @@
 			y = drawLines(ctx, wrap(ctx, data.runner, W - 220), W / 2, y + 16, 48, "center");
 		}
 
+		// How rare this exact result is.
+		if (data.odds) {
+			ctx.fillStyle = GOLD;
+			ctx.font = `600 32px ${SANS}`;
+			y = drawLines(ctx, wrap(ctx, data.odds, W - 220), W / 2, y + 24, 44, "center");
+		}
+
 		// Roast.
 		ctx.fillStyle = TEXT;
 		ctx.font = `400 40px ${SANS}`;

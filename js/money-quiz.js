@@ -57,6 +57,13 @@
 		new Image().src = artFor(key);
 	});
 
+	// Estimated share of people with this exact result (persona + runner-up +
+	// how strong it is), from js/shared/quizOdds.js.
+	function oddsLine(result) {
+		if (!window.QuizOdds) return "";
+		return window.QuizOdds.describe(window.QuizOdds.percentFor(result, runnerLine(result))).text;
+	}
+
 	function runnerLine(result) {
 		return Quiz.runnerUpLine(result);
 	}
@@ -73,6 +80,7 @@
 		$("quiz-blindspot").textContent = persona.blindSpot;
 		$("quiz-tip").textContent = persona.tip;
 		$("quiz-runner").textContent = runnerLine(lastResult);
+		$("quiz-odds").textContent = oddsLine(lastResult);
 		$("quiz-rare").hidden = !lastResult.rare;
 		$("quiz-cta").textContent = persona.cta;
 		const notes = `Took the money persona quiz: ${persona.name}. ${persona.blindSpot}`;
@@ -116,6 +124,7 @@
 			art: artFor(lastResult.key),
 			name: persona.name,
 			runner: runnerLine(lastResult),
+			odds: oddsLine(lastResult),
 			roast: persona.roast,
 			superpower: persona.superpower,
 			blindSpot: persona.blindSpot,
