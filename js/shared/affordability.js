@@ -1,4 +1,4 @@
-// "What can I afford?" for a home and/or a car in Singapore.
+// "What can I afford?" for a home, a car and/or a motorbike in Singapore.
 // Shared, unchanged, by the Telegram bot and the website. Keep both copies
 // identical:
 //   Prosperity_Bot/src/shared/affordability.js
@@ -34,7 +34,14 @@
 // letter; the per-band amounts below are the published indicative table.
 //
 // CAR (Shaun's guide): the loan instalment stays under 10% of take-home
-// pay, and owning the car all in costs about 1.3x to 1.5x the instalment.
+// pay (stretch: 15%), and owning the car all in costs about 1.3x to 1.5x the
+// instalment. MAS caps car loans at 70% of the price if the OMV is $20,000
+// or less, 60% if it's above, over at most 7 years. Most buyers don't know
+// their car's OMV yet, so both are shown.
+// MOTORBIKE: MAS's loan caps don't apply to motorcycles; lenders set their
+// own. Planned at 80% financing (20% down) over 5 years at 2.5% flat, with
+// the same 10% / 15% of take-home rule, and roughly $150 to $300 a month
+// for insurance, road tax, petrol and parking on top.
 (function (root, factory) {
 	if (typeof module === "object" && module.exports) {
 		module.exports = factory();
@@ -87,20 +94,35 @@
 	const FAMILY_GRANT = { couple: 80000, single: 40000 };
 	const PROXIMITY_GRANT = { couple: { with: 30000, near: 20000 }, single: { with: 15000, near: 10000 } };
 
-	// Shaun's guide: keep the car loan instalment under 10% of take-home pay;
-	// owning the car all in (insurance, road tax, petrol, parking,
-	// servicing) costs about 1.3x to 1.5x the instalment.
-	const CAR_COMFORT_SHARE = 0.1; // of take-home
-	const CAR_STRETCH_SHARE = 0.15; // of take-home
+	// Vehicles. Shaun's guide: keep the loan instalment under 10% of
+	// take-home pay (15% is a stretch).
+	const VEHICLE_COMFORT_SHARE = 0.1; // of take-home
+	const VEHICLE_STRETCH_SHARE = 0.15; // of take-home
+	const CAR_COMFORT_SHARE = VEHICLE_COMFORT_SHARE;
 	const CAR_ALL_IN_LOW = 1.3;
 	const CAR_ALL_IN_HIGH = 1.5;
-	const CAR_LOAN_SHARE = 0.7; // MAS: up to 70% if OMV <= $20,000
 	const CAR_FLAT_RATE = 0.0248;
 	const CAR_LOAN_YEARS = 7;
-	const CAR_DOWNPAYMENT = 1 - CAR_LOAN_SHARE;
-	const CAR_INSTALMENT_PER_DOLLAR = (CAR_LOAN_SHARE * (1 + CAR_FLAT_RATE * CAR_LOAN_YEARS)) / (CAR_LOAN_YEARS * 12);
+	const OMV_THRESHOLD = 20000;
+	// MAS: 70% of the price if OMV <= $20,000, 60% above.
+	const CAR_TIERS = [
+		{ key: "low", label: `OMV $20,000 or less`, ltv: 0.7 },
+		{ key: "high", label: `OMV above $20,000`, ltv: 0.6 },
+	];
 	const CAR_EXAMPLE_PRICE = 120000;
 	const CAR_MIN_REALISTIC = 80000;
+	const BIKE_LTV = 0.8;
+	const BIKE_FLAT_RATE = 0.025;
+	const BIKE_LOAN_YEARS = 5;
+	const BIKE_RUNNING_LOW = 150;
+	const BIKE_RUNNING_HIGH = 300;
+	const BIKE_EXAMPLE_PRICE = 20000;
+	const BIKE_MIN_REALISTIC = 8000;
+
+	// Monthly instalment per $1 of vehicle price, flat-rate loan.
+	function perDollar(ltv, rate, years) {
+		return (ltv * (1 + rate * years)) / (years * 12);
+	}
 
 	function bsd(price) {
 		let tax = 0;
@@ -289,31 +311,76 @@
 		};
 	}
 
+	// One vehicle loan setup: the most you can pay at the comfortable and
+	// stretch instalment, capped by cash for the downpayment and by TDSR.
+	function vehicleTier({ takeHome, income, cash, otherDebt, ltv, rate, years }) {
+		const k = perDollar(ltv, rate, years);
+		const byIncome = (share) => Math.max(0, (takeHome * share) / k);
+		const byCash = cash / (1 - ltv);
+		const byTdsr = Math.max(0, (income * TDSR - otherDebt) / k);
+		const comfortable = roundDown(Math.min(byIncome(VEHICLE_COMFORT_SHARE), byCash, byTdsr), 1000);
+		const stretch = roundDown(Math.min(byIncome(VEHICLE_STRETCH_SHARE), byCash, byTdsr), 1000);
+		return {
+			ltv,
+			price: comfortable,
+			stretchPrice: stretch,
+			downpayment: Math.round(comfortable * (1 - ltv)),
+			stretchDownpayment: Math.round(stretch * (1 - ltv)),
+			instalment: Math.round(comfortable * k),
+			stretchInstalment: Math.round(stretch * k),
+			limitedBy: byCash < byIncome(VEHICLE_COMFORT_SHARE) ? "savings" : "income",
+		};
+	}
+
+	// Gross pay whose take-home keeps an instalment under the comfortable share.
+	function payFor(monthly) {
+		return Math.ceil(monthly / VEHICLE_COMFORT_SHARE / TAKE_HOME_SHARE / 100) * 100;
+	}
+
 	function car({ income, cash, otherDebt }) {
 		const takeHome = income * TAKE_HOME_SHARE;
-		const byIncome = (share) => Math.max(0, (takeHome * share) / CAR_INSTALMENT_PER_DOLLAR);
-		const byCash = cash / CAR_DOWNPAYMENT;
-		const byTdsr = Math.max(0, (income * TDSR - otherDebt) / CAR_INSTALMENT_PER_DOLLAR);
-		const comfortable = Math.min(byIncome(CAR_COMFORT_SHARE), byCash, byTdsr);
-		const stretch = Math.min(byIncome(CAR_STRETCH_SHARE), byCash, byTdsr);
-		const price = roundDown(comfortable, 1000);
-		const instalment = price * CAR_INSTALMENT_PER_DOLLAR;
-		const exampleInstalment = CAR_EXAMPLE_PRICE * CAR_INSTALMENT_PER_DOLLAR;
+		const tiers = CAR_TIERS.map((tier) => ({
+			key: tier.key,
+			label: tier.label,
+			...vehicleTier({ takeHome, income, cash, otherDebt, ltv: tier.ltv, rate: CAR_FLAT_RATE, years: CAR_LOAN_YEARS }),
+		}));
+		// Headline on the lower of the two, so it holds whatever the OMV.
+		const base = tiers.reduce((a, b) => (b.price < a.price ? b : a));
 		return {
-			price,
-			stretchPrice: roundDown(stretch, 1000),
-			realistic: price >= CAR_MIN_REALISTIC,
-			limitedBy: byCash < byIncome(CAR_COMFORT_SHARE) ? "savings" : "income",
-			downpayment: Math.round(price * CAR_DOWNPAYMENT),
-			instalment: Math.round(instalment),
-			instalmentCap: Math.round(takeHome * CAR_COMFORT_SHARE),
-			allInLow: Math.round(instalment * CAR_ALL_IN_LOW),
-			allInHigh: Math.round(instalment * CAR_ALL_IN_HIGH),
-			monthlyAllIn: Math.round(instalment * (CAR_ALL_IN_LOW + CAR_ALL_IN_HIGH) / 2),
+			kind: "car",
+			tiers,
+			price: base.price,
+			downpayment: base.downpayment,
+			instalment: base.instalment,
+			realistic: tiers.some((tier) => tier.price >= CAR_MIN_REALISTIC),
+			limitedBy: tiers.every((tier) => tier.limitedBy === "savings") ? "savings" : "income",
+			instalmentCap: Math.round(takeHome * VEHICLE_COMFORT_SHARE),
+			allInLow: Math.round(base.instalment * CAR_ALL_IN_LOW),
+			allInHigh: Math.round(base.instalment * CAR_ALL_IN_HIGH),
+			monthlyAllIn: Math.round(base.instalment * (CAR_ALL_IN_LOW + CAR_ALL_IN_HIGH) / 2),
 			examplePrice: CAR_EXAMPLE_PRICE,
-			// Gross pay whose take-home keeps the example car's instalment under 10%.
-			neededPayForExample: Math.ceil(exampleInstalment / CAR_COMFORT_SHARE / TAKE_HOME_SHARE / 100) * 100,
-			exampleDownpayment: Math.round(CAR_EXAMPLE_PRICE * CAR_DOWNPAYMENT),
+			examples: CAR_TIERS.map((tier) => ({
+				label: tier.label,
+				downpayment: Math.round(CAR_EXAMPLE_PRICE * (1 - tier.ltv)),
+				pay: payFor(CAR_EXAMPLE_PRICE * perDollar(tier.ltv, CAR_FLAT_RATE, CAR_LOAN_YEARS)),
+			})),
+		};
+	}
+
+	function bike({ income, cash, otherDebt }) {
+		const takeHome = income * TAKE_HOME_SHARE;
+		const t = vehicleTier({ takeHome, income, cash, otherDebt, ltv: BIKE_LTV, rate: BIKE_FLAT_RATE, years: BIKE_LOAN_YEARS });
+		return {
+			kind: "bike",
+			...t,
+			realistic: t.price >= BIKE_MIN_REALISTIC,
+			instalmentCap: Math.round(takeHome * VEHICLE_COMFORT_SHARE),
+			allInLow: t.instalment + BIKE_RUNNING_LOW,
+			allInHigh: t.instalment + BIKE_RUNNING_HIGH,
+			monthlyAllIn: t.instalment + (BIKE_RUNNING_LOW + BIKE_RUNNING_HIGH) / 2,
+			examplePrice: BIKE_EXAMPLE_PRICE,
+			exampleDownpayment: Math.round(BIKE_EXAMPLE_PRICE * (1 - BIKE_LTV)),
+			examplePay: payFor(BIKE_EXAMPLE_PRICE * perDollar(BIKE_LTV, BIKE_FLAT_RATE, BIKE_LOAN_YEARS)),
 		};
 	}
 
@@ -321,17 +388,21 @@
 	function carSummary(result) {
 		const c = result.car;
 		const money = (value) => `$${Math.round(value).toLocaleString("en-SG")}`;
+		const pct = (ltv) => `${Math.round((1 - ltv) * 100)}% down`;
 		if (c.realistic) {
+			const rows = [];
+			c.tiers.forEach((tier) => {
+				rows.push([`${tier.label} (${pct(tier.ltv)}): comfortable`, `${money(tier.price)} · ${money(tier.downpayment)} down · ${money(tier.instalment)}/month`]);
+				rows.push([`${tier.label}: stretch`, `${money(tier.stretchPrice)} · ${money(tier.stretchDownpayment)} down · ${money(tier.stretchInstalment)}/month`]);
+			});
+			rows.push(["All-in monthly cost (comfortable)", `${money(c.allInLow)} to ${money(c.allInHigh)} (1.3 to 1.5x the instalment)`]);
+			const high = Math.max(...c.tiers.map((tier) => tier.price));
 			return {
 				ok: true,
-				headlineLabel: "Car: comfortable up to",
-				headline: money(c.price),
-				sub: `Instalment about ${money(c.instalment)}/month, under 10% of your take-home pay.`,
-				rows: [
-					["Downpayment (30%)", money(c.downpayment)],
-					["All-in monthly cost", `${money(c.allInLow)} to ${money(c.allInHigh)} (1.3 to 1.5x the instalment)`],
-					["Stretch (instalment at 15% of take-home)", money(c.stretchPrice)],
-				],
+				headlineLabel: high > c.price ? "Car: comfortable, depending on the OMV" : "Car: comfortable up to",
+				headline: high > c.price ? `${money(c.price)} to ${money(high)}` : money(c.price),
+				sub: `Instalment about ${money(c.instalment)}/month, under 10% of your take-home pay. How much you can borrow depends on the car's OMV, so both are shown.`,
+				rows,
 				notes: [],
 			};
 		}
@@ -340,14 +411,43 @@
 			headlineLabel: "Car",
 			headline: "Not comfortably yet",
 			sub: c.limitedBy === "savings"
-				? "After your emergency buffer, there isn't enough for the 30% downpayment."
+				? "After your emergency buffer, there isn't enough for the downpayment (30% to 40% of the price, in cash)."
 				: `Keeping the instalment under 10% of take-home means about ${money(c.instalmentCap)}/month for you, which covers a car of about ${money(c.price)}.`,
 			rows: [],
-			notes: [`A ${money(c.examplePrice)} car needs about ${money(c.exampleDownpayment)} down, and pay of about ${money(c.neededPayForExample)}/month to keep its instalment under 10% of take-home.`],
+			notes: [`A ${money(c.examplePrice)} car needs ${c.examples.map((e) => `${money(e.downpayment)} down and pay of about ${money(e.pay)}/month (${e.label.replace("OMV", "OMV")})`).join(", or ")} to keep its instalment under 10% of take-home.`],
 		};
 	}
 
-	// input: { want: house|car|both, age, monthlyPay, alone, partnerPay,
+	function bikeSummary(result) {
+		const b = result.bike;
+		const money = (value) => `$${Math.round(value).toLocaleString("en-SG")}`;
+		if (b.realistic) {
+			return {
+				ok: true,
+				headlineLabel: "Motorbike: comfortable up to",
+				headline: money(b.price),
+				sub: `Instalment about ${money(b.instalment)}/month, under 10% of your take-home pay.`,
+				rows: [
+					["Downpayment (20%)", money(b.downpayment)],
+					["Stretch (instalment at 15% of take-home)", `${money(b.stretchPrice)} · ${money(b.stretchDownpayment)} down · ${money(b.stretchInstalment)}/month`],
+					["All-in monthly cost (comfortable)", `${money(b.allInLow)} to ${money(b.allInHigh)} (instalment plus insurance, road tax, petrol, parking)`],
+				],
+				notes: [],
+			};
+		}
+		return {
+			ok: false,
+			headlineLabel: "Motorbike",
+			headline: "Not comfortably yet",
+			sub: b.limitedBy === "savings"
+				? "After your emergency buffer, there isn't enough for the 20% downpayment."
+				: `Keeping the instalment under 10% of take-home means about ${money(b.instalmentCap)}/month for you, which covers a bike of about ${money(b.price)}.`,
+			rows: [],
+			notes: [`A ${money(b.examplePrice)} bike needs about ${money(b.exampleDownpayment)} down, and pay of about ${money(b.examplePay)}/month to keep its instalment under 10% of take-home.`],
+		};
+	}
+
+	// input: { plan: ["home","car","bike"] (or legacy want: house|car|both), age, monthlyPay, alone, partnerPay,
 	//          savings, cpfOa, hasDependants, monthlyExpenses (optional),
 	//          otherDebt, ehg, familyGrant, proximity: none|near|with }
 	function calculate(input) {
@@ -364,7 +464,11 @@
 		const expenses = expensesKnown ? Number(input.monthlyExpenses) : income * TAKE_HOME_SHARE * DEFAULT_SPEND_SHARE;
 		const buffer = Math.round(input.hasDependants ? income * 6 : expenses * 6);
 		const spare = Math.max(0, savings - buffer);
-		const want = input.want || "both";
+		const legacy = { house: ["home"], car: ["car"], both: ["home", "car"], bike: ["bike"] };
+		let plan = Array.isArray(input.plan) ? input.plan : legacy[input.want] || ["home", "car"];
+		plan = ["home", "car", "bike"].filter((item) => plan.includes(item));
+		if (!plan.length) plan = ["home"];
+		const want = plan.includes("home") && plan.includes("car") ? "both" : plan.includes("home") ? "house" : plan.includes("car") ? "car" : "bike";
 
 		const result = {
 			age,
@@ -374,14 +478,24 @@
 			expenses: Math.round(expenses),
 			spare,
 			want,
+			plan,
 		};
 
-		let carResult = null;
-		if (want === "car" || want === "both") {
-			carResult = car({ income, cash: spare, otherDebt });
-			result.car = carResult;
+		const vehicles = [];
+		if (plan.includes("car")) {
+			result.car = car({ income, cash: spare, otherDebt });
+			vehicles.push(result.car);
 		}
-		if (want === "house" || want === "both") {
+		if (plan.includes("bike")) {
+			result.bike = bike({ income, cash: spare, otherDebt });
+			vehicles.push(result.bike);
+		}
+		const owned = vehicles.filter((v) => v.realistic);
+		if (owned.length > 1) {
+			const monthly = owned.reduce((sum, v) => sum + v.instalment, 0);
+			result.vehiclesTogether = { monthly, share: monthly / (income * TAKE_HOME_SHARE) };
+		}
+		if (plan.includes("home")) {
 			const homeInput = {
 				age,
 				income,
@@ -398,18 +512,21 @@
 				proximity: input.proximity || "none",
 				resale: Boolean(input.resale),
 			};
-			const withoutCar = home(homeInput);
-			result.home = withoutCar;
-			if (want === "both" && carResult && carResult.realistic) {
-				const withCar = home({
+			const withoutVehicles = home(homeInput);
+			result.home = withoutVehicles;
+			if (owned.length) {
+				const down = owned.reduce((sum, v) => sum + v.downpayment, 0);
+				const withVehicles = home({
 					...homeInput,
-					cash: Math.max(0, spare - carResult.downpayment),
-					cashAll: Math.max(0, savings - carResult.downpayment),
-					otherDebt: otherDebt + carResult.instalment,
-					expenses: expenses + carResult.monthlyAllIn,
+					cash: Math.max(0, spare - down),
+					cashAll: Math.max(0, savings - down),
+					otherDebt: otherDebt + owned.reduce((sum, v) => sum + v.instalment, 0),
+					expenses: expenses + owned.reduce((sum, v) => sum + v.monthlyAllIn, 0),
 				});
-				result.homeWithCar = withCar;
-				result.carCostsYouOfHome = Math.max(0, withoutCar.price - withCar.price);
+				result.homeWithCar = withVehicles;
+				result.vehicleCostsYouOfHome = Math.max(0, withoutVehicles.price - withVehicles.price);
+				result.vehicleWords = owned.map((v) => (v.kind === "car" ? "car" : "bike")).join(" and ");
+				if (plan.includes("car") && result.car.realistic) result.carCostsYouOfHome = result.vehicleCostsYouOfHome;
 			}
 		}
 		return result;
@@ -461,7 +578,7 @@
 				best.limitedBy === "savings" ? "Savings for the downpayment" : `Your income (instalment kept within 30% of pay, ${money(best.comfortMonthly)}/month)`,
 			]);
 			if (home.maxPrice > home.price) {
-				summary.rows.push(["Most the rules allow, using every dollar", `${money(home.maxPrice)} (a stretch)`]);
+				summary.rows.push(["Stretch (the most the loan rules allow, using every dollar)", money(home.maxPrice)]);
 			}
 			if (home.savingsRateAfter !== null) {
 				summary.notes.push(`After the instalment you'd still save about ${Math.max(0, Math.round(home.savingsRateAfter * 100))}% of your take-home pay.`);
@@ -499,11 +616,14 @@
 			parts.push("Comfortable keeps the home loan instalment within 30% of gross pay, the limit HDB itself uses. Loans are stress-tested at 3% (HDB) or 4% (bank), and bank loans are planned at 3% since today's ~1.6% packages only last 2 to 3 years.");
 		}
 		if (result.car) {
-			parts.push("Car instalments assume a 7-year loan at 2.48% flat with 30% down; all-in costs cover insurance, road tax, petrol, parking and servicing.");
+			parts.push("Car loans: 7 years at 2.48% flat; MAS lets you borrow 70% of the price if the OMV is $20,000 or less, 60% if above. All-in costs cover insurance, road tax, petrol, parking and servicing.");
+		}
+		if (result.bike) {
+			parts.push("Motorbike loans aren't capped by MAS; planned at 80% financing over 5 years at 2.5% flat, typical of bank bike loans.");
 		}
 		parts.push("Estimates only, not personalised advice.");
 		return parts.join(" ");
 	}
 
-	return { calculate, homeSummary, carSummary, footnote, bsd, ehgAmount, CAR_COMFORT_SHARE, MSR, TDSR, HDB_INCOME_CEILING_FAMILY, HDB_INCOME_CEILING_SINGLE };
+	return { calculate, homeSummary, carSummary, bikeSummary, footnote, bsd, ehgAmount, CAR_COMFORT_SHARE, MSR, TDSR, HDB_INCOME_CEILING_FAMILY, HDB_INCOME_CEILING_SINGLE };
 });

@@ -99,9 +99,11 @@
 	// What Can I Afford: topics follow what they're buying.
 	function topicsFor(details) {
 		if (details.id !== "afford") return TOPICS[details.id] || [];
-		const want = (details.querySelector("#afford-want") || {}).value;
-		if (want === "car") return ["Can I afford this car?", "Cash vs car loan", "Loan offsetting"];
-		if (want === "both") return ["Home and car together", "Grants check", "HDB vs bank loan", "Loan offsetting"];
+		const ticked = (id) => { const box = details.querySelector("#afford-plan-" + id); return Boolean(box && box.checked); };
+		const home = ticked("home");
+		const vehicle = ticked("car") ? "car" : ticked("bike") ? "bike" : "";
+		if (!home && vehicle) return [`Can I afford this ${vehicle}?`, `Cash vs ${vehicle} loan`, "Loan offsetting"];
+		if (home && vehicle) return [`Home and ${vehicle} together`, "Grants check", "HDB vs bank loan", "Loan offsetting"];
 		return TOPICS.afford;
 	}
 

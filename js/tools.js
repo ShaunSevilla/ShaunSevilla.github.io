@@ -152,13 +152,17 @@
 		const resultBox = document.getElementById("afford-result");
 		const status = document.getElementById("afford-status");
 
+		const planBoxes = ["home", "car", "bike"].map(function (key) { return document.getElementById("afford-plan-" + key); });
+		function plan() {
+			return planBoxes.filter(function (box) { return box.checked; }).map(function (box) { return box.value; });
+		}
 		function updateVisibility() {
-			const wantsHome = value("afford-want") !== "car";
+			const wantsHome = plan().includes("home");
 			form.closest(".calculator-card").querySelectorAll(".afford-home-fields").forEach(function (el) {
 				el.hidden = !wantsHome;
 			});
 			form.closest(".calculator-card").querySelectorAll(".afford-car-note").forEach(function (el) {
-				el.hidden = value("afford-want") === "house";
+				el.hidden = !plan().includes("car") && !plan().includes("bike");
 			});
 			document.getElementById("afford-partner-field").hidden = !wantsHome || value("afford-with") !== "partner";
 			document.getElementById("afford-expenses-field").hidden = value("afford-dependants") === "yes";
@@ -206,10 +210,15 @@
 				resultBox.hidden = true;
 				return;
 			}
-			const want = value("afford-want");
-			const wantsHome = want !== "car";
+			const picked = plan();
+			if (!picked.length) {
+				setStatus(status, "Tick at least one thing to plan for: a home, a car or a motorbike.");
+				resultBox.hidden = true;
+				return;
+			}
+			const wantsHome = picked.includes("home");
 			const r = window.Affordability.calculate({
-				want,
+				plan: picked,
 				age,
 				monthlyPay,
 				alone: !wantsHome || value("afford-with") !== "partner",
@@ -252,8 +261,20 @@
 				html += `</div>`;
 			}
 
-			if (r.carCostsYouOfHome > 0) {
-				html += note(`<strong>Buying the car first shrinks your home budget by ${formatCurrency(r.carCostsYouOfHome)}.</strong>`, "calculator-note-callout");
+			if (r.bike) {
+				const bs = window.Affordability.bikeSummary(r);
+				html += `<div class="afford-car">` + headline(bs.headlineLabel, bs.headline, bs.sub);
+				bs.rows.forEach(function (row) { html += resultRow(row[0], row[1]); });
+				bs.notes.forEach(function (text) { html += note(text); });
+				html += `</div>`;
+			}
+
+			if (r.vehiclesTogether) {
+				html += note(`<strong>Car and bike together: about ${formatCurrency(r.vehiclesTogether.monthly)}/month in instalments, ${Math.round(r.vehiclesTogether.share * 100)}% of your take-home pay.</strong> Each is worked out on its own above, so the downpayments come from the same savings.`, "calculator-note-callout");
+			}
+
+			if (r.vehicleCostsYouOfHome > 0) {
+				html += note(`<strong>Buying the ${r.vehicleWords} first shrinks your home budget by ${formatCurrency(r.vehicleCostsYouOfHome)}.</strong>`, "calculator-note-callout");
 			}
 			html += note(window.Affordability.footnote(r));
 			resultBox.innerHTML = html;

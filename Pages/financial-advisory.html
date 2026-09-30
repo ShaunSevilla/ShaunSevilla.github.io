@@ -4,13 +4,13 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Free Tax Relief, HDB, CPF & Car Calculators | Shaun Sevilla</title>
-		<meta name="description" content="Free Singapore calculators: tax reliefs and how much you can still save, what home or car you can afford, HDB vs bank loans, CPF growth, insurance and car loans. Then book a chat if you want a plan." />
+		<meta name="description" content="Free Singapore calculators: tax reliefs and how much you can still save, what home, car or bike you can afford, HDB vs bank loans, CPF growth, insurance and car loans. Then book a chat if you want a plan." />
 		<meta name="theme-color" content="#080808" />
 		<link rel="canonical" href="https://shaunsevilla.github.io/Pages/financial-advisory.html" />
 		<meta property="og:type" content="website" />
 		<meta property="og:site_name" content="Shaun Sevilla" />
 		<meta property="og:title" content="Free Tax Relief, HDB, CPF & Car Calculators | Shaun Sevilla" />
-		<meta property="og:description" content="Free Singapore calculators: tax reliefs and how much you can still save, what home or car you can afford, HDB vs bank loans, CPF growth, insurance and car loans. Then book a chat if you want a plan." />
+		<meta property="og:description" content="Free Singapore calculators: tax reliefs and how much you can still save, what home, car or bike you can afford, HDB vs bank loans, CPF growth, insurance and car loans. Then book a chat if you want a plan." />
 		<meta property="og:url" content="https://shaunsevilla.github.io/Pages/financial-advisory.html" />
 		<meta property="og:image" content="https://shaunsevilla.github.io/assets/og-image.jpg" />
 		<meta property="og:image:width" content="1200" />
@@ -154,21 +154,20 @@
 						<summary>
 							<div>
 								<h3><i class="fas fa-wallet" aria-hidden="true"></i> What Can I Afford?</h3>
-								<p>The home and/or car you can comfortably afford, using the rules banks actually use.</p>
+								<p>The home, car and/or motorbike you can comfortably afford, and how far you could stretch, using the rules banks actually use.</p>
 							</div>
 							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
 						</summary>
 						<div class="calculator-dropdown-body">
 							<article class="calculator-card">
-								<p class="calculator-card-note">Keeps an emergency buffer untouched first: 6 months of spending, or 6 months of pay if people depend on you.<span class="afford-home-fields"> Home: the loan instalment stays within 30% of your gross pay. Shows a BTO by default; tick a resale grant to see resale instead.</span><span class="afford-car-note"> Car: the loan instalment stays under 10% of your take-home pay, and owning it costs about 1.3 to 1.5 times that.</span></p>
+								<p class="calculator-card-note">Keeps an emergency buffer untouched first: 6 months of spending, or 6 months of pay if people depend on you.<span class="afford-home-fields"> Home: the loan instalment stays within 30% of your gross pay. Shows a BTO by default; tick a resale grant to see resale instead.</span><span class="afford-car-note"> Car or bike: the loan instalment stays under 10% of your take-home pay (15% is a stretch).</span></p>
 								<form class="booking-form calculator-form" id="afford-form">
-									<label><span>What are you thinking of buying?</span>
-										<select id="afford-want">
-											<option value="both">A home and a car</option>
-											<option value="house">A home</option>
-											<option value="car">A car</option>
-										</select>
-									</label>
+									<fieldset class="afford-plan">
+										<legend>What do you want to plan for? <em>Tick all that apply.</em></legend>
+										<label class="check-row"><input type="checkbox" id="afford-plan-home" value="home" checked /><span>🏠 A home (HDB flat)</span></label>
+										<label class="check-row"><input type="checkbox" id="afford-plan-car" value="car" checked /><span>🚗 A car</span></label>
+										<label class="check-row"><input type="checkbox" id="afford-plan-bike" value="bike" /><span>🏍️ A motorbike</span></label>
+									</fieldset>
 									<label><span>Age</span><input type="number" id="afford-age" min="18" max="100" step="1" placeholder="28" required /></label>
 									<label><span>Monthly salary before CPF ($)</span><input type="number" id="afford-pay" min="0" step="1" placeholder="5000" required /></label>
 									<div class="afford-home-fields">

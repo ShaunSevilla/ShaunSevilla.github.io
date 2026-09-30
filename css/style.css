@@ -3208,19 +3208,27 @@ footer span {
 }
 
 /* Grant ticks in the affordability calculator */
-.afford-grants {
+.afford-grants,
+.afford-plan {
 	border: 1px solid var(--border);
 	padding: 0.9rem 1rem 0.2rem;
 	margin: 0 0 1rem;
 }
 
-.afford-grants legend {
+.afford-plan .check-row {
+	display: inline-flex;
+	margin-right: 1.2rem;
+}
+
+.afford-grants legend,
+.afford-plan legend {
 	padding: 0 0.4rem;
 	font-size: 0.85rem;
 	color: var(--text);
 }
 
 .afford-grants legend em,
+.afford-plan legend em,
 .afford-grants small,
 .booking-form label small {
 	font-style: normal;
