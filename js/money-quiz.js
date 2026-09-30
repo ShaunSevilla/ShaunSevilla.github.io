@@ -79,6 +79,7 @@
 		$("quiz-book").href = `booking.html?${new URLSearchParams({ topic: "Money persona", notes }).toString()}`;
 		$("quiz-share-status").textContent = "";
 		show(resultBox);
+		buildCard();
 	}
 
 	function start() {
@@ -104,49 +105,64 @@
 		}
 	}
 
-	// Story-sized image of the result (like a Strava share): the share sheet
-	// on phones (so it can go straight to IG Stories or Photos), a download
-	// everywhere else.
+	// Story-sized image of the result (like a Strava share). It's built as
+	// soon as the result shows, so tapping the button can share it right away:
+	// browsers only allow the share sheet straight after a tap.
+	let cardPromise = null;
+
+	function buildCard() {
+		const persona = lastResult.persona;
+		cardPromise = window.QuizCard.render({
+			art: artFor(lastResult.key),
+			name: persona.name,
+			runner: runnerLine(lastResult),
+			roast: persona.roast,
+			superpower: persona.superpower,
+			blindSpot: persona.blindSpot,
+			rare: lastResult.rare,
+		});
+		cardPromise.catch(() => {});
+	}
+
+	function download(blob, fileName) {
+		const link = document.createElement("a");
+		link.href = URL.createObjectURL(blob);
+		link.download = fileName;
+		document.body.appendChild(link);
+		link.click();
+		link.remove();
+		setTimeout(() => URL.revokeObjectURL(link.href), 10000);
+	}
+
+	// Phones and tablets: share sheet (Save Image, IG Stories...).
+	// Computers: straight download.
+	const isTouchDevice = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+
 	async function shareCard() {
 		const status = $("quiz-share-status");
-		const button = $("quiz-card-share");
 		const persona = lastResult.persona;
-		button.disabled = true;
-		status.textContent = "Making your card…";
+		const fileName = `money-persona-${lastResult.key}.png`;
+		if (!cardPromise) buildCard();
+		let blob;
 		try {
-			const blob = await window.QuizCard.render({
-				art: artFor(lastResult.key),
-				name: persona.name,
-				runner: runnerLine(lastResult),
-				roast: persona.roast,
-				superpower: persona.superpower,
-				blindSpot: persona.blindSpot,
-				rare: lastResult.rare,
-			});
-			const fileName = `money-persona-${lastResult.key}.png`;
-			const file = new File([blob], fileName, { type: "image/png" });
-			if (navigator.canShare && navigator.canShare({ files: [file] })) {
-				try {
-					await navigator.share({ files: [file], text: `I got ${persona.name}. What's yours? ${PAGE_URL}?r=${lastResult.key}` });
-					status.textContent = "";
-				} catch (error) {
-					status.textContent = "";
-				}
-				return;
-			}
-			const link = document.createElement("a");
-			link.href = URL.createObjectURL(blob);
-			link.download = fileName;
-			document.body.appendChild(link);
-			link.click();
-			link.remove();
-			setTimeout(() => URL.revokeObjectURL(link.href), 5000);
-			status.textContent = "Card downloaded. Post it and tag a friend.";
+			blob = await cardPromise;
 		} catch (error) {
 			status.textContent = "Couldn't make the card. Try a screenshot instead.";
-		} finally {
-			button.disabled = false;
+			return;
 		}
+		const file = new File([blob], fileName, { type: "image/png" });
+		if (isTouchDevice && navigator.canShare && navigator.canShare({ files: [file] })) {
+			try {
+				await navigator.share({ files: [file], text: `I got ${persona.name}. What's yours? ${PAGE_URL}?r=${lastResult.key}` });
+				status.textContent = "";
+				return;
+			} catch (error) {
+				if (error && error.name === "AbortError") return;
+				// Share sheet refused: fall through to a download.
+			}
+		}
+		download(blob, fileName);
+		status.textContent = "Card downloaded. Post it and tag a friend.";
 	}
 
 	// A link shared from a result (?r=monk) shows who sent it.

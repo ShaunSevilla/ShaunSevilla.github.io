@@ -22,6 +22,38 @@
 		});
 	}
 
+	// iPhone Safari measures and centres canvas text wrongly when it holds an
+	// emoji, so text is always drawn left-aligned from a position worked out
+	// here, and each emoji is given a fixed width instead of trusting
+	// measureText for it.
+	const EMOJI = /(\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic}|️‍\p{Extended_Pictographic})*️?)/u;
+
+	function fontSize(ctx) {
+		const match = /(\d+(?:\.\d+)?)px/.exec(ctx.font);
+		return match ? Number(match[1]) : 16;
+	}
+
+	function pieces(text) {
+		return String(text || "").split(EMOJI).filter(Boolean).map((part) => ({ part, emoji: EMOJI.test(part) }));
+	}
+
+	function textWidth(ctx, text) {
+		const emojiWidth = fontSize(ctx) * 1.15;
+		return pieces(text).reduce((sum, { part, emoji }) => sum + (emoji ? emojiWidth : ctx.measureText(part).width), 0);
+	}
+
+	function drawText(ctx, text, x, y, align) {
+		const emojiWidth = fontSize(ctx) * 1.15;
+		let cursor = align === "center" ? x - textWidth(ctx, text) / 2 : x;
+		const saved = ctx.textAlign;
+		ctx.textAlign = "left";
+		pieces(text).forEach(({ part, emoji }) => {
+			ctx.fillText(part, cursor, y);
+			cursor += emoji ? emojiWidth : ctx.measureText(part).width;
+		});
+		ctx.textAlign = saved;
+	}
+
 	// Splits text into lines that fit maxWidth at the context's current font.
 	function wrap(ctx, text, maxWidth) {
 		const words = String(text || "").split(/\s+/).filter(Boolean);
@@ -29,7 +61,7 @@
 		let line = "";
 		words.forEach((word) => {
 			const test = line ? `${line} ${word}` : word;
-			if (ctx.measureText(test).width > maxWidth && line) {
+			if (textWidth(ctx, test) > maxWidth && line) {
 				lines.push(line);
 				line = word;
 			} else {
@@ -40,8 +72,8 @@
 		return lines;
 	}
 
-	function drawLines(ctx, lines, x, y, lineHeight) {
-		lines.forEach((line, index) => ctx.fillText(line, x, y + index * lineHeight));
+	function drawLines(ctx, lines, x, y, lineHeight, align) {
+		lines.forEach((line, index) => drawText(ctx, line, x, y + index * lineHeight, align));
 		return y + lines.length * lineHeight;
 	}
 
@@ -121,23 +153,23 @@
 		for (;;) {
 			ctx.font = `600 ${nameSize}px ${SERIF}`;
 			nameLines = wrap(ctx, data.name, W - 220);
-			const widest = Math.max(...nameLines.map((line) => ctx.measureText(line).width));
+			const widest = Math.max(...nameLines.map((line) => textWidth(ctx, line)));
 			if ((widest <= W - 220 && nameLines.length <= 2) || nameSize <= 64) break;
 			nameSize -= 6;
 		}
-		y = drawLines(ctx, nameLines, W / 2, y + nameSize * 0.4, nameSize);
+		y = drawLines(ctx, nameLines, W / 2, y + nameSize * 0.4, nameSize, "center");
 
 		// Runner-up, right under the name.
 		if (data.runner) {
 			ctx.fillStyle = MUTED;
 			ctx.font = `italic 400 36px ${SANS}`;
-			y = drawLines(ctx, wrap(ctx, data.runner, W - 220), W / 2, y + 16, 48);
+			y = drawLines(ctx, wrap(ctx, data.runner, W - 220), W / 2, y + 16, 48, "center");
 		}
 
 		// Roast.
 		ctx.fillStyle = TEXT;
 		ctx.font = `400 40px ${SANS}`;
-		y = drawLines(ctx, wrap(ctx, data.roast, W - 240), W / 2, y + 50, 58);
+		y = drawLines(ctx, wrap(ctx, data.roast, W - 240), W / 2, y + 50, 58, "center");
 
 		// Superpower / blind spot.
 		const left = 150;
@@ -150,7 +182,7 @@
 			ctx.fillText(label.split("").join(String.fromCharCode(8202)), left, y);
 			ctx.fillStyle = TEXT;
 			ctx.font = `400 36px ${SANS}`;
-			y = drawLines(ctx, wrap(ctx, text, traitWidth), left, y + 50, 50) + 34;
+			y = drawLines(ctx, wrap(ctx, text, traitWidth), left, y + 50, 50, "left") + 34;
 		});
 
 		const contentBottom = y;
@@ -159,10 +191,10 @@
 		ctx.textAlign = "center";
 		ctx.fillStyle = GOLD;
 		ctx.font = `600 70px ${SERIF}`;
-		ctx.fillText("What's yours?", W / 2, H - 190);
+		drawText(ctx, "What's yours?", W / 2, H - 190, "center");
 		ctx.fillStyle = MUTED;
 		ctx.font = `400 30px ${SANS}`;
-		ctx.fillText(SITE, W / 2, H - 130);
+		drawText(ctx, SITE, W / 2, H - 130, "center");
 
 		return contentBottom;
 	}
