@@ -197,6 +197,37 @@
 		};
 	}
 
+	// Plain-English verdict on SRS for this person, or null when there's
+	// nothing worth flagging. Foreigners get their own version: they can
+	// withdraw everything penalty-free after 10 years (only half taxed, with
+	// 15% withheld on that half if they've left and take out <= $200k a
+	// year), so SRS works differently for them (IRAS, smartwealth.sg).
+	function srsHonestTake(result) {
+		const srs = result.opportunities.find((option) => option.key === "srs");
+		if (!srs || result.tax <= 0) return null;
+		const rate = result.marginalRate;
+		const pct = `${Math.round(rate * 1000) / 10}%`;
+		const perThousand = Math.round(rate * 1000);
+		if (!result.isLocal) {
+			return (
+				`Honest take for foreigners: at your ${pct} top rate, every $1,000 into SRS saves about $${perThousand} of tax now. The catch is getting it out. ` +
+				"Once you've had the account for 10 years (and aren't a citizen or PR), you can withdraw everything with no penalty and only half of it taxed. " +
+				"If you've left Singapore by then, the bank withholds 15% on that half, about 7.5% of what you take out (if it's under $200,000 a year and you have no other Singapore income). " +
+				"Take it out before 10 years and it's fully taxed plus a 5% penalty. " +
+				(rate <= 0.07
+					? "At your rate that's roughly break-even, so only do it if you're sure you can leave the money invested for 10+ years."
+					: "At your rate you save more now than you'd likely pay later, as long as you can leave it for 10+ years.")
+			);
+		}
+		if (rate <= 0.035) {
+			return `Honest take: your top tax rate is only ${pct}, so locking money away saves you little. An emergency fund and investing come first. SRS starts to make sense once you're in the 7%+ bracket, and really pays off at 11.5% and up.`;
+		}
+		if (rate <= 0.07) {
+			return "Honest take: at a 7% top rate, every $1,000 into SRS saves about $70 of tax, and the money is locked until retirement age. Worth it only once your emergency fund is sorted and you won't need that money for decades.";
+		}
+		return null;
+	}
+
 	// Days until 31 Dec of `now`'s year (top-ups count for the year they're made).
 	function daysLeftInYear(now) {
 		const date = now || new Date();
@@ -214,6 +245,7 @@
 		marginalRate,
 		employeeCpf,
 		calculate,
+		srsHonestTake,
 		daysLeftInYear,
 	};
 });

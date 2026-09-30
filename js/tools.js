@@ -98,7 +98,13 @@
 				lifePremium: lifeField.hidden ? 0 : numberValue("tax-life") || 0,
 			});
 
-			let html = headline("Estimated tax", formatCurrency(result.tax), `${percent(result.effectiveRate)} of your ${formatCurrency(result.income)} income`);
+			let html = headline(
+				"You'll probably pay",
+				formatCurrency(result.tax),
+				result.tax > 0
+					? `in tax, ${percent(result.effectiveRate)} of your ${formatCurrency(result.income)} income. The bill comes next year, and IRAS lets you spread it over up to 12 interest-free GIRO payments (about ${formatCurrency(result.tax / 12)}/month).`
+					: `in tax on ${formatCurrency(result.income)} of income.`,
+			);
 			result.items.forEach(function (item) {
 				html += resultRow(item.label, formatCurrency(item.amount));
 			});
@@ -115,15 +121,16 @@
 					html += `<li>${option.label} with ${formatCurrency(option.amount)} → save <strong>${formatCurrency(option.saving)}</strong></li>`;
 				});
 				html += `</ul><p class="calculator-note">Do all of it and your tax drops from ${formatCurrency(result.tax)} to <strong>${formatCurrency(result.taxAfterOpportunities)}</strong>.</p></div>`;
-				if (result.lowTax) {
-					html += note(`Honest take: your top tax rate is only ${percent(result.marginalRate)}, so locking money away saves you little. An emergency fund and investing come first. SRS starts to make sense once you're in the 7%+ bracket, and really pays off at 11.5% and up.`, "calculator-note-callout");
-				} else if (result.marginalRate <= 0.07) {
-					html += note("Honest take: at a 7% top rate, every $1,000 into SRS saves about $70 of tax, and the money is locked until retirement age. Worth it only once your emergency fund is sorted and you won't need that money for decades.", "calculator-note-callout");
+				const take = window.TaxRelief.srsHonestTake(result);
+				if (take) {
+					html += note(take, "calculator-note-callout");
 				}
 			} else {
 				html += note("You've already used the big ones (SRS and CPF top-ups).");
 			}
-			html += note("SRS money is locked until retirement age and 50% taxable when you withdraw. CPF top-ups stay in CPF for good. No tax rebate has been announced for this year. Not personalised advice.");
+			html += note(result.isLocal
+				? "SRS money is locked until retirement age and 50% taxable when you withdraw. CPF top-ups stay in CPF for good. No tax rebate has been announced for this year. Not personalised advice."
+				: "Assumes you're a tax resident (in Singapore 183+ days this year). No tax rebate has been announced for this year. Not personalised advice.");
 			resultBox.innerHTML = html;
 			resultBox.hidden = false;
 		});
