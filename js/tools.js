@@ -277,13 +277,12 @@
 			}
 			const annual = monthly * 12;
 			resultBox.innerHTML =
-				`<div class="insurance-alarm"><p>On ${formatCurrency(monthly)} a month, you should be insured for at least <strong>${formatCurrency(annual * 9)}</strong> in case you pass away or can never work again, and <strong>${formatCurrency(annual * 4)}</strong> for critical illness.</p><p>Most people your age have a fraction of that. Do you know your number?</p></div>` +
+				`<div class="insurance-alarm"><p>On ${formatCurrency(monthly)} a month, you should be insured for at least <strong>${formatCurrency(annual * 9)}</strong> in case you pass away or can never work again, and <strong>${formatCurrency(annual * 4)}</strong> for critical illness.</p><p>Most people have a fraction of that. Do you know your number?</p></div>` +
 				headline("Suggested budget", `${formatCurrency(monthly * 0.1)}/month`, `About 10% of your income, or ${formatCurrency(annual * 0.1)} a year`) +
-				resultRow("Critical illness (5x annual income)", formatCurrency(annual * 5)) +
-				resultRow("Total permanent disability (10x)", formatCurrency(annual * 10)) +
-				resultRow("Life / term (10x)", formatCurrency(annual * 10)) +
-				note(`Baseline: critical illness around ${formatCurrency(annual * 4)}, death and disability around ${formatCurrency(annual * 9)}.`) +
-				note("A simple benchmark, not personalised advice. Your real needs depend on dependants, debts, CPF, existing cover and health.");
+				note("<strong>Where I'd aim</strong>, a little above the minimum to cover debts and inflation:") +
+				resultRow("Death & total permanent disability (10x)", formatCurrency(annual * 10)) +
+				resultRow("Critical illness (5x)", formatCurrency(annual * 5)) +
+				note("The minimums are the Life Insurance Association's benchmarks: 9x your annual income for death and disability, 4x for critical illness. A simple benchmark, not personalised advice. Your real needs depend on dependants, debts, CPF, existing cover and health.");
 			resultBox.hidden = false;
 		});
 	}

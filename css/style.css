@@ -2846,9 +2846,11 @@ footer span {
 	color: var(--gold);
 }
 
-.quiz-teaser-emoji {
-	font-size: 1.8rem;
-	line-height: 1;
+.quiz-teaser-art {
+	flex-shrink: 0;
+	width: 56px;
+	height: 56px;
+	object-fit: contain;
 }
 
 .quiz-teaser > i {

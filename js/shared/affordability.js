@@ -195,11 +195,16 @@
 		const fitsFunds = (price, cash) => {
 			const due = price * (1 - LTV) + bsd(price) + LEGAL_AND_FEES;
 			if (o.bto) {
-				if (cash < BTO_OPTION_FEE) return false;
+				// The option fee is the one BTO cost that must be cash. It's small
+				// and one-off, so it may come out of the emergency buffer (the
+				// result says so) rather than blocking the flat altogether.
+				if (cash < BTO_OPTION_FEE && o.cashAll < BTO_OPTION_FEE) return false;
 				// Signing the Agreement for Lease: 5% now, from today's cash + CPF.
 				if (cash + o.cpfNow < price * BTO_SIGNING_SHARE) return false;
-			} else if (cash < Math.min(price * OTP_RATE, OTP_CAP)) {
-				return false;
+			} else {
+				// Resale option fees (up to $5,000) are cash-only too; same rule.
+				const otp = Math.min(price * OTP_RATE, OTP_CAP);
+				if (cash < otp && o.cashAll < otp) return false;
 			}
 			if (bank && cash < price * BANK_MIN_CASH) return false;
 			return cash + o.cpfAtKeys + o.grants >= due;
@@ -424,6 +429,13 @@
 			}
 			if (home.type === "resale" && home.grants.items.some((item) => item.key === "ehg" && item.amount > 0)) {
 				summary.notes.push("Enhanced CPF Housing Grant on resale: at least one of you needs to have been working for the 12 months before you apply.");
+			}
+			const optionFee = home.type === "bto" ? BTO_OPTION_FEE : Math.min(home.price * OTP_RATE, OTP_CAP);
+			if (home.type !== "bto" && result.spare < optionFee) {
+				summary.notes.push(`The option fee (about ${money(optionFee)}) has to be paid in cash before CPF can be used, so it comes out of your emergency buffer. Top the buffer back up afterwards.`);
+			}
+			if (home.type === "bto" && result.spare < BTO_OPTION_FEE) {
+				summary.notes.push(`The ${money(BTO_OPTION_FEE)} BTO option fee has to be paid in cash, so it comes out of your emergency buffer. Top the buffer back up before key collection.`);
 			}
 			if (home.type === "bto") {
 				summary.notes.push("BTO: most of the 25% downpayment is due at key collection, so the CPF you build up while waiting counts. Buying resale instead? Pick a resale option (and its grants) to compare.");

@@ -171,6 +171,8 @@
 			if (usable <= 0) continue;
 			const newTax = taxOn(Math.max(0, income - Math.min(RELIEF_CAP, reliefSoFar + usable)));
 			const saving = Math.round(taxSoFar - newTax);
+			// Nothing left to save (tax already $0): don't suggest it.
+			if (saving <= 0) continue;
 			opportunities.push({ key: option.key, label: option.label, amount: Math.round(usable), saving });
 			reliefSoFar += usable;
 			taxSoFar = newTax;

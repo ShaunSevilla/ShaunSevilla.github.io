@@ -57,7 +57,7 @@
 			superpower: "You will never go broke.",
 			blindSpot: "Cash in the bank quietly loses to inflation every single year.",
 			tip: "Keep 6 months of expenses easy to reach, then let the rest actually work.",
-			cta: "Want to see what your idle cash could be doing? 15 minutes with Shaun.",
+			cta: "Want to see what your idle cash could be doing? Book a free chat with Shaun.",
 		},
 		cpf: {
 			emoji: "🏦",
@@ -66,7 +66,7 @@
 			superpower: "Disciplined, guaranteed, sleeps like a baby.",
 			blindSpot: "CPF alone may not pay for the retirement you actually want.",
 			tip: "Find out your CPF LIFE payout, then plan for the gap.",
-			cta: "Want to know your real retirement gap? Shaun can map it in 15 minutes.",
+			cta: "Want to know your real retirement gap? Shaun can map it with you in one chat.",
 		},
 		monk: {
 			emoji: "📊",
