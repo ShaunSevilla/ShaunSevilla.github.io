@@ -208,5 +208,20 @@
 		return { key: top, rare: top === "quiet", persona: PERSONAS[top], runnerUp, runnerUpPersona: runnerUp ? PERSONAS[runnerUp] : null, totals };
 	}
 
-	return { PERSONAS, PERSONA_ORDER, QUESTIONS, score };
+	// "With a little bit of ... in me": worded by how close the second-highest
+	// persona came to the winner.
+	//   85%+ of the winner's score  -> "With a lot of X in me too."
+	//   50% to 85%                  -> "With a little bit of X in me."
+	//   under 50%                   -> "With a pinch of X in me."
+	function runnerUpLine(result) {
+		if (!result || !result.runnerUpPersona) return "";
+		const top = result.totals[result.key] || 0;
+		const closeness = top > 0 ? result.totals[result.runnerUp] / top : 0;
+		const who = `${result.runnerUpPersona.emoji} ${result.runnerUpPersona.name}`;
+		if (closeness >= 0.85) return `With a lot of ${who} in me too.`;
+		if (closeness >= 0.5) return `With a little bit of ${who} in me.`;
+		return `With a pinch of ${who} in me.`;
+	}
+
+	return { PERSONAS, PERSONA_ORDER, QUESTIONS, score, runnerUpLine };
 });

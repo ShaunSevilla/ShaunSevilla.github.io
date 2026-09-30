@@ -58,7 +58,7 @@
 	});
 
 	function runnerLine(result) {
-		return result.runnerUpPersona ? `With a little bit of ${result.runnerUpPersona.name} in me.` : "";
+		return Quiz.runnerUpLine(result);
 	}
 
 	function showResult() {
