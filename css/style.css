@@ -3400,3 +3400,160 @@ footer span {
 	font-size: 1.15rem;
 	color: var(--text);
 }
+
+/* ------------------------------------------------------------------
+   MOBILE RHYTHM
+   One spacing scale for every page on phones, instead of the layered
+   per-page values above. Sections: 2.75rem top and bottom. Page heroes:
+   2.75rem top, 2.25rem bottom. Side gutter: 1.25rem everywhere.
+   ------------------------------------------------------------------ */
+@media (max-width: 720px) {
+	:root {
+		--m-space: 2.75rem;
+		--m-gutter: 1.25rem;
+		--card-padding: 1.25rem;
+		--component-gap: 0.75rem;
+	}
+
+	.container {
+		padding: 0 var(--m-gutter);
+	}
+
+	section,
+	.consultation-cta,
+	.software-capabilities,
+	.tools-section {
+		padding: var(--m-space) 0;
+	}
+
+	.section-title {
+		margin-bottom: 0.6rem;
+	}
+
+	.section-line {
+		margin-bottom: 1.75rem;
+	}
+
+	.tools-intro {
+		margin: -0.75rem 0 1.5rem;
+	}
+
+	/* Page heroes: same breathing room on every page. */
+	.detail-hero,
+	.software-hero,
+	.money-guide-hero {
+		min-height: 0;
+		padding: var(--m-space) 0 2.25rem;
+	}
+
+	.detail-section {
+		padding: 0.5rem 0 var(--m-space);
+	}
+
+	.detail-section + .detail-section {
+		padding-top: var(--m-space);
+	}
+
+	/* main already clears the nav bar; the quiz added it a second time. */
+	.quiz-shell {
+		min-height: 0;
+		padding: var(--m-space) 0;
+	}
+
+	.guide-entry {
+		padding: 0 0 var(--m-space);
+	}
+
+	.guide-entry-inner {
+		padding-block: 1.75rem;
+	}
+
+	.software-bot-feature {
+		padding: 0;
+	}
+
+	.software-bot-inner {
+		padding-block: 2.25rem;
+		border-bottom: 0;
+	}
+
+	.software-capabilities {
+		padding-top: 0;
+	}
+
+	.leadership-role {
+		line-height: 1.3;
+	}
+
+	/* HOME: text sits low over the two portraits, no empty band on top. */
+	.hero {
+		min-height: calc(100svh - var(--nav-height));
+		align-items: flex-end;
+		padding: 2rem var(--m-gutter) 3rem;
+	}
+
+	.hero::after {
+		content: "";
+		position: absolute;
+		inset: auto 0 0 0;
+		height: 60%;
+		background: linear-gradient(to bottom, transparent, rgba(10, 10, 10, 0.85) 55%, #0a0a0a);
+		z-index: 1;
+		pointer-events: none;
+	}
+
+	.hero-portrait-casual {
+		left: 18%;
+		height: 72svh;
+		opacity: 0.6;
+	}
+
+	.hero-portrait-professional {
+		left: 82%;
+		height: 80svh;
+		opacity: 0.65;
+	}
+
+	/* Tagline on two tidy lines: "Computer Scientist · Financial Adviser" / "Athlete". */
+	.hero-tagline span:last-of-type {
+		display: block;
+		height: 0;
+		overflow: hidden;
+	}
+
+	/* HOME order on phones: tools, what I do, booking, background, roles. */
+	body[data-page="home"] main {
+		display: flex;
+		flex-direction: column;
+	}
+
+	body[data-page="home"] .home-profile-grid,
+	body[data-page="home"] .home-overview {
+		display: contents;
+	}
+
+	body[data-page="home"] .hero { order: 0; }
+	body[data-page="home"] .tools-section { order: 1; }
+	body[data-page="home"] #work { order: 2; }
+	body[data-page="home"] .consultation-cta { order: 3; }
+	body[data-page="home"] #credentials { order: 4; }
+	body[data-page="home"] #leadership { order: 5; }
+
+	.home-profile-grid > section,
+	.home-overview > section {
+		padding: var(--m-space) var(--m-gutter);
+		border: 0;
+		border-top: 1px solid var(--border);
+		background: transparent;
+	}
+
+	.home-overview > .consultation-cta {
+		background: var(--surface);
+		border-bottom: 1px solid var(--border);
+	}
+
+	.home-overview > .consultation-cta + #leadership,
+	body[data-page="home"] #credentials {
+		border-top: 0;
+	}
+}
