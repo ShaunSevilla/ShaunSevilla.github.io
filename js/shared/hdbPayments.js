@@ -42,6 +42,21 @@
 		[Infinity, 0.06],
 	];
 
+	// Rough CPF OA added each month from salary: 23% of wages (age 35 and
+	// under, 2026 rates), wages counted up to the $8,000 ceiling per person.
+	// Combined pay is capped at two ceilings.
+	const OA_SHARE = 0.23;
+	const CPF_OW_CEILING = 8000;
+	const BTO_KEY_YEARS = 3;
+	function oaPerMonth(monthlyPay) {
+		const pay = Math.max(0, Number(monthlyPay) || 0);
+		return Math.round(Math.min(pay, CPF_OW_CEILING * 2) * OA_SHARE);
+	}
+	// CPF OA expected by key collection (BTO) from today's balance + salary.
+	function oaByKeys(oaToday, monthlyPay) {
+		return Math.round(Math.max(0, Number(oaToday) || 0) + oaPerMonth(monthlyPay) * 12 * BTO_KEY_YEARS);
+	}
+
 	function bsd(price) {
 		let tax = 0;
 		let lower = 0;
@@ -119,9 +134,13 @@
 			totalGrants += stage.grants;
 		});
 
+		const mustBeCash = Math.round(stages.reduce((sum, stage) => sum + stage.cashOnly, 0));
 		return {
 			type: bto ? "bto" : "resale",
 			loanType: bank ? "bank" : "hdb",
+			// Only this has to be cash; CPF OA (and grants) can pay the rest.
+			mustBeCash,
+			extraCash: Math.max(0, Math.round(totalCash - mustBeCash)),
 			price: Math.round(price),
 			downpayment: Math.round(downpayment),
 			loan: Math.round(price * LTV),
@@ -154,12 +173,16 @@
 	function summaryRows(plan) {
 		const short = { booking: "booking", afl: "signing", keys: "keys", otp: "OTP", completion: "completion" };
 		const k = (value) => (value >= 1000 ? `$${Math.round(value / 1000)}k` : money(value));
-		const cashStages = plan.stages.filter((stage) => stage.cash > 0).map((stage) => `${k(stage.cash)} ${short[stage.key]}`);
-		return [
-			["Cash you'll need", `${money(plan.totalCash)}${cashStages.length > 1 ? ` (${cashStages.join(", ")})` : ""}`],
-			["CPF OA you'll need", `${money(plan.totalOa)}${plan.type === "bto" ? " by keys" : ""}`],
+		const extraStages = plan.stages.filter((stage) => stage.cash - stage.cashOnly > 0).map((stage) => `${k(stage.cash - stage.cashOnly)} ${short[stage.key]}`);
+		const rows = [
+			["Must be cash", `${money(plan.mustBeCash)}${plan.loanType === "bank" ? " (5% of the price: banks need it in cash)" : plan.type === "bto" ? " (the option fee)" : " (the option fees)"}`],
+			["Paid from CPF OA", money(plan.totalOa)],
 		];
+		if (plan.extraCash > 0) {
+			rows.push(["Extra cash where your CPF OA runs short", `${money(plan.extraCash)}${extraStages.length ? ` (${extraStages.join(", ")})` : ""}`]);
+		}
+		return rows;
 	}
 
-	return { schedule, sourceLine, summaryRows, bsd, money, BTO_OPTION_FEE, OTP_CAP };
+	return { schedule, sourceLine, summaryRows, bsd, money, oaPerMonth, oaByKeys, BTO_OPTION_FEE, OTP_CAP, BTO_KEY_YEARS };
 });

@@ -214,6 +214,8 @@
 		const cpfHint = document.getElementById("hdb-cpf-hint");
 		if (!priceHint || !cpfHint) return;
 		const price = Number(document.getElementById("hdb-price").value);
+		const isBto = document.getElementById("hdb-type").value === "bto";
+		["hdb-pay-field", "hdb-pay-hint"].forEach(function (id) { const el = document.getElementById(id); if (el) el.hidden = !isBto; });
 		cpfHint.textContent = "";
 		priceHint.textContent = price > 0 ? `Downpayment (25%): ${formatCurrency(price * (1 - HDB_LOAN_LTV))}, plus stamp duty ${formatCurrency(computeBsd(price))}` : "";
 	}
@@ -249,6 +251,8 @@
 		if (priceEl) priceEl.addEventListener("input", updateHdbHints);
 		if (cpfEl) cpfEl.addEventListener("input", updateHdbHints);
 		if (grantsEl) grantsEl.addEventListener("input", updateHdbHints);
+		const typeEl = document.getElementById("hdb-type");
+		if (typeEl) typeEl.addEventListener("change", updateHdbHints);
 		updateHdbHints();
 
 		form.addEventListener("submit", function (event) {
@@ -283,8 +287,12 @@
 				return;
 			}
 
-			const hdbPlan = Pay.schedule({ price, type, loan: "hdb", oa: cpfAvailable, grants });
-			const bankPlan = Pay.schedule({ price, type, loan: "bank", oa: cpfAvailable, grants });
+			const payRaw = document.getElementById("hdb-pay") ? document.getElementById("hdb-pay").value : "";
+			const monthlyPay = type === "bto" && payRaw !== "" ? Math.max(0, Number(payRaw) || 0) : 0;
+			const oaAtKeys = monthlyPay > 0 ? Pay.oaByKeys(cpfAvailable, monthlyPay) : cpfAvailable;
+			const hdbPlan = Pay.schedule({ price, type, loan: "hdb", oa: cpfAvailable, oaAtKeys, grants });
+			const bankPlan = Pay.schedule({ price, type, loan: "bank", oa: cpfAvailable, oaAtKeys, grants });
+			hdbPlan.monthlyPay = monthlyPay;
 			const loanAmount = hdbPlan.loan;
 			const monthlyPayment = amortisedMonthlyPayment(loanAmount, HDB_LOAN_ANNUAL_RATE, years);
 			const totalInterest = monthlyPayment * years * 12 - loanAmount;
@@ -316,9 +324,13 @@
 			html += `<li><div class="pay-plan-head"><strong>${stage.label}</strong><span>${formatCurrency(stage.total)}</span></div><span class="pay-plan-when">${stage.when}</span>${parts}<span class="pay-plan-source">${Pay.sourceLine(stage)}</span></li>`;
 		});
 		html += `</ol>`;
-		html += `<div class="pay-plan-totals"><div><span>Cash you need</span><strong>${formatCurrency(plan.totalCash)}</strong></div><div><span>CPF OA you need</span><strong>${formatCurrency(plan.totalOa)}</strong></div>${plan.totalGrants > 0 ? `<div><span>Covered by grants</span><strong>${formatCurrency(plan.totalGrants)}</strong></div>` : ""}</div>`;
+		html += `<div class="pay-plan-totals"><div><span>Must be cash</span><strong>${formatCurrency(plan.mustBeCash)}</strong></div><div><span>Paid from CPF OA</span><strong>${formatCurrency(plan.totalOa)}</strong></div>${plan.totalGrants > 0 ? `<div><span>Covered by grants</span><strong>${formatCurrency(plan.totalGrants)}</strong></div>` : ""}<div><span>Extra cash where OA runs short</span><strong>${formatCurrency(plan.extraCash)}</strong></div></div>`;
+		html += `<p class="calculator-note">CPF OA is used first for everything it can pay. Only ${plan.loanType === "bank" ? "5% of the price (banks need it in cash)" : plan.type === "bto" ? "the option fee" : "the option fees"} must be cash; the rest is cash only where your OA runs out.</p>`;
 		if (plan.type === "bto") {
-			html += `<p class="calculator-note">Uses the CPF OA you have today. Your monthly CPF contributions over the 3 to 4 years before key collection will add to it, so the cash at key collection is likely lower. The $2,000 booking fee is for 4-room and bigger ($1,000 for 3-room, $500 for 2-room). Young couples on HDB's Staggered Downpayment Scheme can pay 5% at signing and 20% at key collection instead.</p>`;
+			const oaNote = plan.monthlyPay > 0
+				? `Counts about ${formatCurrency(window.HdbPayments.oaPerMonth(plan.monthlyPay))}/month of new CPF OA from your salary until key collection (~3 years, 23% of pay, age 35 and under).`
+				: "Only counts the CPF OA you have today. Add your salary to count the OA you'll build up before key collection, so less cash is needed at the keys.";
+			html += `<p class="calculator-note">${oaNote} The $2,000 booking fee is for 4-room and bigger ($1,000 for 3-room, $500 for 2-room). Young couples on HDB's Staggered Downpayment Scheme can pay 5% at signing and 20% at key collection instead.</p>`;
 		} else {
 			html += `<p class="calculator-note">The option fees must be cash, because CPF can't be used until HDB accepts the resale application. They're negotiable with the seller but capped at $5,000. Any Cash-Over-Valuation (COV) is extra and cash only.</p>`;
 		}
