@@ -110,6 +110,8 @@
 			});
 		}
 
+		// No CPF OA entered at all: show where OA could come in instead.
+		const noOa = oaLater <= 0;
 		let oaLeft = oaNow;
 		let grantsLeft = grants;
 		let totalCash = 0;
@@ -128,6 +130,10 @@
 			stage.oa = Math.round(Math.min(oaLeft, flexible));
 			oaLeft -= stage.oa;
 			stage.cash = Math.round(stage.cashOnly + flexible - stage.oa);
+			// What CPF OA is allowed to pay at this stage (everything except the
+			// cash-only part and what grants already cover).
+			stage.oaEligible = Math.max(0, Math.round(stage.total - stage.cashOnly - stage.grants));
+			if (noOa) stage.noOaHint = true;
 			stage.parts = stage.parts.map(([label, amount]) => [label, Math.round(amount)]);
 			totalCash += stage.cash;
 			totalOa += stage.oa;
@@ -140,6 +146,8 @@
 			loanType: bank ? "bank" : "hdb",
 			// Only this has to be cash; CPF OA (and grants) can pay the rest.
 			mustBeCash,
+			noOa,
+			oaCouldCover: Math.round(stages.reduce((sum, stage) => sum + stage.oaEligible, 0)),
 			extraCash: Math.max(0, Math.round(totalCash - mustBeCash)),
 			price: Math.round(price),
 			downpayment: Math.round(downpayment),
@@ -162,6 +170,14 @@
 	// "From CPF OA $x · grants $y · cash $z" for one stage.
 	function sourceLine(stage) {
 		const bits = [];
+		if (stage.noOaHint) {
+			// No CPF OA entered: show what could come from CPF instead of
+			// calling it all cash.
+			if (stage.grants > 0) bits.push(`grants ${money(stage.grants)}`);
+			if (stage.cashOnly > 0) bits.push(`cash ${money(stage.cashOnly)} (must be cash)`);
+			if (stage.oaEligible > 0) bits.push(`CPF OA or cash ${money(stage.oaEligible)}`);
+			return bits.join(" · ") || "$0";
+		}
 		if (stage.oa > 0) bits.push(`CPF OA ${money(stage.oa)}`);
 		if (stage.grants > 0) bits.push(`grants ${money(stage.grants)}`);
 		if (stage.cash > 0) bits.push(`cash ${money(stage.cash)}${stage.cashOnly > 0 && stage.cash <= stage.cashOnly + 1 ? " (must be cash)" : ""}`);
@@ -174,6 +190,13 @@
 		const short = { booking: "booking", afl: "signing", keys: "keys", otp: "OTP", completion: "completion" };
 		const k = (value) => (value >= 1000 ? `$${Math.round(value / 1000)}k` : money(value));
 		const extraStages = plan.stages.filter((stage) => stage.cash - stage.cashOnly > 0).map((stage) => `${k(stage.cash - stage.cashOnly)} ${short[stage.key]}`);
+		if (plan.noOa) {
+			return [
+				["Must be cash", `${money(plan.mustBeCash)}${plan.loanType === "bank" ? " (5% of the price: banks need it in cash)" : plan.type === "bto" ? " (the option fee)" : " (the option fees)"}`],
+				["CPF OA could pay", `up to ${money(plan.oaCouldCover)} (no CPF OA counted yet)`],
+				["All in cash, if you don't use CPF", money(plan.totalCash)],
+			];
+		}
 		const rows = [
 			["Must be cash", `${money(plan.mustBeCash)}${plan.loanType === "bank" ? " (5% of the price: banks need it in cash)" : plan.type === "bto" ? " (the option fee)" : " (the option fees)"}`],
 			["Paid from CPF OA", money(plan.totalOa)],

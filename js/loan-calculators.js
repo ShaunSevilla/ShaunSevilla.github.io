@@ -269,7 +269,7 @@
 			const years = yearsRaw === "" ? HDB_LOAN_MAX_YEARS : Number(yearsRaw);
 
 			if (!(price > 0) || cpfAvailable < 0 || grants < 0 || !(years > 0)) {
-				setStatus(status, "Please fill in the price and your CPF OA.", true);
+				setStatus(status, "Please fill in the flat price.", true);
 				resultBox.hidden = true;
 				return;
 			}
@@ -324,10 +324,15 @@
 			html += `<li><div class="pay-plan-head"><strong>${stage.label}</strong><span>${formatCurrency(stage.total)}</span></div><span class="pay-plan-when">${stage.when}</span>${parts}<span class="pay-plan-source">${Pay.sourceLine(stage)}</span></li>`;
 		});
 		html += `</ol>`;
-		html += `<div class="pay-plan-totals"><div><span>Must be cash</span><strong>${formatCurrency(plan.mustBeCash)}</strong></div><div><span>Paid from CPF OA</span><strong>${formatCurrency(plan.totalOa)}</strong></div>${plan.totalGrants > 0 ? `<div><span>Covered by grants</span><strong>${formatCurrency(plan.totalGrants)}</strong></div>` : ""}<div><span>Extra cash where OA runs short</span><strong>${formatCurrency(plan.extraCash)}</strong></div></div>`;
+		const grantsBox = plan.totalGrants > 0 ? `<div><span>Covered by grants</span><strong>${formatCurrency(plan.totalGrants)}</strong></div>` : "";
+		html += plan.noOa
+			? `<div class="pay-plan-totals"><div><span>Must be cash</span><strong>${formatCurrency(plan.mustBeCash)}</strong></div><div><span>CPF OA could pay</span><strong>up to ${formatCurrency(plan.oaCouldCover)}</strong></div>${grantsBox}<div><span>All in cash, if you don't use CPF</span><strong>${formatCurrency(plan.totalCash)}</strong></div></div>`
+			: `<div class="pay-plan-totals"><div><span>Must be cash</span><strong>${formatCurrency(plan.mustBeCash)}</strong></div><div><span>Paid from CPF OA</span><strong>${formatCurrency(plan.totalOa)}</strong></div>${grantsBox}<div><span>Extra cash where OA runs short</span><strong>${formatCurrency(plan.extraCash)}</strong></div></div>`;
 		html += `<p class="calculator-note">CPF OA is used first for everything it can pay. Only ${plan.loanType === "bank" ? "5% of the price (banks need it in cash)" : plan.type === "bto" ? "the option fee" : "the option fees"} must be cash; the rest is cash only where your OA runs out.</p>`;
 		if (plan.type === "bto") {
-			const oaNote = plan.monthlyPay > 0
+			const oaNote = plan.noOa
+				? "No CPF OA entered, so each step shows what CPF OA could pay (\"CPF OA or cash\"). Only the must-be-cash part has to come from your bank account."
+				: plan.monthlyPay > 0
 				? `Counts about ${formatCurrency(window.HdbPayments.oaPerMonth(plan.monthlyPay))}/month of new CPF OA from your salary until key collection (~3 years, 23% of pay, age 35 and under).`
 				: "Only counts the CPF OA you have today. Add your salary to count the OA you'll build up before key collection, so less cash is needed at the keys.";
 			html += `<p class="calculator-note">${oaNote} The $2,000 booking fee is for 4-room and bigger ($1,000 for 3-room, $500 for 2-room). Young couples on HDB's Staggered Downpayment Scheme can pay 5% at signing and 20% at key collection instead.</p>`;
