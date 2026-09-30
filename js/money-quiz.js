@@ -85,6 +85,15 @@
 		$("quiz-cta").textContent = persona.cta;
 		const notes = `Took the money persona quiz: ${persona.name}. ${persona.blindSpot}`;
 		$("quiz-book").href = `booking.html?${new URLSearchParams({ topic: "Money persona", notes }).toString()}`;
+		const topicBox = $("quiz-topics");
+		topicBox.innerHTML = "<span>Ask Shaun about</span>";
+		(persona.topics || []).forEach((topic) => {
+			const link = document.createElement("a");
+			link.className = "topic-chip";
+			link.textContent = topic;
+			link.href = `booking.html?${new URLSearchParams({ topic: "Money persona", ask: topic, notes: `I'd like to talk about: ${topic}\n\n${notes}` }).toString()}`;
+			topicBox.appendChild(link);
+		});
 		$("quiz-share-status").textContent = "";
 		show(resultBox);
 		buildCard();
@@ -95,22 +104,6 @@
 		current = 0;
 		renderQuestion();
 		show(questionBox);
-	}
-
-	async function share() {
-		const persona = lastResult.persona;
-		const url = `${PAGE_URL}?r=${lastResult.key}`;
-		const text = `I got ${persona.name}. What's your money persona?`;
-		try {
-			if (navigator.share) {
-				await navigator.share({ title: "What's your money persona?", text, url });
-				return;
-			}
-			await navigator.clipboard.writeText(`${text} ${url}`);
-			$("quiz-share-status").textContent = "Link copied. Paste it to a friend.";
-		} catch (error) {
-			$("quiz-share-status").textContent = `Copy this: ${url}`;
-		}
 	}
 
 	// Story-sized image of the result (like a Strava share). It's built as
@@ -190,7 +183,6 @@
 
 	$("quiz-start").addEventListener("click", start);
 	$("quiz-restart").addEventListener("click", start);
-	$("quiz-share").addEventListener("click", share);
 	$("quiz-card-share").addEventListener("click", shareCard);
 	$("quiz-back").addEventListener("click", () => {
 		if (current > 0) {

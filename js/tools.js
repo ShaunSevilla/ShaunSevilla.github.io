@@ -130,8 +130,8 @@
 				html += note("You've already used the big ones (SRS and CPF top-ups).");
 			}
 			html += note(result.isLocal
-				? "SRS money is locked until retirement age and 50% taxable when you withdraw. CPF top-ups stay in CPF for good. No tax rebate has been announced for this year. Not personalised advice."
-				: "Assumes you're a tax resident (in Singapore 183+ days this year). No tax rebate has been announced for this year. Not personalised advice.");
+				? "CPF top-ups stay in CPF for good. Estimate only, not personalised advice."
+				: "Assumes you're a tax resident (in Singapore 183+ days this year). Estimate only, not personalised advice.");
 			resultBox.innerHTML = html;
 			resultBox.hidden = false;
 		});
@@ -252,7 +252,7 @@
 			if (r.carCostsYouOfHome > 0) {
 				html += note(`<strong>Buying the car first shrinks your home budget by ${formatCurrency(r.carCostsYouOfHome)}.</strong>`, "calculator-note-callout");
 			}
-			html += note("Comfortable means the instalment stays within 25% of your pay (CPF's own guideline) and within the bank limits: 30% of income for housing and 55% for all debts, tested at 3% (HDB loan) or 4% (bank). Bank loans are planned at 3%, since today's ~1.6% packages only last 2 to 3 years. Grant amounts are HDB's published figures; HDB confirms yours in your HFE letter. Car costs include value lost over 10 years, loan interest, insurance, road tax, petrol and parking. Estimates only, not personalised advice.");
+			html += note(window.Affordability.footnote(r));
 			resultBox.innerHTML = html;
 			resultBox.hidden = false;
 		});

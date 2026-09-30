@@ -7,7 +7,6 @@
 //     that carries the numbers into the booking form's notes
 (function () {
 	const STORAGE_KEY = "ss-calculator-inputs-v1";
-	const BOT_URL = "https://t.me/ProsperityPath_bot";
 
 	function readSaved() {
 		try {
@@ -85,19 +84,46 @@
 		return lines.join("\n").slice(0, 1000);
 	}
 
+	// Small "ask Shaun about..." buttons under each result. Each opens the
+	// booking form with that topic and the numbers already in the notes.
+	const TOPICS = {
+		tax: ["Is SRS worth it for me?", "CPF top-ups for tax", "Planning for next year's tax"],
+		afford: ["Grants check", "BTO vs resale", "HDB vs bank loan", "Loan offsetting"],
+		hdb: ["Loan offsetting", "HDB vs bank loan", "CPF or cash for my loan?", "Refinancing"],
+		cpf: ["CPF optimisation", "Reaching my retirement sum", "CPF top-ups"],
+		vehicle: ["Loan offsetting", "Cash vs car loan", "Can I afford this car?"],
+		insurance: ["Coverage review", "Closing my protection gap", "Cover on a budget"],
+		compound: ["Where to invest", "A regular investing plan", "Investing my SRS"],
+	};
+
+	function topicChips(details, summary) {
+		const topics = TOPICS[details.id] || [];
+		if (!topics.length) return "";
+		const chips = topics.map(function (topic) {
+			const params = new URLSearchParams({
+				topic: details.dataset.calculator || "",
+				ask: topic,
+				notes: ("I'd like to talk about: " + topic + "\n\n" + summary).slice(0, 1000),
+			});
+			return '<a class="topic-chip" href="booking.html?' + params.toString() + '">' + topic + "</a>";
+		});
+		return '<div class="topic-chips"><span>Ask Shaun about</span>' + chips.join("") + "</div>";
+	}
+
 	function addResultActions(details, form, resultBox) {
 		if (resultBox.hidden || resultBox.querySelector(".calculator-actions")) return;
 
+		const summary = summarise(details, form, resultBox);
 		const params = new URLSearchParams({
 			topic: details.dataset.calculator || "",
-			notes: summarise(details, form, resultBox),
+			notes: summary,
 		});
 
 		const actions = document.createElement("div");
 		actions.className = "calculator-actions";
 		actions.innerHTML =
-			'<a class="bot-cta-link bot-cta-primary" href="booking.html?' + params.toString() + '">Discuss this with Shaun <i class="fas fa-arrow-right" aria-hidden="true"></i></a>' +
-			'<a class="bot-cta-link" href="' + BOT_URL + "?start=" + encodeURIComponent(details.dataset.botStart || "menu") + '" target="_blank" rel="noopener noreferrer">Open in Telegram <i class="fab fa-telegram" aria-hidden="true"></i></a>';
+			topicChips(details, summary) +
+			'<a class="bot-cta-link bot-cta-primary" href="booking.html?' + params.toString() + '">Discuss this with Shaun <i class="fas fa-arrow-right" aria-hidden="true"></i></a>';
 		resultBox.appendChild(actions);
 
 		// On phones the result lands below the fold; bring it up.

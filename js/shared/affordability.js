@@ -419,7 +419,7 @@
 			}
 			summary.rows.push([
 				"What's holding you back",
-				best.limitedBy === "savings" ? "Savings for the downpayment" : `Your income (keeping the instalment within 25% of pay, ${money(best.comfortMonthly)}/month)`,
+				best.limitedBy === "savings" ? "Savings for the downpayment" : `Your income (instalment kept within 25% of pay, ${money(best.comfortMonthly)}/month)`,
 			]);
 			if (home.maxPrice > home.price) {
 				summary.rows.push(["Most the rules allow, using every dollar", `${money(home.maxPrice)} (a stretch)`]);
@@ -453,5 +453,18 @@
 		return summary;
 	}
 
-	return { calculate, homeSummary, bsd, ehgAmount, CAR_RUNNING_COST, CAR_COMFORT_SHARE, MSR, TDSR, HDB_INCOME_CEILING_FAMILY, HDB_INCOME_CEILING_SINGLE };
+	// The small print under a result, shared by the bot and the website.
+	function footnote(result) {
+		const parts = [];
+		if (result.home) {
+			parts.push("Comfortable keeps the instalment within 25% of pay: a buffer below HDB's 30% cap, so you can keep saving (CPF also suggests paying more in cash to protect your retirement savings). Loans are stress-tested at 3% (HDB) or 4% (bank), and bank loans are planned at 3% since today's ~1.6% packages only last 2 to 3 years.");
+		}
+		if (result.car) {
+			parts.push("Car costs include 10 years of depreciation, interest, insurance, road tax, petrol and parking.");
+		}
+		parts.push("Estimates only, not personalised advice.");
+		return parts.join(" ");
+	}
+
+	return { calculate, homeSummary, footnote, bsd, ehgAmount, CAR_RUNNING_COST, CAR_COMFORT_SHARE, MSR, TDSR, HDB_INCOME_CEILING_FAMILY, HDB_INCOME_CEILING_SINGLE };
 });

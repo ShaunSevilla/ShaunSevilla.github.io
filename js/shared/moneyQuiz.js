@@ -22,6 +22,7 @@
 			blindSpot: "Everything. That's kind of the point.",
 			tip: "Look once. Just one number: what comes in each month and what goes out.",
 			cta: "Too paiseh to look alone? Shaun will look with you. No lectures.",
+			topics: ["A simple money check-up", "Where is my money going?"],
 		},
 		grabfood: {
 			emoji: "🛵",
@@ -31,6 +32,7 @@
 			blindSpot: "$25 a day is $750 a month. That's $9,000 a year.",
 			tip: "Pick a monthly cap for convenience spending, and move your savings out on payday before it happens.",
 			cta: "Curious what the delivery habit is worth by 60? Shaun will run the numbers with you.",
+			topics: ["A budget that actually sticks", "Saving without trying"],
 		},
 		yolo: {
 			emoji: "✈️",
@@ -40,6 +42,7 @@
 			blindSpot: "Future you also wants to travel. At 65.",
 			tip: "Save first, automatically, then travel on what's left. Guilt-free.",
 			cta: "Want to keep travelling and still retire on time? That's literally Shaun's job.",
+			topics: ["Travel now, retire fine too", "Building my emergency fund"],
 		},
 		crypto: {
 			emoji: "🚀",
@@ -49,6 +52,7 @@
 			blindSpot: "Putting it all in one place. One bad month can undo years.",
 			tip: "Keep a boring core that grows quietly, then have fun with a small slice.",
 			cta: "Want a second pair of eyes on your risk? No judgement, just numbers.",
+			topics: ["Diversifying beyond crypto", "Right-sizing my risk"],
 		},
 		hoarder: {
 			emoji: "🐿️",
@@ -58,6 +62,7 @@
 			blindSpot: "Cash in the bank quietly loses to inflation every single year.",
 			tip: "Keep 6 months of expenses easy to reach, then let the rest actually work.",
 			cta: "Want to see what your idle cash could be doing? Book a free chat with Shaun.",
+			topics: ["Making idle cash work", "Beating inflation safely"],
 		},
 		cpf: {
 			emoji: "🏦",
@@ -67,6 +72,7 @@
 			blindSpot: "CPF alone may not pay for the retirement you actually want.",
 			tip: "Find out your CPF LIFE payout, then plan for the gap.",
 			cta: "Want to know your real retirement gap? Shaun can map it with you in one chat.",
+			topics: ["Retirement beyond CPF", "CPF optimisation"],
 		},
 		monk: {
 			emoji: "📊",
@@ -76,6 +82,7 @@
 			blindSpot: "Optimising a 0.2% difference while the big decisions wait.",
 			tip: "Lock in the three things that really move the needle: protection, investing and housing.",
 			cta: "Bring the spreadsheet. Shaun will stress-test it for free.",
+			topics: ["The big decisions, not the 0.2%", "My protection and investing plan"],
 		},
 		quiet: {
 			emoji: "🌱",
@@ -85,6 +92,7 @@
 			blindSpot: "Being on autopilot so long you forget to check the plan still fits.",
 			tip: "Do a yearly check-up: protection, investments and goals.",
 			cta: "Want a second opinion that the plan holds up? Book a check-up.",
+			topics: ["My yearly plan check-up", "Next-level investing"],
 		},
 	};
 

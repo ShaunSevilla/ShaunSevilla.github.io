@@ -70,7 +70,7 @@
 					<a href="${root}/Pages/booking.html">Book a Chat</a>
 				</p>
 				<div class="footer-contact-links">
-					<a href="mailto:00shaun.sevilla@gmail.com"><i class="fas fa-envelope"></i>Email</a>
+					<a href="mailto:shaun.sevilla@aiafa.com.sg"><i class="fas fa-envelope"></i>Email</a>
 					<a href="https://www.linkedin.com/in/shaunsevilla/" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin"></i>LinkedIn</a>
 					<a href="https://github.com/ShaunSevilla" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i>GitHub</a>
 					<a href="https://www.instagram.com/se.villa/" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i>Instagram</a>

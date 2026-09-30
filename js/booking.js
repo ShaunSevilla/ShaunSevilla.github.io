@@ -137,11 +137,14 @@ function applyPrefill(form) {
 	const params = new URLSearchParams(window.location.search);
 	const notes = params.get("notes");
 	const topic = params.get("topic");
+	const ask = params.get("ask");
 	if (notes && !form.elements.notes.value) {
 		form.elements.notes.value = notes.slice(0, 1000);
 		const note = document.getElementById("booking-prefill-note");
 		if (note) {
-			note.textContent = `Your ${topic ? `${topic} ` : ""}results are already in the notes below, so we can start from your numbers.`;
+			note.textContent = ask
+				? `We'll talk about ${ask.toLowerCase().replace(/\?$/, "")}. Your numbers are already in the notes below.`
+				: `Your ${topic ? `${topic} ` : ""}results are already in the notes below, so we can start from your numbers.`;
 			note.hidden = false;
 		}
 	}

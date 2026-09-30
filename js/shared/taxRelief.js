@@ -182,6 +182,7 @@
 		return {
 			income: Math.round(income),
 			isLocal,
+			children,
 			items,
 			reliefsBeforeCap: Math.round(reliefsBeforeCap),
 			totalRelief: Math.round(totalRelief),
