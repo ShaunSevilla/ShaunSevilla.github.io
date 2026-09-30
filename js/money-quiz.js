@@ -47,10 +47,22 @@
 		}
 	}
 
+	// Persona illustrations live in assets/quiz/<key>.webp.
+	function artFor(key) {
+		return `../assets/quiz/${key}.webp`;
+	}
+
+	// Load all eight up front so the result appears with its picture.
+	Object.keys(Quiz.PERSONAS).forEach((key) => {
+		new Image().src = artFor(key);
+	});
+
 	function showResult() {
 		lastResult = Quiz.score(answers);
 		const persona = lastResult.persona;
-		$("quiz-emoji").textContent = persona.emoji;
+		const art = $("quiz-art");
+		art.src = artFor(lastResult.key);
+		art.alt = persona.name;
 		$("quiz-name").textContent = persona.name;
 		$("quiz-roast").textContent = persona.roast;
 		$("quiz-superpower").textContent = persona.superpower;
@@ -92,7 +104,12 @@
 	if (shared && Quiz.PERSONAS[shared]) {
 		const persona = Quiz.PERSONAS[shared];
 		const friend = $("quiz-friend");
-		friend.textContent = `Your friend got ${persona.emoji} ${persona.name}. Your turn.`;
+		friend.innerHTML = "";
+		const img = document.createElement("img");
+		img.src = artFor(shared);
+		img.alt = "";
+		img.className = "quiz-friend-art";
+		friend.append(img, `Your friend got ${persona.name}. Your turn.`);
 		friend.hidden = false;
 	}
 
