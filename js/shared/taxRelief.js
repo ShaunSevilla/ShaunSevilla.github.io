@@ -75,7 +75,10 @@
 	}
 
 	function employeeCpf({ monthlyPay, bonus, age, isLocal }) {
-		if (!isLocal || monthlyPay <= 750) return 0;
+		if (!isLocal || monthlyPay <= 500) return 0;
+		// $500 to $750 a month: the employee share phases in at 3x the rate on
+		// pay above $500 (CPF's graduated rates for lower-wage workers).
+		if (monthlyPay <= 750) return Math.round(3 * employeeCpfRate(age) * (monthlyPay - 500) * 12);
 		const ordinary = Math.min(monthlyPay, CPF_OW_CEILING_MONTHLY) * 12;
 		const additional = Math.min(bonus, Math.max(0, CPF_ANNUAL_SALARY_CEILING - ordinary));
 		return Math.round((ordinary + additional) * employeeCpfRate(age));
@@ -160,14 +163,17 @@
 			{ key: "topup_self", label: "Top up your own CPF (SA/RA or MediSave)", room: isLocal ? CPF_TOPUP_SELF_CAP - topUpSelfSoFar : 0 },
 			// Recipients must be Singapore Citizens/PRs; for simplicity only locals
 			// are shown this one.
-			{ key: "topup_family", label: "Top up a parent's or grandparent's CPF", room: isLocal ? CPF_TOPUP_FAMILY_CAP - topUpFamilySoFar : 0 },
+			{ key: "topup_family", label: "Top up a family member's CPF (parent, grandparent, spouse or sibling)", room: isLocal ? CPF_TOPUP_FAMILY_CAP - topUpFamilySoFar : 0 },
 		];
 		let reliefSoFar = reliefsBeforeCap;
 		let taxSoFar = tax;
 		const opportunities = [];
 		for (const option of options) {
 			const capRoom = Math.max(0, RELIEF_CAP - reliefSoFar);
-			const usable = Math.min(option.room, capRoom);
+			// Never suggest more than it takes to bring tax to $0 (the first
+			// $20,000 of chargeable income is taxed at 0%).
+			const toZero = Math.max(0, income - Math.min(RELIEF_CAP, reliefSoFar) - TAX_BANDS[0][0]);
+			const usable = Math.min(option.room, capRoom, toZero);
 			if (usable <= 0) continue;
 			const newTax = taxOn(Math.max(0, income - Math.min(RELIEF_CAP, reliefSoFar + usable)));
 			const saving = Math.round(taxSoFar - newTax);
@@ -232,10 +238,14 @@
 	}
 
 	// Days until 31 Dec of `now`'s year (top-ups count for the year they're made).
+	// Counted in Singapore time (UTC+8) so a server in another time zone
+	// agrees with the website.
 	function daysLeftInYear(now) {
 		const date = now || new Date();
-		const end = new Date(date.getFullYear(), 11, 31, 23, 59, 59);
-		return Math.max(0, Math.ceil((end - date) / 86400000));
+		const sgOffset = 8 * 3600000;
+		const year = new Date(date.getTime() + sgOffset).getUTCFullYear();
+		const end = Date.UTC(year, 11, 31, 23, 59, 59) - sgOffset;
+		return Math.max(0, Math.ceil((end - date.getTime()) / 86400000));
 	}
 
 	return {

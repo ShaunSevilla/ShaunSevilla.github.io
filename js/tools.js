@@ -121,7 +121,7 @@
 				result.opportunities.forEach(function (option) {
 					html += `<li>${option.label} with ${formatCurrency(option.amount)} → save <strong>${formatCurrency(option.saving)}</strong></li>`;
 				});
-				html += `</ul><p class="calculator-note">Do all of it and your tax drops from ${formatCurrency(result.tax)} to <strong>${formatCurrency(result.taxAfterOpportunities)}</strong>.</p></div>`;
+				html += `</ul>${result.marginalRate >= 0.07 && result.opportunities.length > 1 ? `<p class="calculator-note">Do all of it and your tax drops from ${formatCurrency(result.tax)} to <strong>${formatCurrency(result.taxAfterOpportunities)}</strong>. Each saving counts the ones above it first.</p>` : ""}</div>`;
 				const take = window.TaxRelief.srsHonestTake(result);
 				if (take) {
 					html += note(take, "calculator-note-callout");
@@ -299,14 +299,13 @@
 				resultBox.hidden = true;
 				return;
 			}
-			const annual = monthly * 12;
-			resultBox.innerHTML =
-				`<div class="insurance-alarm"><p>On ${formatCurrency(monthly)} a month, you should be insured for at least <strong>${formatCurrency(annual * 9)}</strong> in case you pass away or can never work again, and <strong>${formatCurrency(annual * 4)}</strong> for critical illness.</p><p>Most people have a fraction of that. Do you know your number?</p></div>` +
-				headline("Suggested budget", `${formatCurrency(monthly * 0.1)}/month`, `About 10% of your income, or ${formatCurrency(annual * 0.1)} a year`) +
-				note("<strong>Where I'd aim</strong>, a little above the minimum to cover debts and inflation:") +
-				resultRow("Death & total permanent disability (10x)", formatCurrency(annual * 10)) +
-				resultRow("Critical illness (5x)", formatCurrency(annual * 5)) +
-				note("The minimums are the Life Insurance Association's benchmarks: 9x your annual income for death and disability, 4x for critical illness. A simple benchmark, not personalised advice. Your real needs depend on dependants, debts, CPF, existing cover and health.");
+			const raw = (id) => document.getElementById(id).value;
+			const r = window.Insurance.calculate({ monthlyIncome: monthly, existingDeathTpd: raw("insurance-have-life"), existingCi: raw("insurance-have-ci") });
+			const sum = window.Insurance.summary(r);
+			let html = `<div class="insurance-alarm"><p>${sum.lead.replace(formatCurrency(r.deathTpd), `<strong>${formatCurrency(r.deathTpd)}</strong>`).replace(formatCurrency(r.ci) + " for", `<strong>${formatCurrency(r.ci)}</strong> for`)}</p></div>`;
+			sum.rows.forEach(function (row) { html += resultRow(row[0], row[1]); });
+			sum.notes.forEach(function (text, index) { html += note(text, index === 0 && !sum.askedAboutCover ? "calculator-note-callout" : ""); });
+			resultBox.innerHTML = html;
 			resultBox.hidden = false;
 		});
 	}

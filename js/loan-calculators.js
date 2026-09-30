@@ -23,15 +23,7 @@
 	// OMV is $20,000 or below, and 60% when OMV is above $20,000, with a
 	// maximum tenure of 7 years.
 	// Source: mas.gov.sg/regulation/explainers/motor-vehicle-loans.
-	const VEHICLE_LOAN_OMV_THRESHOLD = 20000;
-	const VEHICLE_LOAN_LTV_LOW_OMV = 0.70;
-	const VEHICLE_LOAN_LTV_HIGH_OMV = 0.60;
-	const VEHICLE_LOAN_MAX_YEARS = 7;
-	// Used when the rate is left blank (most people only know their monthly
-	// instalment). 2.48% flat is where most bank car loans cluster in 2026;
-	// source: moneysmart.sg/car-loan, Sep 2026. Keep in sync with the bot's
-	// calculatorConstants.js.
-	const VEHICLE_LOAN_TYPICAL_FLAT_RATE = 2.48;
+	// Vehicle loan rules and maths live in js/shared/vehicleLoan.js.
 
 	// Buyer's Stamp Duty (BSD), residential, effective 15 Feb 2023 — payable
 	// via CPF OA or cash. Source: iras.gov.sg.
@@ -92,48 +84,11 @@
 		html += resultRow("Cash you'd need", `${formatCurrency(bank.cash)}${cashDiff > 0 ? ` (${formatCurrency(cashDiff)} more: banks need 5% of the price in cash)` : ""}`);
 		html += `<ul class="calculator-note-list">`;
 		html += `<li><strong>HDB loan:</strong> 2.6%, pegged to the CPF rate so it rarely moves. The whole 25% can come from CPF, no early repayment penalty, but only if your household earns up to $16,000 a month ($8,000 for singles).</li>`;
-		html += `<li><strong>Bank loan:</strong> ${bank.ratePercent < 2.6 ? "cheaper at this rate" : "no cheaper at this rate"}, and up to ${BANK_HOME_LOAN_MAX_YEARS} years, but the rate is only fixed for 2 to 3 years, then it floats. If bank rates average above 2.6% over your loan, HDB ends up cheaper. Once you leave the HDB loan you can't switch back.</li>`;
+		html += `<li><strong>Bank loan:</strong> ${bank.ratePercent < 2.6 ? "cheaper at this rate" : "no cheaper at this rate"}, and up to 25 years for the full 75% loan (MAS cuts it to 55% beyond that), but the rate is only fixed for 2 to 3 years, then it floats. If bank rates average above 2.6% over your loan, HDB ends up cheaper. Once you leave the HDB loan you can't switch back.</li>`;
 		html += `</ul></div>`;
 		return html;
 	}
 
-	// OMV is optional: dealers selling from stock don't always disclose it,
-	// and it isn't needed for the loan math itself — only to check it
-	// against MAS's LTV cap. When omv is null, that check is skipped.
-	function calculateVehicleLoan({ price, omv, downpayment, years, ratePercent }) {
-		const hasOmv = omv !== null && omv !== undefined;
-		const maxLoanPercent = hasOmv ? (omv <= VEHICLE_LOAN_OMV_THRESHOLD ? VEHICLE_LOAN_LTV_LOW_OMV : VEHICLE_LOAN_LTV_HIGH_OMV) : null;
-		const minDownpayment = hasOmv ? price - (price * maxLoanPercent) : null;
-
-		if (hasOmv && downpayment < minDownpayment) {
-			return {
-				sufficient: false,
-				maxLoanPercent: maxLoanPercent * 100,
-				minDownpayment,
-				downpayment,
-				shortfall: minDownpayment - downpayment,
-			};
-		}
-
-		const loanAmount = price - downpayment;
-		const totalInterest = loanAmount * (ratePercent / 100) * years;
-		const totalRepayment = loanAmount + totalInterest;
-		const monthlyPayment = totalRepayment / (years * 12);
-
-		return {
-			sufficient: true,
-			hasOmv,
-			maxLoanPercent: hasOmv ? maxLoanPercent * 100 : null,
-			minDownpayment,
-			downpayment,
-			loanAmount,
-			ratePercent,
-			years,
-			monthlyPayment,
-			totalRepayment,
-			totalInterest,
-		};
-	}
 
 	// Loan offsetting: how much to invest so the investment's RETURNS alone
 	// (not the money put in) add up to the loan's total interest by the end
@@ -223,20 +178,30 @@
 	// Same idea for the vehicle calculator: OMV decides the LTV tier, so the
 	// minimum downpayment can be shown as soon as price + OMV are both typed in.
 	function updateVehicleHints() {
+		const V = window.VehicleLoan;
 		const omvHint = document.getElementById("vehicle-omv-hint");
-		if (!omvHint) return;
+		const typeEl = document.getElementById("vehicle-type");
+		if (!omvHint || !V) return;
+		const type = typeEl ? typeEl.value : "car";
+		const isCar = type === "car";
+		document.getElementById("vehicle-omv-field").hidden = !isCar;
+		omvHint.hidden = !isCar;
+		const yearsLabel = document.getElementById("vehicle-years-label");
+		if (yearsLabel) yearsLabel.innerHTML = `Loan tenure (years, max ${V.MAX_YEARS[type]}) <em>Optional</em>`;
+		document.getElementById("vehicle-years").placeholder = `Blank = ${V.MAX_YEARS[type]}`;
 
 		const price = Number(document.getElementById("vehicle-price").value);
 		const omv = Number(document.getElementById("vehicle-omv").value);
-
-		if (!(price > 0) || !(omv > 0)) {
+		if (!isCar || !(price > 0)) {
 			omvHint.textContent = "";
 			return;
 		}
-
-		const maxLoanPercent = omv <= VEHICLE_LOAN_OMV_THRESHOLD ? VEHICLE_LOAN_LTV_LOW_OMV : VEHICLE_LOAN_LTV_HIGH_OMV;
-		const minDownpayment = price - price * maxLoanPercent;
-		omvHint.textContent = `Minimum downpayment required: ${formatCurrency(minDownpayment)} (max loan ${(maxLoanPercent * 100).toFixed(0)}% of price)`;
+		if (omv > 0) {
+			const ltv = omv <= V.OMV_THRESHOLD ? 0.7 : 0.6;
+			omvHint.textContent = `Minimum downpayment: ${formatCurrency(price * (1 - ltv))} (max loan ${Math.round(ltv * 100)}% of the price)`;
+		} else {
+			omvHint.textContent = `Minimum downpayment: ${formatCurrency(price * 0.3)} if the OMV is $20,000 or less, ${formatCurrency(price * 0.4)} if above`;
+		}
 	}
 
 	function initHdbCalculator() {
@@ -296,11 +261,11 @@
 			const loanAmount = hdbPlan.loan;
 			const monthlyPayment = amortisedMonthlyPayment(loanAmount, HDB_LOAN_ANNUAL_RATE, years);
 			const totalInterest = monthlyPayment * years * 12 - loanAmount;
-			const bankMonthly = amortisedMonthlyPayment(loanAmount, bankRatePercent / 100, years);
-			const bankInterest = bankMonthly * years * 12 - loanAmount;
+			const bankMonthly = amortisedMonthlyPayment(bankPlan.loan, bankRatePercent / 100, years);
+			const bankInterest = bankMonthly * years * 12 - bankPlan.loan;
 
 			resultBox.innerHTML =
-				headline("HDB loan: monthly payment", formatCurrency(monthlyPayment), `${years} years at ${(HDB_LOAN_ANNUAL_RATE * 100).toFixed(1)}% p.a. on a ${formatCurrency(loanAmount)} loan`) +
+				headline("HDB loan: monthly payment", formatCurrency(monthlyPayment), `${years} years at ${(HDB_LOAN_ANNUAL_RATE * 100).toFixed(1)}% p.a. on a ${formatCurrency(loanAmount)} loan${loanAmount < hdbPlan.fullLoan ? ` (75% of the price, less ${formatCurrency(hdbPlan.fullLoan - loanAmount)} of grants and CPF OA)` : ""}`) +
 				buildPaymentPlan(hdbPlan, cpfAvailable) +
 				resultRow("Total interest paid", formatCurrency(totalInterest)) +
 				buildBankComparison(
@@ -328,6 +293,8 @@
 		html += plan.noOa
 			? `<div class="pay-plan-totals"><div><span>Must be cash</span><strong>${formatCurrency(plan.mustBeCash)}</strong></div><div><span>CPF OA could pay</span><strong>up to ${formatCurrency(plan.oaCouldCover)}</strong></div>${grantsBox}<div><span>All in cash, if you don't use CPF</span><strong>${formatCurrency(plan.totalCash)}</strong></div></div>`
 			: `<div class="pay-plan-totals"><div><span>Must be cash</span><strong>${formatCurrency(plan.mustBeCash)}</strong></div><div><span>Paid from CPF OA</span><strong>${formatCurrency(plan.totalOa)}</strong></div>${grantsBox}<div><span>Extra cash where OA runs short</span><strong>${formatCurrency(plan.extraCash)}</strong></div></div>`;
+		if (plan.grantsToLoan > 0) html += `<p class="calculator-note calculator-note-callout">Your grants are bigger than the downpayment they can go towards, so the other <strong>${formatCurrency(plan.grantsToLoan)}</strong> cuts your loan instead.</p>`;
+		if (plan.oaToLoan > 0) html += `<p class="calculator-note calculator-note-callout">With an HDB loan you can only keep $20,000 in CPF OA; the other <strong>${formatCurrency(plan.oaToLoan)}</strong> goes into the flat and cuts your loan.</p>`;
 		html += `<p class="calculator-note">CPF OA is used first for everything it can pay. Only ${plan.loanType === "bank" ? "5% of the price (banks need it in cash)" : plan.type === "bto" ? "the option fee" : "the option fees"} must be cash; the rest is cash only where your OA runs out.</p>`;
 		if (plan.type === "bto") {
 			const oaNote = plan.noOa
@@ -340,7 +307,7 @@
 			html += `<p class="calculator-note">The option fees must be cash, because CPF can't be used until HDB accepts the resale application. They're negotiable with the seller but capped at $5,000. Any Cash-Over-Valuation (COV) is extra and cash only.</p>`;
 		}
 		if (plan.oaLeft > 0) {
-			html += `<p class="calculator-note">${formatCurrency(plan.oaLeft)} of your CPF OA is left over. CPF suggests keeping some as a buffer (you can keep up to $20,000 when taking an HDB loan).</p>`;
+			html += `<p class="calculator-note">${formatCurrency(plan.oaLeft)} of your CPF OA is left over${plan.loanType === "hdb" ? " (with an HDB loan you can keep up to $20,000)" : ". With a bank loan you choose how much to use; keeping some as a buffer is sensible"}.</p>`;
 		}
 		html += `</div>`;
 		return html;
@@ -350,70 +317,59 @@
 		const form = document.getElementById("vehicle-loan-form");
 		const resultBox = document.getElementById("vehicle-result");
 		const status = document.getElementById("vehicle-status");
-		if (!form) return;
+		const V = window.VehicleLoan;
+		if (!form || !V) return;
 
-		const priceEl = document.getElementById("vehicle-price");
-		const omvEl = document.getElementById("vehicle-omv");
-		if (priceEl) priceEl.addEventListener("input", updateVehicleHints);
-		if (omvEl) omvEl.addEventListener("input", updateVehicleHints);
+		["vehicle-price", "vehicle-omv"].forEach(function (id) {
+			const el = document.getElementById(id);
+			if (el) el.addEventListener("input", updateVehicleHints);
+		});
+		const typeEl = document.getElementById("vehicle-type");
+		if (typeEl) typeEl.addEventListener("change", updateVehicleHints);
 		updateVehicleHints();
 
 		form.addEventListener("submit", function (event) {
 			event.preventDefault();
 			setStatus(status, "", false);
-
-			const price = Number(document.getElementById("vehicle-price").value);
-			const omvRaw = document.getElementById("vehicle-omv").value;
-			const omv = omvRaw === "" ? null : Number(omvRaw);
-			const downpayment = Number(document.getElementById("vehicle-downpayment").value);
-			// Blank tenure = the 7-year maximum.
-			const yearsRaw = document.getElementById("vehicle-years").value;
-			const years = yearsRaw === "" ? VEHICLE_LOAN_MAX_YEARS : Number(yearsRaw);
-			const rateRaw = document.getElementById("vehicle-rate").value;
-			const rateIsTypical = rateRaw === "";
-			const ratePercent = rateIsTypical ? VEHICLE_LOAN_TYPICAL_FLAT_RATE : Number(rateRaw);
-
-			if (!(price > 0) || (omv !== null && !(omv > 0)) || downpayment < 0 || !(years > 0) || ratePercent < 0) {
-				setStatus(status, "Please fill in every field with a valid number (OMV can be left blank).", true);
+			const type = typeEl ? typeEl.value : "car";
+			const value = (id) => document.getElementById(id).value;
+			const result = V.calculate({
+				type,
+				price: value("vehicle-price"),
+				omv: type === "car" ? value("vehicle-omv") : "",
+				downpayment: value("vehicle-downpayment"),
+				years: value("vehicle-years"),
+				ratePercent: value("vehicle-rate"),
+			});
+			if (!result.ok) {
+				setStatus(status, result.error, true);
 				resultBox.hidden = true;
 				return;
 			}
 
-			if (years > VEHICLE_LOAN_MAX_YEARS) {
-				setStatus(status, `MAS caps vehicle loans at ${VEHICLE_LOAN_MAX_YEARS} years.`, true);
-				resultBox.hidden = true;
-				return;
-			}
-
-			const results = calculateVehicleLoan({ price, omv, downpayment, years, ratePercent });
-
-			if (!results.sufficient) {
-				resultBox.innerHTML =
-					resultRow("Max loan allowed", `${results.maxLoanPercent}% of price`) +
-					resultRow("Minimum downpayment required", formatCurrency(results.minDownpayment)) +
-					resultRow("Your downpayment", formatCurrency(results.downpayment)) +
-					resultRow("Shortfall", formatCurrency(results.shortfall)) +
-					`<p class="calculator-note">MAS caps car loans at 70% of the price if OMV is $20,000 or less, and 60% if it's higher.</p>`;
+			if (!result.sufficient) {
+				let html = headline("Downpayment too low", formatCurrency(result.shortfall), "short of the MAS minimum for a car");
+				result.tiers.forEach(function (tier) {
+					html += resultRow(`Minimum down (${tier.label}, ${Math.round(tier.ltv * 100)}% loan)`, formatCurrency(tier.minDownpayment));
+				});
+				html += resultRow("Your downpayment", formatCurrency(result.downpayment));
+				html += `<p class="calculator-note">MAS caps car loans at 70% of the price if the OMV is $20,000 or less, and 60% if it's higher.</p>`;
+				resultBox.innerHTML = html;
 				resultBox.hidden = false;
 				return;
 			}
 
-			resultBox.innerHTML =
-				headline("Monthly payment", formatCurrency(results.monthlyPayment), `${results.years} years at ${results.ratePercent}% p.a. flat${rateIsTypical ? " (typical bank rate)" : ""}`) +
-				(results.hasOmv
-					? resultRow("Max loan allowed", `${results.maxLoanPercent}% of price`)
-					: resultRow("Max loan allowed", "Not checked (no OMV given)")) +
-				resultRow("Downpayment", formatCurrency(results.downpayment)) +
-				resultRow("Loan amount", formatCurrency(results.loanAmount)) +
-				resultRow("Total repayment", formatCurrency(results.totalRepayment)) +
-				resultRow("Total interest paid", formatCurrency(results.totalInterest)) +
-				(rateIsTypical
-					? `<p class="calculator-note">You left the rate blank, so this uses ${VEHICLE_LOAN_TYPICAL_FLAT_RATE}% flat, where most bank car loans sit in 2026. Used cars are often higher. Your bank will confirm your actual rate.</p>`
-					: "") +
-				(results.hasOmv
-					? `<p class="calculator-note">Car loans quote a flat rate, so the real (effective) rate is roughly 1.8 to 2x higher.</p>`
-					: `<p class="calculator-note">No OMV given, so the MAS loan limit wasn't checked. Your dealer or bank will confirm how much they'll finance. Car loans quote a flat rate, so the real rate is roughly 1.8 to 2x higher.</p>`) +
-				buildLoanOffsettingBlock(results.totalInterest, results.years, "car loan");
+			let html = headline("Monthly payment", formatCurrency(result.monthlyPayment), `${result.years} years at ${result.ratePercent}% p.a. flat${result.rateIsTypical ? " (typical bank rate)" : ""}`);
+			html += resultRow("Real (effective) rate", `about ${result.eirPercent}% a year`);
+			html += resultRow("Downpayment", formatCurrency(result.downpayment));
+			html += resultRow("Loan amount", `${formatCurrency(result.loanAmount)} (${result.loanPercent}% of the price)`);
+			html += resultRow("Total repayment", formatCurrency(result.totalRepayment));
+			html += resultRow("Total interest paid", formatCurrency(result.totalInterest));
+			V.notes(result).forEach(function (text, index) {
+				html += `<p class="calculator-note${result.onlyIfLowOmv && index === (result.rateIsTypical ? 2 : 1) ? " calculator-note-callout" : ""}">${text}</p>`;
+			});
+			html += buildLoanOffsettingBlock(result.totalInterest, result.years, `${result.type === "car" ? "car" : result.type === "bike" ? "bike" : "vehicle"} loan`);
+			resultBox.innerHTML = html;
 			resultBox.hidden = false;
 		});
 	}

@@ -18,6 +18,8 @@
 //   and can come from CPF OA. Grants are credited to CPF OA at key
 //   collection (BTO) or completion (resale), so they only help at that stage.
 // CPF OA is used first for anything CPF can pay; cash covers the rest.
+// Grants left over after the downpayment, and (HDB loans) CPF OA above
+// $20,000, go towards the flat and make the loan smaller.
 (function (root, factory) {
 	if (typeof module === "object" && module.exports) {
 		module.exports = factory();
@@ -30,6 +32,8 @@
 	const OTP_CAP = 5000;
 	const BTO_OPTION_FEE = 2000; // 4-room and bigger ($1,000 3-room, $500 2-room)
 	const BANK_MIN_CASH = 0.05;
+	// HDB loan: you may keep up to $20,000 in CPF OA; the rest must be used.
+	const OA_RETAIN_HDB = 20000;
 	// Share of the price due by signing the Agreement for Lease (BTO).
 	const AFL_SHARE = { hdb: 0.1, bank: 0.2 };
 	const LEGAL_FEES = { hdb: 1000, bank: 3000 }; // rough, conveyancing + admin
@@ -140,6 +144,18 @@
 			totalGrants += stage.grants;
 		});
 
+		// Grants bigger than the downpayment they can go towards aren't lost:
+		// HDB credits them to CPF OA and they cut the loan instead.
+		const grantsToLoan = Math.round(Math.max(0, grantsLeft));
+		totalGrants += grantsToLoan;
+		// HDB loans: CPF OA above $20,000 must go into the flat (you can keep
+		// up to $20,000), which also cuts the loan.
+		const oaToLoan = bank ? 0 : Math.round(Math.max(0, oaLeft - OA_RETAIN_HDB));
+		oaLeft -= oaToLoan;
+		totalOa += oaToLoan;
+		const fullLoan = price * LTV;
+		const loan = Math.max(0, fullLoan - grantsToLoan - oaToLoan);
+
 		const mustBeCash = Math.round(stages.reduce((sum, stage) => sum + stage.cashOnly, 0));
 		return {
 			type: bto ? "bto" : "resale",
@@ -151,7 +167,10 @@
 			extraCash: Math.max(0, Math.round(totalCash - mustBeCash)),
 			price: Math.round(price),
 			downpayment: Math.round(downpayment),
-			loan: Math.round(price * LTV),
+			loan: Math.round(loan),
+			fullLoan: Math.round(fullLoan),
+			grantsToLoan,
+			oaToLoan,
 			stampDuty,
 			legal,
 			stages,
@@ -195,12 +214,15 @@
 				["Must be cash", `${money(plan.mustBeCash)}${plan.loanType === "bank" ? " (5% of the price: banks need it in cash)" : plan.type === "bto" ? " (the option fee)" : " (the option fees)"}`],
 				["CPF OA could pay", `up to ${money(plan.oaCouldCover)} (no CPF OA counted yet)`],
 				["All in cash, if you don't use CPF", money(plan.totalCash)],
+				...(plan.grantsToLoan > 0 ? [["Grants beyond the downpayment", `cut the loan by ${money(plan.grantsToLoan)}`]] : []),
 			];
 		}
 		const rows = [
 			["Must be cash", `${money(plan.mustBeCash)}${plan.loanType === "bank" ? " (5% of the price: banks need it in cash)" : plan.type === "bto" ? " (the option fee)" : " (the option fees)"}`],
 			["Paid from CPF OA", money(plan.totalOa)],
 		];
+		if (plan.grantsToLoan > 0) rows.push(["Grants beyond the downpayment", `cut the loan by ${money(plan.grantsToLoan)}`]);
+		if (plan.oaToLoan > 0) rows.push(["CPF OA above $20,000 (must be used with an HDB loan)", `cuts the loan by ${money(plan.oaToLoan)}`]);
 		if (plan.extraCash > 0) {
 			rows.push(["Extra cash where your CPF OA runs short", `${money(plan.extraCash)}${extraStages.length ? ` (${extraStages.join(", ")})` : ""}`]);
 		}

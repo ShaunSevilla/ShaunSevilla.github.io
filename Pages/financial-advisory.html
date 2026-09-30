@@ -97,7 +97,7 @@
 									<label><span>Married?</span>
 										<select id="tax-marital">
 											<option value="single">Single</option>
-											<option value="married_low">Married, spouse earned under $8,000 last year</option>
+											<option value="married_low">Married, spouse earns under $8,000 this year</option>
 											<option value="married">Married, spouse earns more</option>
 										</select>
 									</label>
@@ -119,7 +119,7 @@
 											</label>
 										</div>
 									</div>
-									<label><span>Parents or grandparents you support (55+, earned under $8,000 last year)</span>
+									<label><span>Parents or grandparents you support (55+, earn under $8,000 this year)</span>
 										<select id="tax-parents">
 											<option value="0_0">None</option>
 											<option value="1_0">1, lives with me</option>
@@ -132,8 +132,8 @@
 									<label><span>NS</span>
 										<select id="tax-nsman">
 											<option value="none">None</option>
-											<option value="active">I'm an NSman, did in-camp or IPPT last year</option>
-											<option value="inactive">I'm an NSman, no NS activities last year</option>
+											<option value="active">I'm an NSman, did in-camp or IPPT this year</option>
+											<option value="inactive">I'm an NSman, no NS activities this year</option>
 											<option value="family">My husband or son is an NSman</option>
 										</select>
 									</label>
@@ -259,9 +259,10 @@
 								<form class="booking-form calculator-form" id="cpf-form">
 									<label><span>Current age</span><input type="number" id="cpf-age" min="16" max="90" step="1" placeholder="30" required /></label>
 									<label><span>Monthly income before CPF deductions ($)</span><input type="number" id="cpf-wage" min="0" step="1" placeholder="5000" required /></label>
-									<label><span>Current CPF Ordinary Account (OA) balance ($)</span><input type="number" id="cpf-oa" min="0" step="1" placeholder="20000" required /></label>
+									<label><span>Current CPF Ordinary Account (OA) balance ($) <em>Optional</em></span><input type="number" id="cpf-oa" min="0" step="1" placeholder="Blank = $0" /></label>
 									<label><span id="cpf-sa-label">Current CPF Special Account (SA) balance ($) <em>Optional</em></span><input type="number" id="cpf-sa" min="0" step="1" placeholder="Blank = $0" /></label>
 									<label><span>Current MediSave Account (MA) balance ($) <em>Optional</em></span><input type="number" id="cpf-ma" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label><span>Pay rise per year (%) <em>Optional</em></span><input type="number" id="cpf-growth" min="0" max="15" step="0.1" placeholder="Blank = pay stays flat. Try 3" /></label>
 									<p class="calculator-field-hint">Leave SA/MA blank (treated as $0) if you just want to project OA. CPF doesn't let you top up OA on its own, only SA/RA (via RSTU) or MediSave individually, or all three together.</p>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="cpf-status" role="status"></p>
@@ -275,20 +276,27 @@
 						<summary>
 							<div>
 								<h3><i class="fas fa-car" aria-hidden="true"></i> Vehicle Loan Calculator</h3>
-								<p>MAS loan-to-value caps and monthly instalment on a flat-rate car loan.</p>
+								<p>Monthly instalment, MAS loan caps and the real interest rate on a car, motorbike or private-hire loan.</p>
 							</div>
 							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
 						</summary>
 						<div class="calculator-dropdown-body">
 							<article class="calculator-card">
-								<p class="calculator-card-note">Uses MAS's loan-to-value caps (70% of price if OMV ≤ $20,000, else 60%) and 7-year tenure cap. Car loans are quoted as a flat rate, not reducing balance.</p>
+								<p class="calculator-card-note">Cars: MAS caps the loan at 70% of the price if the OMV is $20,000 or less, 60% if above, over at most 7 years. Motorbikes and commercial or private-hire vehicles aren't capped by MAS. Vehicle loans are quoted as a flat rate; the result also shows the real (effective) rate.</p>
 								<form class="booking-form calculator-form" id="vehicle-loan-form">
+									<label><span>Vehicle</span>
+										<select id="vehicle-type">
+											<option value="car">Car</option>
+											<option value="bike">Motorbike</option>
+											<option value="commercial">Commercial or private-hire (PHV)</option>
+										</select>
+									</label>
 									<label><span>Purchase price ($)</span><input type="number" id="vehicle-price" min="0" step="1" placeholder="120000" required /></label>
-									<label><span>Open Market Value / OMV ($) <em>Optional</em></span><input type="number" id="vehicle-omv" min="0" step="1" placeholder="Leave blank if you don't have it" /></label>
+									<label id="vehicle-omv-field"><span>Open Market Value / OMV ($) <em>Optional</em></span><input type="number" id="vehicle-omv" min="0" step="1" placeholder="Blank = check against both MAS limits" /></label>
 									<p class="calculator-field-hint" id="vehicle-omv-hint"></p>
 									<label><span>Downpayment ($)</span><input type="number" id="vehicle-downpayment" min="0" step="1" placeholder="55000" required /></label>
-									<label><span>Loan tenure (years, max 7) <em>Optional</em></span><input type="number" id="vehicle-years" min="1" max="7" step="1" placeholder="Blank = 7" /></label>
-									<label><span>Quoted interest rate (% p.a., flat) <em>Optional</em></span><input type="number" id="vehicle-rate" min="0" step="0.01" placeholder="Don't know? Blank = typical 2.48%" /></label>
+									<label><span id="vehicle-years-label">Loan tenure (years, max 7) <em>Optional</em></span><input type="number" id="vehicle-years" min="1" max="10" step="1" placeholder="Blank = 7" /></label>
+									<label><span>Quoted interest rate (% p.a., flat) <em>Optional</em></span><input type="number" id="vehicle-rate" min="0" max="15" step="0.01" placeholder="Don't know? Blank = typical 2.48%" /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="vehicle-status" role="status"></p>
 								</form>
@@ -301,7 +309,7 @@
 						<summary>
 							<div>
 								<h3><i class="fas fa-umbrella" aria-hidden="true"></i> Insurance Calculator</h3>
-								<p>How much cover you should have, and a sensible budget for it.</p>
+								<p>How much cover the benchmarks say you need, what you already have, and your gap.</p>
 							</div>
 							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
 						</summary>
@@ -310,6 +318,8 @@
 								<p class="calculator-card-note">A simple benchmark based on your income, using the life insurance industry's guideline (9x annual income for death and total permanent disability, 4x for critical illness).</p>
 								<form class="booking-form calculator-form" id="insurance-form">
 									<label><span>Monthly income ($)</span><input type="number" id="insurance-income" min="0" step="1" placeholder="4000" required /></label>
+									<label><span>Death & TPD cover you already have ($) <em>Optional</em></span><input type="number" id="insurance-have-life" min="0" step="1" placeholder="Blank = skip. Include work cover and CPF DPS" /></label>
+									<label><span>Critical illness cover you already have ($) <em>Optional</em></span><input type="number" id="insurance-have-ci" min="0" step="1" placeholder="Blank = skip" /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="insurance-status" role="status"></p>
 								</form>
@@ -331,8 +341,8 @@
 								<form class="booking-form calculator-form" id="compound-form">
 									<label><span>Starting amount ($)</span><input type="number" id="compound-principal" min="0" step="1" placeholder="10000" required /></label>
 									<label><span>Amount added each year ($) <em>Optional</em></span><input type="number" id="compound-addition" min="0" step="1" placeholder="Blank = $0" /></label>
-									<label><span>Number of years</span><input type="number" id="compound-years" min="1" step="1" placeholder="20" required /></label>
-									<label><span>Expected annual return (%)</span><input type="number" id="compound-rate" min="0" step="0.1" placeholder="6" required /></label>
+									<label><span>Number of years</span><input type="number" id="compound-years" min="1" max="60" step="1" placeholder="20" required /></label>
+									<label><span>Assumed annual return (%)</span><input type="number" id="compound-rate" min="0" max="12" step="0.1" placeholder="e.g. 4" required /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="compound-status" role="status"></p>
 								</form>
@@ -362,8 +372,11 @@
 		<script src="../js/layout.js"></script>
 		<script src="../js/main.js"></script>
 		<script src="../js/shared/hdbPayments.js"></script>
+		<script src="../js/shared/vehicleLoan.js"></script>
+		<script src="../js/shared/insurance.js"></script>
 		<script src="../js/loan-calculators.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
+		<script src="../js/shared/cpfProjection.js"></script>
 		<script src="../js/cpf-calculator.js"></script>
 		<script src="../js/compound-calculator.js"></script>
 		<script src="../js/shared/taxRelief.js"></script>

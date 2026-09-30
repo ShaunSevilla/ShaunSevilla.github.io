@@ -64,7 +64,9 @@
 	const LTV = 0.75;
 	const BANK_MIN_CASH = 0.05;
 	const HDB_MAX_YEARS = 25;
-	const BANK_MAX_YEARS = 30;
+	// MAS: 75% LTV on an HDB flat only if the bank loan is 25 years or less
+	// (and ends by 65); longer loans drop to 55%. So plan at 25 years.
+	const BANK_MAX_YEARS = 25;
 	const MAX_LOAN_AGE = 65;
 	const HDB_INCOME_CEILING_FAMILY = 16000;
 	const HDB_INCOME_CEILING_SINGLE = 8000;
@@ -91,7 +93,7 @@
 		[1500, 120000], [2000, 110000], [2500, 105000], [3000, 95000],
 		[3500, 90000], [4000, 80000], [4500, 70000], [5000, 65000],
 		[5500, 55000], [6000, 50000], [6500, 40000], [7000, 30000],
-		[7500, 25000], [8000, 20000], [8500, 15000], [9000, 10000],
+		[7500, 25000], [8000, 20000], [8500, 10000], [9000, 5000],
 	];
 	const FAMILY_GRANT = { couple: 80000, single: 40000 };
 	const PROXIMITY_GRANT = { couple: { with: 30000, near: 20000 }, single: { with: 15000, near: 10000 } };
@@ -162,7 +164,8 @@
 		if (age <= 50) return 0.19;
 		if (age <= 55) return 0.15;
 		if (age <= 60) return 0.12;
-		return 0.035;
+		if (age <= 65) return 0.035;
+		return 0.01;
 	}
 
 	function ehgAmount(income, alone) {
@@ -237,12 +240,22 @@
 			return cash + o.cpfAtKeys + o.grants >= due;
 		};
 
-		const priceFor = (loanLimit, cash) => searchPrice((price) => price * LTV <= loanLimit && fitsFunds(price, cash));
+		// The loan is only what savings, CPF OA and grants don't cover (never
+		// more than 75% of the price), so bigger savings mean a bigger flat.
+		const loanNeeded = (price, cash) => Math.max(0, price + bsd(price) + LEGAL_AND_FEES - cash - o.cpfAtKeys - o.grants);
+		const priceFor = (loanLimit, cash) => searchPrice((price) => {
+			const need = loanNeeded(price, cash);
+			return need <= loanLimit && need <= price * LTV && fitsFunds(price, cash);
+		});
 		const comfortable = priceFor(comfortLoan, o.cashComfort);
-		const byIncomeOnly = searchPrice((price) => price * LTV <= comfortLoan);
 		const max = priceFor(maxLoanAllowed, o.cashAll);
-		const loan = comfortable * LTV;
+		const loan = loanNeeded(comfortable, o.cashComfort);
 		const monthly = instalment(loan, planningRate, years);
+		// Income-limited if the loan is up against the comfortable limit;
+		// otherwise it's the downpayment (savings) holding things back.
+		const incomeBound = comfortLoan > 0 && loan >= comfortLoan - 5000;
+		// With no loan at all (age), what cash + CPF + grants alone can buy.
+		const fundsOnly = searchPrice((price) => loanNeeded(price, o.cashAll) <= 0 && fitsFunds(price, o.cashAll));
 
 		return {
 			loan: bank ? "bank" : "hdb",
@@ -252,7 +265,9 @@
 			maxPrice: roundDown(max, 1000),
 			monthly: Math.round(monthly),
 			cpfCovers: Math.round(Math.min(monthly, o.oaInflow)),
-			limitedBy: byIncomeOnly - comfortable > 1000 ? "savings" : "income",
+			limitedBy: incomeBound ? "income" : "savings",
+			loanAmount: Math.round(loan),
+			fundsOnlyPrice: roundDown(fundsOnly, 1000),
 			comfortMonthly: Math.round(comfortMonthly),
 		};
 	}
