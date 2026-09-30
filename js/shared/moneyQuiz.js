@@ -1,10 +1,10 @@
 // "What's your money persona?" quiz: 15 one-tap questions, 8 personas.
-// Shared, unchanged, by the Telegram bot and the website. Keep both copies
-// identical:
-//   Prosperity_Bot/src/shared/moneyQuiz.js
-//   ShaunSevilla.github.io/js/shared/moneyQuiz.js
+// Website only (the Telegram bot no longer runs the quiz).
 // Each answer gives points to one or two personas; the highest total wins
 // (ties go to the persona listed first in PERSONA_ORDER).
+// The Quiet Millionaire-in-Training is the rare one: it's only on the table
+// if every answer you gave was the good-habit one (every question that has a
+// Quiet Millionaire option). One slip and the next-highest persona wins.
 (function (root, factory) {
 	if (typeof module === "object" && module.exports) {
 		module.exports = factory();
@@ -193,10 +193,19 @@
 			if (!option) return;
 			Object.entries(option[1]).forEach(([key, points]) => { totals[key] += points; });
 		});
-		const ranked = PERSONA_ORDER.slice().sort((a, b) => totals[b] - totals[a] || PERSONA_ORDER.indexOf(a) - PERSONA_ORDER.indexOf(b));
-		const top = ranked[0];
-		const runnerUp = totals[ranked[1]] > 0 ? ranked[1] : null;
-		return { key: top, persona: PERSONAS[top], runnerUp, runnerUpPersona: runnerUp ? PERSONAS[runnerUp] : null, totals };
+		const earnedQuiet = QUESTIONS.every((question, index) => {
+			const hasGoodAnswer = question[1].some((option) => option[1].quiet);
+			if (!hasGoodAnswer) return true;
+			const option = question[1][(answers || [])[index]];
+			return Boolean(option && option[1].quiet);
+		});
+		const eligible = earnedQuiet ? PERSONA_ORDER : PERSONA_ORDER.filter((key) => key !== "quiet");
+		const ranked = eligible.slice().sort((a, b) => totals[b] - totals[a] || PERSONA_ORDER.indexOf(a) - PERSONA_ORDER.indexOf(b));
+		const top = earnedQuiet ? "quiet" : ranked[0];
+		if (earnedQuiet) ranked.splice(ranked.indexOf("quiet"), 1);
+		const second = earnedQuiet ? ranked[0] : ranked[1];
+		const runnerUp = totals[second] > 0 ? second : null;
+		return { key: top, rare: top === "quiet", persona: PERSONAS[top], runnerUp, runnerUpPersona: runnerUp ? PERSONAS[runnerUp] : null, totals };
 	}
 
 	return { PERSONAS, PERSONA_ORDER, QUESTIONS, score };

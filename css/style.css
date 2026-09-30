@@ -3048,6 +3048,22 @@ footer span {
 	margin-right: 0.75rem;
 }
 
+.quiz-rare {
+	display: inline-block;
+	margin-bottom: 0.6rem;
+	padding: 0.25rem 0.75rem;
+	border: 1px solid var(--gold);
+	border-radius: 999px;
+	color: var(--gold);
+	font-size: 0.68rem;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+}
+
+.quiz-rare[hidden] {
+	display: none;
+}
+
 .quiz-card h2 {
 	font-family: "Cormorant Garamond", serif;
 	font-size: clamp(1.9rem, 6vw, 2.6rem);
@@ -3083,9 +3099,14 @@ footer span {
 }
 
 .quiz-runner {
-	font-size: 0.85rem;
+	font-size: 0.9rem;
+	font-style: italic;
 	color: var(--text-muted);
-	margin-bottom: 1rem;
+	margin: -0.5rem 0 1.1rem;
+}
+
+.quiz-runner:empty {
+	display: none;
 }
 
 .quiz-card-site {

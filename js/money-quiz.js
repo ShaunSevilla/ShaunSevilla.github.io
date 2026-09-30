@@ -57,6 +57,10 @@
 		new Image().src = artFor(key);
 	});
 
+	function runnerLine(result) {
+		return result.runnerUpPersona ? `With a little bit of ${result.runnerUpPersona.name} in me.` : "";
+	}
+
 	function showResult() {
 		lastResult = Quiz.score(answers);
 		const persona = lastResult.persona;
@@ -68,7 +72,8 @@
 		$("quiz-superpower").textContent = persona.superpower;
 		$("quiz-blindspot").textContent = persona.blindSpot;
 		$("quiz-tip").textContent = persona.tip;
-		$("quiz-runner").textContent = lastResult.runnerUpPersona ? `With a little bit of ${lastResult.runnerUpPersona.emoji} ${lastResult.runnerUpPersona.name} in me.` : "";
+		$("quiz-runner").textContent = runnerLine(lastResult);
+		$("quiz-rare").hidden = !lastResult.rare;
 		$("quiz-cta").textContent = persona.cta;
 		const notes = `Took the money persona quiz: ${persona.name}. ${persona.blindSpot}`;
 		$("quiz-book").href = `booking.html?${new URLSearchParams({ topic: "Money persona", notes }).toString()}`;
@@ -86,7 +91,7 @@
 	async function share() {
 		const persona = lastResult.persona;
 		const url = `${PAGE_URL}?r=${lastResult.key}`;
-		const text = `I got ${persona.emoji} ${persona.name}. What's your money persona?`;
+		const text = `I got ${persona.name}. What's your money persona?`;
 		try {
 			if (navigator.share) {
 				await navigator.share({ title: "What's your money persona?", text, url });
@@ -96,6 +101,51 @@
 			$("quiz-share-status").textContent = "Link copied. Paste it to a friend.";
 		} catch (error) {
 			$("quiz-share-status").textContent = `Copy this: ${url}`;
+		}
+	}
+
+	// Story-sized image of the result (like a Strava share): the share sheet
+	// on phones (so it can go straight to IG Stories or Photos), a download
+	// everywhere else.
+	async function shareCard() {
+		const status = $("quiz-share-status");
+		const button = $("quiz-card-share");
+		const persona = lastResult.persona;
+		button.disabled = true;
+		status.textContent = "Making your card…";
+		try {
+			const blob = await window.QuizCard.render({
+				art: artFor(lastResult.key),
+				name: persona.name,
+				runner: runnerLine(lastResult),
+				roast: persona.roast,
+				superpower: persona.superpower,
+				blindSpot: persona.blindSpot,
+				rare: lastResult.rare,
+			});
+			const fileName = `money-persona-${lastResult.key}.png`;
+			const file = new File([blob], fileName, { type: "image/png" });
+			if (navigator.canShare && navigator.canShare({ files: [file] })) {
+				try {
+					await navigator.share({ files: [file], text: `I got ${persona.name}. What's yours? ${PAGE_URL}?r=${lastResult.key}` });
+					status.textContent = "";
+				} catch (error) {
+					status.textContent = "";
+				}
+				return;
+			}
+			const link = document.createElement("a");
+			link.href = URL.createObjectURL(blob);
+			link.download = fileName;
+			document.body.appendChild(link);
+			link.click();
+			link.remove();
+			setTimeout(() => URL.revokeObjectURL(link.href), 5000);
+			status.textContent = "Card downloaded. Post it and tag a friend.";
+		} catch (error) {
+			status.textContent = "Couldn't make the card. Try a screenshot instead.";
+		} finally {
+			button.disabled = false;
 		}
 	}
 
@@ -116,6 +166,7 @@
 	$("quiz-start").addEventListener("click", start);
 	$("quiz-restart").addEventListener("click", start);
 	$("quiz-share").addEventListener("click", share);
+	$("quiz-card-share").addEventListener("click", shareCard);
 	$("quiz-back").addEventListener("click", () => {
 		if (current > 0) {
 			current -= 1;
