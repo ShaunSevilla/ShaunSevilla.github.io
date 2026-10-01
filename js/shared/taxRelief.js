@@ -1,4 +1,5 @@
-// Singapore personal income tax + reliefs for a tax-resident employee.
+// Singapore personal income tax + reliefs for an employee: tax residents
+// (citizens, PRs, foreigners here 183+ days) and non-resident foreigners.
 // Shared, unchanged, by the Telegram bot (require) and the website (<script>),
 // so both give the same answer. Keep the two copies identical:
 //   Prosperity_Bot/src/shared/taxRelief.js
@@ -45,7 +46,24 @@
 	const QCR_PER_CHILD = 4000;
 	const WMCR_PER_CHILD_CAP = 50000; // QCR + WMCR per child
 	const GRANDPARENT_CAREGIVER = 3000;
-	const NSMAN = { active: 3000, inactive: 1500, family: 750, none: 0 };
+	// NSman Relief: key command/staff appointment holders get more.
+	const NSMAN = { active: 3000, inactive: 1500, keyActive: 5000, keyInactive: 3500, family: 750, none: 0 };
+	// Non-residents (foreigners here under 183 days): employment income taxed
+	// at the higher of 15% flat or resident rates, with no reliefs (IRAS).
+	const NON_RESIDENT_FLAT = 0.15;
+	// local = citizen or PR from the 3rd year; pr1/pr2 = PR in the 1st/2nd
+	// year (lower, graduated CPF); foreigner = here 183+ days (tax resident);
+	// nonresident = foreigner here under 183 days.
+	const RESIDENCY = ["local", "pr1", "pr2", "foreigner", "nonresident"];
+	function residencyInfo(residency) {
+		const value = RESIDENCY.includes(residency) ? residency : "local";
+		return {
+			residency: value,
+			isLocal: value === "local" || value === "pr1" || value === "pr2",
+			isNonResident: value === "nonresident",
+			prYear: value === "pr1" ? 1 : value === "pr2" ? 2 : 0,
+		};
+	}
 
 	function taxOn(chargeable) {
 		let tax = 0;
@@ -65,8 +83,17 @@
 		return TAX_BANDS[TAX_BANDS.length - 1][1];
 	}
 
-	// Employee share of compulsory CPF, Citizens and 3rd-year+ PRs, 2026.
-	function employeeCpfRate(age) {
+	// Employee share of compulsory CPF, 2026 (CPF Board rate tables). Citizens
+	// and 3rd-year+ PRs pay full rates; PRs in their 1st and 2nd year pay the
+	// graduated rates (the default unless they opted into full rates).
+	function employeeCpfRate(age, prYear) {
+		if (prYear === 1) return 0.05;
+		if (prYear === 2) {
+			if (age <= 55) return 0.15;
+			if (age <= 60) return 0.125;
+			if (age <= 65) return 0.075;
+			return 0.05;
+		}
 		if (age <= 55) return 0.2;
 		if (age <= 60) return 0.18;
 		if (age <= 65) return 0.125;
@@ -74,14 +101,18 @@
 		return 0.05;
 	}
 
-	function employeeCpf({ monthlyPay, bonus, age, isLocal }) {
-		if (!isLocal || monthlyPay <= 500) return 0;
+	// Pass `residency` (preferred), or `isLocal` for a citizen/3rd-year+ PR.
+	function employeeCpf({ monthlyPay, bonus, age, isLocal, residency }) {
+		const info = residency !== undefined ? residencyInfo(residency) : { isLocal: Boolean(isLocal), prYear: 0 };
+		const pay = Number(monthlyPay) || 0;
+		if (!info.isLocal || pay <= 500) return 0;
+		const rate = employeeCpfRate(age, info.prYear);
 		// $500 to $750 a month: the employee share phases in at 3x the rate on
 		// pay above $500 (CPF's graduated rates for lower-wage workers).
-		if (monthlyPay <= 750) return Math.round(3 * employeeCpfRate(age) * (monthlyPay - 500) * 12);
-		const ordinary = Math.min(monthlyPay, CPF_OW_CEILING_MONTHLY) * 12;
-		const additional = Math.min(bonus, Math.max(0, CPF_ANNUAL_SALARY_CEILING - ordinary));
-		return Math.round((ordinary + additional) * employeeCpfRate(age));
+		if (pay <= 750) return Math.round(3 * rate * (pay - 500) * 12);
+		const ordinary = Math.min(pay, CPF_OW_CEILING_MONTHLY) * 12;
+		const additional = Math.min(Number(bonus) || 0, Math.max(0, CPF_ANNUAL_SALARY_CEILING - ordinary));
+		return Math.round((ordinary + additional) * rate);
 	}
 
 	function earnedIncomeRelief(age, income) {
@@ -113,8 +144,45 @@
 		const monthlyPay = Math.max(0, Number(input.monthlyPay) || 0);
 		const bonus = Math.max(0, Number(input.bonus) || 0);
 		const age = Math.max(16, Number(input.age) || 30);
-		const isLocal = input.residency !== "foreigner";
+		const { residency, isLocal, isNonResident, prYear } = residencyInfo(input.residency);
 		const income = monthlyPay * 12 + bonus;
+		// Parenthood Tax Rebate still unused: comes off the tax itself, after
+		// reliefs, and whatever isn't used carries forward to later years.
+		const rebateAvailable = isNonResident ? 0 : Math.max(0, Math.round(Number(input.parenthoodRebate) || 0));
+
+		if (isNonResident) {
+			const flat = income * NON_RESIDENT_FLAT;
+			const progressive = taxOn(income);
+			const flatApplies = flat >= progressive;
+			const tax = Math.round(Math.max(flat, progressive));
+			return {
+				income: Math.round(income),
+				residency,
+				isLocal: false,
+				isNonResident: true,
+				flatApplies,
+				prYear: 0,
+				children: 0,
+				items: [],
+				reliefsBeforeCap: 0,
+				totalRelief: 0,
+				capped: false,
+				chargeable: Math.round(income),
+				taxBeforeRebate: tax,
+				rebateAvailable: 0,
+				rebateUsed: 0,
+				rebateLeft: 0,
+				tax,
+				taxWithoutReliefs: tax,
+				reliefSaved: 0,
+				effectiveRate: income > 0 ? tax / income : 0,
+				marginalRate: flatApplies ? NON_RESIDENT_FLAT : marginalRate(income),
+				opportunities: [],
+				potentialSaving: 0,
+				taxAfterOpportunities: tax,
+				lowTax: false,
+			};
+		}
 		const children = Math.max(0, Math.floor(Number(input.children) || 0));
 		const parentsWith = Math.max(0, Math.floor(Number(input.parentsLivingWith) || 0));
 		const parentsApart = Math.max(0, Math.floor(Number(input.parentsNotLivingWith) || 0));
@@ -123,13 +191,13 @@
 		const topUpSelfSoFar = isLocal ? Math.min(CPF_TOPUP_SELF_CAP, Math.max(0, Number(input.topUpSelfSoFar) || 0)) : 0;
 		const topUpFamilySoFar = Math.min(CPF_TOPUP_FAMILY_CAP, Math.max(0, Number(input.topUpFamilySoFar) || 0));
 
-		const cpf = employeeCpf({ monthlyPay, bonus, age, isLocal });
+		const cpf = employeeCpf({ monthlyPay, bonus, age, residency });
 		const items = [];
 		const add = (key, label, amount, auto) => {
 			if (amount > 0) items.push({ key, label, amount: Math.round(amount), auto: Boolean(auto) });
 		};
 
-		add("cpf", "CPF contributions (from your pay)", cpf, true);
+		add("cpf", prYear ? `CPF contributions (from your pay, at the lower rate for year ${prYear} of PR)` : "CPF contributions (from your pay)", cpf, true);
 		add("earned", "Earned Income Relief", earnedIncomeRelief(age, income), true);
 		if (input.married && input.spouseLowIncome) add("spouse", "Spouse Relief", SPOUSE_RELIEF);
 		add("qcr", `Qualifying Child Relief (${children} × $4,000)`, children * QCR_PER_CHILD);
@@ -152,8 +220,12 @@
 		const reliefsBeforeCap = items.reduce((sum, item) => sum + item.amount, 0);
 		const totalRelief = Math.min(RELIEF_CAP, reliefsBeforeCap);
 		const chargeable = Math.max(0, income - totalRelief);
-		const tax = taxOn(chargeable);
+		const taxBeforeRebate = taxOn(chargeable);
+		const rebateUsed = Math.min(rebateAvailable, taxBeforeRebate);
+		const tax = taxBeforeRebate - rebateUsed;
 		const taxWithoutReliefs = taxOn(income);
+		// What you actually pay on a given chargeable income, after the rebate.
+		const payable = (amount) => Math.max(0, taxOn(amount) - rebateAvailable);
 
 		// What's still on the table before 31 Dec, applied in this order:
 		// SRS, your own CPF top-up, then family. Each saving is the extra tax
@@ -173,11 +245,23 @@
 			// Never suggest more than it takes to bring tax to $0 (the first
 			// $20,000 of chargeable income is taxed at 0%).
 			const toZero = Math.max(0, income - Math.min(RELIEF_CAP, reliefSoFar) - TAX_BANDS[0][0]);
-			const usable = Math.min(option.room, capRoom, toZero);
-			if (usable <= 0) continue;
-			const newTax = taxOn(Math.max(0, income - Math.min(RELIEF_CAP, reliefSoFar + usable)));
+			const most = Math.min(option.room, capRoom, toZero);
+			if (most <= 0) continue;
+			const taxWith = (x) => payable(Math.max(0, income - Math.min(RELIEF_CAP, reliefSoFar + x)));
+			const newTax = taxWith(most);
+			// With a rebate, a smaller top-up may already bring the bill to the
+			// same place: suggest only what still lowers it.
+			let low = 0;
+			let high = Math.ceil(most);
+			while (low < high) {
+				const mid = Math.floor((low + high) / 2);
+				if (taxWith(mid) <= newTax) high = mid;
+				else low = mid + 1;
+			}
+			const usable = Math.min(most, high);
 			const saving = Math.round(taxSoFar - newTax);
-			// Nothing left to save (tax already $0): don't suggest it.
+			// Nothing left to save (tax already $0, or the rebate covers it):
+			// don't suggest it.
 			if (saving <= 0) continue;
 			opportunities.push({ key: option.key, label: option.label, amount: Math.round(usable), saving });
 			reliefSoFar += usable;
@@ -187,16 +271,25 @@
 
 		return {
 			income: Math.round(income),
+			residency,
 			isLocal,
+			isNonResident: false,
+			prYear,
 			children,
 			items,
 			reliefsBeforeCap: Math.round(reliefsBeforeCap),
 			totalRelief: Math.round(totalRelief),
 			capped: reliefsBeforeCap > RELIEF_CAP,
 			chargeable: Math.round(chargeable),
+			taxBeforeRebate: Math.round(taxBeforeRebate),
+			rebateAvailable,
+			rebateUsed: Math.round(rebateUsed),
+			rebateLeft: Math.round(rebateAvailable - rebateUsed),
+			// The rebate wipes out this year's tax (top-ups can't lower it further).
+			rebateCoversTax: rebateAvailable > 0 && taxBeforeRebate > 0 && tax <= 0,
 			tax: Math.round(tax),
 			taxWithoutReliefs: Math.round(taxWithoutReliefs),
-			reliefSaved: Math.round(taxWithoutReliefs - tax),
+			reliefSaved: Math.round(taxWithoutReliefs - taxBeforeRebate),
 			effectiveRate: income > 0 ? tax / income : 0,
 			marginalRate: marginalRate(chargeable),
 			opportunities,
@@ -250,6 +343,9 @@
 
 	return {
 		RELIEF_CAP,
+		NSMAN,
+		NON_RESIDENT_FLAT,
+		RESIDENCY,
 		SRS_CAP_LOCAL,
 		SRS_CAP_FOREIGNER,
 		CPF_TOPUP_SELF_CAP,

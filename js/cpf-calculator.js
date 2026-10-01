@@ -34,6 +34,26 @@
 			: "Current CPF Special Account (SA) balance ($)") + " <em>Optional</em>";
 	}
 
+	// What paying for a home from OA does to the projection.
+	function housingHtml(projection, targetAge, currentAge) {
+		const h = projection.housing;
+		if (!h) return "";
+		const plan = [
+			h.lumpSum > 0 ? `${formatCurrency(h.lumpSum)} downpayment` : "",
+			h.monthly > 0 ? `${formatCurrency(h.monthly)}/month for ${h.years} years` : "",
+		].filter(Boolean).join(" then ");
+		let html = `<p class="calculator-note"><strong>Your home: ${plan}${h.fromAge > currentAge ? `, from age ${Math.round(h.fromAge)}` : ""}</strong></p><ul class="calculator-note-list">`;
+		html += `<li>Paid from CPF OA: <strong>${formatCurrency(h.fromOa)}</strong></li>`;
+		if (h.cash > 0) html += `<li>OA runs short, so paid in cash: <strong>${formatCurrency(h.cash)}</strong></li>`;
+		html += `<li>Your CPF at ${targetAge} without the home: ${formatCurrency(h.totalWithout)}, so it costs about <strong>${formatCurrency(h.costToTotal)}</strong> of your CPF at ${targetAge}, counting the interest that money would have earned</li>`;
+		if (projection.raAt55 !== null) {
+			html += `<li>Retirement Account at 55: about ${formatCurrency(projection.raAt55)} (without the home, ${formatCurrency(h.raAt55Without)}; Full Retirement Sum &asymp; ${formatCurrency(projection.frsCap)})</li>`;
+		}
+		html += "</ul>";
+		html += `<p class="calculator-note">That's the trade-off, not a loss: you get the home for it. If you sell, what you used plus the 2.5% interest it would have earned goes back into your CPF.${projection.raAt55 !== null && projection.raAt55 < projection.frsCap - 1 ? " Owning a home lets you set aside as little as the Basic Retirement Sum (half the full sum) at 55, but less in the RA means smaller CPF LIFE payouts from 65." : ""}</p>`;
+		return html;
+	}
+
 	let cpfChartInstance = null;
 
 	function renderChart(yearly) {
@@ -99,6 +119,16 @@
 		const ageEl = document.getElementById("cpf-age");
 		if (ageEl) ageEl.addEventListener("input", updateSaRaLabel);
 		updateSaRaLabel();
+		const houseMore = document.getElementById("cpf-house-more");
+		const optional = (id) => {
+			const el = document.getElementById(id);
+			return el && el.value !== "" ? Number(el.value) : null;
+		};
+		function updateHousing() {
+			if (houseMore) houseMore.hidden = !(optional("cpf-house-monthly") > 0 || optional("cpf-house-lump") > 0);
+		}
+		form.addEventListener("input", updateHousing);
+		updateHousing();
 
 		form.addEventListener("submit", function (event) {
 			event.preventDefault();
@@ -121,7 +151,18 @@
 				return;
 			}
 
-			const projection = projectCpf({ currentAge, targetAge, monthlyWage, oaBalance, saOrRaBalance, maBalance, salaryGrowth });
+			const housingMonthly = optional("cpf-house-monthly") || 0;
+			const housingLump = optional("cpf-house-lump") || 0;
+			const housingFrom = optional("cpf-house-from");
+			const housingYears = optional("cpf-house-years");
+			if (housingMonthly < 0 || housingLump < 0 || (housingFrom !== null && !(housingFrom >= 16 && housingFrom <= 90)) || (housingYears !== null && !(housingYears >= 1 && housingYears <= 35))) {
+				setStatus(status, "Please check the home loan fields.", true);
+				resultBox.hidden = true;
+				return;
+			}
+			const housing = housingMonthly > 0 || housingLump > 0 ? { monthly: housingMonthly, lumpSum: housingLump, fromAge: housingFrom, years: housingYears } : null;
+
+			const projection = projectCpf({ currentAge, targetAge, monthlyWage, oaBalance, saOrRaBalance, maBalance, salaryGrowth, housing });
 			const { yearly, frsCap, bhsCap } = projection;
 			const final = yearly[yearly.length - 1];
 
@@ -135,7 +176,8 @@
 				`<div class="calculator-result-row"><span>OA · SA/RA · MediSave</span><strong>${formatCurrency(final.oa)} · ${formatCurrency(final.sa + final.ra)} · ${formatCurrency(final.ma)}</strong></div>` +
 				`<div class="calculator-result-row"><span>In today's money (2% inflation)</span><strong>about ${formatCurrency(projection.todayDollars)}</strong></div>` +
 				`<p class="calculator-note">Most of this isn't cash you can take out: the RA pays you monthly for life through CPF LIFE from 65, and MediSave is for healthcare.</p>` +
-				`<p class="calculator-note">${monthlyWage > CPF_OW_CEILING ? `CPF counts pay up to $${CPF_OW_CEILING.toLocaleString("en-SG")} a month, so ${formatCurrency(CPF_OW_CEILING)} is used. ` : ""}${salaryGrowth > 0 ? `Pay grows ${Math.round(salaryGrowth * 1000) / 10}% a year. ` : "Pay stays flat; add a yearly pay rise for a truer picture. "}Uses 2026 CPF rates plus the 2027 increase for ages 55 to 65. Doesn't take out anything you use for housing.</p>` +
+				`<p class="calculator-note">${monthlyWage > CPF_OW_CEILING ? `CPF counts pay up to $${CPF_OW_CEILING.toLocaleString("en-SG")} a month, so ${formatCurrency(CPF_OW_CEILING)} is used. ` : ""}${salaryGrowth > 0 ? `Pay grows ${Math.round(salaryGrowth * 1000) / 10}% a year. ` : "Pay stays flat; add a yearly pay rise for a truer picture. "}Uses 2026 CPF rates plus the 2027 increase for ages 55 to 65.${projection.housing ? "" : " Doesn't take out anything you use for housing; add your home loan above to see that."}</p>` +
+				housingHtml(projection, targetAge, currentAge) +
 				(currentAge >= 55
 					? `<p class="calculator-note">Your Full Retirement Sum was set in the year you turned 55 and your Basic Healthcare Sum is fixed at 65. Check your exact figures in your CPF account.</p>`
 					: `<p class="calculator-note">${age55Heading}:</p>` +

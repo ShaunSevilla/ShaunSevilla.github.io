@@ -20,6 +20,11 @@
 //   • At 55 the SA closes: SA then OA move to the RA up to the FRS; the rest
 //     stays in OA. RA contributions after 55 go to the RA only up to the FRS,
 //     then to OA.
+//   • Housing (optional): OA pays a monthly home loan from a given age for a
+//     number of years, plus an optional lump sum (the downpayment) at the
+//     start. Where the OA runs short, the rest is cash. Money used comes back
+//     to CPF, with the 2.5% interest it would have earned, only if the home
+//     is sold.
 (function (root, factory) {
 	if (typeof module === "object" && module.exports) {
 		module.exports = factory();
@@ -89,7 +94,9 @@
 	}
 
 	// input: { currentAge, targetAge, monthlyWage, oaBalance, saOrRaBalance,
-	//          maBalance, salaryGrowth (optional, e.g. 0.03), start (Date) }
+	//          maBalance, salaryGrowth (optional, e.g. 0.03), start (Date),
+	//          housing (optional): { monthly, fromAge (blank = now),
+	//                                years (blank = 25), lumpSum } }
 	function project(input) {
 		const currentAge = Number(input.currentAge);
 		const targetAge = Number(input.targetAge);
@@ -110,6 +117,16 @@
 		const months = Math.round((targetAge - currentAge) * 12);
 		const yearly = [];
 		let wage = Number(input.monthlyWage) || 0;
+		const h = input.housing || {};
+		const housingMonthly = Math.max(0, Number(h.monthly) || 0);
+		const housingLump = Math.max(0, Number(h.lumpSum) || 0);
+		const housingFrom = h.fromAge === null || h.fromAge === undefined || h.fromAge === "" ? currentAge : Math.max(currentAge, Number(h.fromAge));
+		const housingYears = Number(h.years) > 0 ? Number(h.years) : 25;
+		const usesHousing = housingMonthly > 0 || housingLump > 0;
+		let lumpDone = housingLump <= 0;
+		let housingUsed = 0;
+		let housingCash = 0;
+		let raAt55 = null;
 
 		for (let m = 1; m <= months; m += 1) {
 			const t = (m - 1) / 12; // years since start
@@ -142,6 +159,21 @@
 				sa += toRetirement;
 			}
 
+			// Housing: the downpayment once, then the monthly loan, from OA;
+			// whatever OA can't cover is paid in cash.
+			if (usesHousing && age >= housingFrom - 1e-9) {
+				let due = 0;
+				if (!lumpDone) {
+					due += housingLump;
+					lumpDone = true;
+				}
+				if (age < housingFrom + housingYears - 1e-9) due += housingMonthly;
+				const fromOa = Math.min(oa, due);
+				oa -= fromOa;
+				housingUsed += fromOa;
+				housingCash += due - fromOa;
+			}
+
 			// SA closes at 55: SA then OA into the RA, up to the FRS.
 			if (age >= 55 && sa > 0) {
 				const fromSa = Math.min(sa, Math.max(0, frsAt55 - ra));
@@ -152,6 +184,8 @@
 				ra += fromOa;
 				oa -= fromOa;
 			}
+
+			if (raAt55 === null && currentAge < 55 && age >= 55) raAt55 = ra;
 
 			// Credit interest every 12 months.
 			if (m % 12 === 0) {
@@ -178,14 +212,33 @@
 			}
 
 			if (m % 12 === 0) {
-				yearly.push({ age: currentAge + m / 12, oa, sa, ra, ma, total: oa + sa + ra + ma, wage });
+				yearly.push({ age: currentAge + m / 12, oa, sa, ra, ma, total: oa + sa + ra + ma, wage, housingUsed });
 			}
 		}
 		const years = months / 12;
+		const finalTotal = yearly.length ? yearly[yearly.length - 1].total : 0;
+		// Same projection without the housing use, to show what it costs.
+		const without = usesHousing ? project({ ...input, housing: null }) : null;
 		return {
 			yearly,
 			frsCap: frsAt55,
 			bhsCap: bhsAt55,
+			// RA right after the SA closes at 55 (null if already 55+ or the
+			// projection stops before 55).
+			raAt55: raAt55 === null ? null : Math.round(raAt55),
+			housing: usesHousing
+				? {
+					monthly: housingMonthly,
+					lumpSum: housingLump,
+					fromAge: housingFrom,
+					years: housingYears,
+					fromOa: Math.round(housingUsed),
+					cash: Math.round(housingCash),
+					totalWithout: Math.round(without.yearly.length ? without.yearly[without.yearly.length - 1].total : 0),
+					costToTotal: Math.round((without.yearly.length ? without.yearly[without.yearly.length - 1].total : 0) - finalTotal),
+					raAt55Without: without.raAt55 === null ? null : Math.round(without.raAt55),
+				}
+				: null,
 			// Final total in today's money, at 2% inflation.
 			todayDollars: yearly.length ? yearly[yearly.length - 1].total / Math.pow(1.02, years) : 0,
 		};

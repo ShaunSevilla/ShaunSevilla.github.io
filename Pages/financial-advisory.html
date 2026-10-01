@@ -83,25 +83,28 @@
 						</summary>
 						<div class="calculator-dropdown-body">
 							<article class="calculator-card">
-								<p class="calculator-card-note">For tax residents on a salary, using the rules for income earned this year. Assumes you claim the full child relief (you can split it with your spouse). Disability reliefs and special cases aren't included.</p>
+								<p class="calculator-card-note">For employees on a salary, using the rules for income earned this year. Assumes you claim the full child relief (you can split it with your spouse). Disability reliefs and special cases aren't included.</p>
 								<form class="booking-form calculator-form" id="tax-form">
 									<label><span>Monthly salary before CPF ($)</span><input type="number" id="tax-pay" min="0" step="1" placeholder="5000" required /></label>
 									<label><span>Bonus this year, incl. AWS ($) <em>Optional</em></span><input type="number" id="tax-bonus" min="0" step="1" placeholder="Blank = none" /></label>
 									<label><span>Age this year</span><input type="number" id="tax-age" min="16" max="100" step="1" placeholder="29" required /></label>
 									<label><span>Residency</span>
 										<select id="tax-residency">
-											<option value="local">Singapore Citizen / PR</option>
-											<option value="foreigner">Foreigner (working here)</option>
+											<option value="local">Singapore Citizen, or PR for 2+ years</option>
+											<option value="pr1">PR, in my 1st year</option>
+											<option value="pr2">PR, in my 2nd year</option>
+											<option value="foreigner">Foreigner, in Singapore 183+ days this year</option>
+											<option value="nonresident">Foreigner, under 183 days this year</option>
 										</select>
 									</label>
-									<label><span>Married?</span>
+									<label class="tax-relief-field"><span>Married?</span>
 										<select id="tax-marital">
 											<option value="single">Single</option>
 											<option value="married_low">Married, spouse earns under $8,000 this year</option>
 											<option value="married">Married, spouse earns more</option>
 										</select>
 									</label>
-									<label><span>Children under 16, or studying full-time <em>Optional</em></span><input type="number" id="tax-children" min="0" max="20" step="1" placeholder="Blank = none" /></label>
+									<label class="tax-relief-field"><span>Children under 16, or studying full-time <em>Optional</em></span><input type="number" id="tax-children" min="0" max="20" step="1" placeholder="Blank = none" /></label>
 									<div class="tax-mother-fields" id="tax-mother-fields" hidden>
 										<label><span>Are you their mother, and working?</span>
 											<select id="tax-working-mother">
@@ -119,7 +122,11 @@
 											</label>
 										</div>
 									</div>
-									<label><span>Parents or grandparents you support (55+, earn under $8,000 this year)</span>
+									<div class="form-group-contents" id="tax-ptr-field" hidden>
+										<label><span>Parenthood Tax Rebate you still have ($) <em>Optional</em></span><input type="number" id="tax-ptr" min="0" step="1" placeholder="Blank = none" /></label>
+										<p class="calculator-field-hint">$5,000 for your 1st child, $10,000 for the 2nd, $20,000 for each after. Unused rebate carries forward; myTax Portal shows what's left.</p>
+									</div>
+									<label class="tax-relief-field"><span>Parents or grandparents you support (55+, earn under $8,000 this year)</span>
 										<select id="tax-parents">
 											<option value="0_0">None</option>
 											<option value="1_0">1, lives with me</option>
@@ -129,18 +136,20 @@
 											<option value="1_1">1 with me, 1 elsewhere</option>
 										</select>
 									</label>
-									<label><span>NS</span>
+									<label class="tax-relief-field"><span>NS</span>
 										<select id="tax-nsman">
 											<option value="none">None</option>
 											<option value="active">I'm an NSman, did in-camp or IPPT this year</option>
 											<option value="inactive">I'm an NSman, no NS activities this year</option>
+											<option value="keyActive">NSman in a key command or staff appointment, did NS activities this year</option>
+											<option value="keyInactive">NSman in a key command or staff appointment, no NS activities this year</option>
 											<option value="family">My husband or son is an NSman</option>
 										</select>
 									</label>
-									<p class="calculator-field-hint tax-group-hint">Already done this year? Leave blank if not.</p>
-									<label><span>SRS contributions so far ($) <em>Optional</em></span><input type="number" id="tax-srs" min="0" step="1" placeholder="Blank = $0" /></label>
-									<label><span>CPF cash top-ups to yourself so far ($) <em>Optional</em></span><input type="number" id="tax-topup-self" min="0" step="1" placeholder="Blank = $0" /></label>
-									<label><span>CPF cash top-ups to family so far ($) <em>Optional</em></span><input type="number" id="tax-topup-family" min="0" step="1" placeholder="Blank = $0" /></label>
+									<p class="calculator-field-hint tax-group-hint tax-relief-field">Already done this year? Leave blank if not.</p>
+									<label class="tax-relief-field"><span>SRS contributions so far ($) <em>Optional</em></span><input type="number" id="tax-srs" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label class="tax-relief-field"><span>CPF cash top-ups to yourself so far ($) <em>Optional</em></span><input type="number" id="tax-topup-self" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label class="tax-relief-field"><span>CPF cash top-ups to family so far ($) <em>Optional</em></span><input type="number" id="tax-topup-family" min="0" step="1" placeholder="Blank = $0" /></label>
 									<label id="tax-life-field" hidden><span>Life insurance premiums a year ($) <em>Optional</em></span><input type="number" id="tax-life" min="0" step="1" placeholder="Only counts when your CPF is under $5,000 a year" /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="tax-status" role="status"></p>
@@ -264,6 +273,13 @@
 									<label><span>Current MediSave Account (MA) balance ($) <em>Optional</em></span><input type="number" id="cpf-ma" min="0" step="1" placeholder="Blank = $0" /></label>
 									<label><span>Pay rise per year (%) <em>Optional</em></span><input type="number" id="cpf-growth" min="0" max="15" step="0.1" placeholder="Blank = pay stays flat. Try 3" /></label>
 									<p class="calculator-field-hint">Leave SA/MA blank (treated as $0) if you just want to project OA. CPF doesn't let you top up OA on its own, only SA/RA (via RSTU) or MediSave individually, or all three together.</p>
+									<p class="calculator-field-hint tax-group-hint">Paying for a home with CPF? Leave blank if not.</p>
+									<label><span>Home loan paid from OA each month ($) <em>Optional</em></span><input type="number" id="cpf-house-monthly" min="0" step="1" placeholder="Blank = none" /></label>
+									<label><span>OA for the downpayment ($) <em>Optional</em></span><input type="number" id="cpf-house-lump" min="0" step="1" placeholder="Only if you haven't bought yet" /></label>
+									<div class="form-group-contents" id="cpf-house-more" hidden>
+										<label><span>Starting at age <em>Optional</em></span><input type="number" id="cpf-house-from" min="16" max="90" step="1" placeholder="Blank = now" /></label>
+										<label><span>Loan years left <em>Optional</em></span><input type="number" id="cpf-house-years" min="1" max="35" step="1" placeholder="Blank = 25" /></label>
+									</div>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="cpf-status" role="status"></p>
 								</form>

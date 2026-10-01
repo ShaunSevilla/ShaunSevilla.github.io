@@ -48,18 +48,26 @@
 		const motherFields = document.getElementById("tax-mother-fields");
 		const motherExtra = document.getElementById("tax-mother-extra");
 		const lifeField = document.getElementById("tax-life-field");
+		const ptrField = document.getElementById("tax-ptr-field");
+		const reliefFields = form.querySelectorAll(".tax-relief-field");
 
 		function updateVisibility() {
-			const children = numberValue("tax-children") || 0;
+			// Non-residents get no reliefs, so none of the relief questions apply.
+			const nonResident = value("tax-residency") === "nonresident";
+			reliefFields.forEach(function (field) {
+				field.hidden = nonResident;
+			});
+			const children = nonResident ? 0 : numberValue("tax-children") || 0;
 			motherFields.hidden = !(children > 0);
 			motherExtra.hidden = motherFields.hidden || value("tax-working-mother") !== "yes";
+			ptrField.hidden = !(children > 0);
 			const cpf = window.TaxRelief.employeeCpf({
 				monthlyPay: numberValue("tax-pay") || 0,
 				bonus: numberValue("tax-bonus") || 0,
 				age: numberValue("tax-age") || 30,
-				isLocal: value("tax-residency") !== "foreigner",
+				residency: value("tax-residency"),
 			});
-			lifeField.hidden = !(numberValue("tax-pay") > 0) || cpf >= 5000;
+			lifeField.hidden = nonResident || !(numberValue("tax-pay") > 0) || cpf >= 5000;
 		}
 		form.addEventListener("input", updateVisibility);
 		form.addEventListener("change", updateVisibility);
@@ -76,7 +84,7 @@
 				return;
 			}
 			const [withMe, elsewhere] = value("tax-parents").split("_").map(Number);
-			const children = numberValue("tax-children") || 0;
+			const children = value("tax-residency") === "nonresident" ? 0 : numberValue("tax-children") || 0;
 			const workingMother = children > 0 && value("tax-working-mother") === "yes";
 			const result = window.TaxRelief.calculate({
 				monthlyPay,
@@ -96,7 +104,24 @@
 				topUpSelfSoFar: numberValue("tax-topup-self") || 0,
 				topUpFamilySoFar: numberValue("tax-topup-family") || 0,
 				lifePremium: lifeField.hidden ? 0 : numberValue("tax-life") || 0,
+				parenthoodRebate: ptrField.hidden ? 0 : numberValue("tax-ptr") || 0,
 			});
+
+			if (result.isNonResident) {
+				let nr = headline(
+					"You'll probably pay",
+					formatCurrency(result.tax),
+					`in tax, ${percent(result.effectiveRate)} of your ${formatCurrency(result.income)} income.`,
+				);
+				nr += resultRow("How it's worked out", result.flatApplies
+					? "15% flat on your whole income (higher than resident rates at your pay)"
+					: "Resident rates on your whole income, with no reliefs (higher than 15% flat at your pay)");
+				nr += note("Under 183 days in Singapore this year, you're a non-resident: no reliefs, and SRS or CPF top-ups don't lower your tax. Stay or work here 183+ days in the year (IRAS also counts a continuous stay across two years) and you're taxed as a resident, usually for a lot less.");
+				nr += note("Working here 60 days or less in the year? That job's pay is usually tax-free (not for company directors, entertainers or professionals). Estimate only, not personalised advice.");
+				resultBox.innerHTML = nr;
+				resultBox.hidden = false;
+				return;
+			}
 
 			let html = headline(
 				"You'll probably pay",
@@ -112,8 +137,16 @@
 			html += "</ul>";
 			html += resultRow("Taxable after reliefs", `${formatCurrency(result.chargeable)} (top rate ${percent(result.marginalRate)})`);
 			html += note(`Without reliefs you'd pay ${formatCurrency(result.taxWithoutReliefs)}, so they already save you <strong>${formatCurrency(result.reliefSaved)}</strong>.`);
+			if (result.rebateAvailable > 0 && result.taxBeforeRebate > 0) {
+				html += resultRow("Parenthood Tax Rebate used", `${formatCurrency(result.rebateUsed)} of ${formatCurrency(result.taxBeforeRebate)} tax${result.rebateLeft > 0 ? `, ${formatCurrency(result.rebateLeft)} left for next year` : ""}`);
+			}
+			if (result.prYear) {
+				html += note(`In your ${result.prYear === 1 ? "1st" : "2nd"} year as a PR you pay less CPF, so your CPF relief is smaller than a citizen's on the same pay. Full rates start from your 3rd year.`);
+			}
 
-			if (result.tax <= 0) {
+			if (result.rebateCoversTax) {
+				html += note(`Your Parenthood Tax Rebate covers all of this year's tax${result.rebateLeft > 0 ? `, with ${formatCurrency(result.rebateLeft)} still left for later years` : ""}. Topping up SRS or CPF won't lower this year's bill; it would only leave more rebate for later.`);
+			} else if (result.tax <= 0) {
 				html += note("You pay no income tax. Topping up SRS or CPF won't save you anything this year.");
 			} else if (result.opportunities.length) {
 				const days = window.TaxRelief.daysLeftInYear(new Date());

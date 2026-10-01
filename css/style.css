@@ -2858,6 +2858,10 @@ footer span {
 	color: var(--gold);
 }
 
+.form-group-contents:not([hidden]) {
+	display: contents;
+}
+
 .tax-group-hint {
 	margin: 0.4rem 0 0.6rem;
 	color: var(--text);
