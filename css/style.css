@@ -3541,7 +3541,7 @@ footer span {
 		overflow: hidden;
 	}
 
-	/* HOME order on phones: tools, what I do, booking, background, roles. */
+	/* HOME order on phones: tools, booking, what I do, background, roles. */
 	body[data-page="home"] main {
 		display: flex;
 		flex-direction: column;
@@ -3554,8 +3554,8 @@ footer span {
 
 	body[data-page="home"] .hero { order: 0; }
 	body[data-page="home"] .tools-section { order: 1; }
-	body[data-page="home"] #work { order: 2; }
-	body[data-page="home"] .consultation-cta { order: 3; }
+	body[data-page="home"] .consultation-cta { order: 2; }
+	body[data-page="home"] #work { order: 3; }
 	body[data-page="home"] #credentials { order: 4; }
 	body[data-page="home"] #leadership { order: 5; }
 
@@ -3573,7 +3573,7 @@ footer span {
 	}
 
 	.home-overview > .consultation-cta + #leadership,
-	body[data-page="home"] #credentials {
+	body[data-page="home"] #work {
 		border-top: 0;
 	}
 }
