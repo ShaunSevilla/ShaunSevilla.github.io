@@ -3408,6 +3408,14 @@ footer span {
 	color: var(--text-muted);
 }
 
+.pay-plan-totals .pay-plan-sub {
+	display: block;
+	margin-top: 0.2rem;
+	font-size: 0.72rem;
+	font-style: normal;
+	color: var(--text-muted);
+}
+
 .pay-plan-totals strong {
 	font-size: 1.15rem;
 	color: var(--text);

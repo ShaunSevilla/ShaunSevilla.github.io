@@ -6,11 +6,12 @@
 //
 // Rules (HDB / CPF Board, Sep 2026):
 //   BTO, HDB loan:  booking option fee (cash) → 10% at Agreement for Lease
-//                   → 15% at key collection (HDB's standard split; young
-//                   couples on the Staggered Downpayment Scheme can pay 5%
-//                   at AFL and 20% at keys instead)
+//                   → 15% at key collection
 //   BTO, bank loan: option fee (cash) → 20% at AFL, at least 5% of the price
 //                   in cash → 5% at key collection
+//   Staggered Downpayment Scheme (BTO; first-timer couple, younger one got
+//   the HFE letter before 30, 5-room or smaller): HDB loan 5% at AFL and 20%
+//   at keys; bank loan 10% at AFL (5% of it cash) and 15% at keys.
 //   Resale:         Option to Purchase fees (cash, up to $5,000, often ~1%)
 //                   → rest of the 25% at completion. Bank loans need at least
 //                   5% of the price in cash in total.
@@ -36,6 +37,7 @@
 	const OA_RETAIN_HDB = 20000;
 	// Share of the price due by signing the Agreement for Lease (BTO).
 	const AFL_SHARE = { hdb: 0.1, bank: 0.2 };
+	const AFL_SHARE_STAGGERED = { hdb: 0.05, bank: 0.1 };
 	const LEGAL_FEES = { hdb: 1000, bank: 3000 }; // rough, conveyancing + admin
 	const BSD_TIERS = [
 		[180000, 0.01],
@@ -74,7 +76,8 @@
 
 	// input: { price, type: "bto" | "resale", loan: "hdb" | "bank",
 	//          oa (CPF OA today), oaAtKeys (optional, BTO: OA expected by key
-	//          collection), grants }
+	//          collection), grants, staggered (BTO: Staggered Downpayment
+	//          Scheme) }
 	function schedule(input) {
 		const price = Math.max(0, Number(input.price) || 0);
 		const bto = input.type === "bto";
@@ -90,7 +93,7 @@
 		const stages = [];
 		if (bto) {
 			const fee = Math.min(BTO_OPTION_FEE, downpayment);
-			const aflShare = AFL_SHARE[bank ? "bank" : "hdb"];
+			const aflShare = (input.staggered ? AFL_SHARE_STAGGERED : AFL_SHARE)[bank ? "bank" : "hdb"];
 			const signing = price * aflShare - fee;
 			stages.push({ key: "booking", label: "Booking the flat", when: "when you pick your flat", parts: [["Option fee", fee]], cashOnly: fee });
 			stages.push({
@@ -159,6 +162,7 @@
 		const mustBeCash = Math.round(stages.reduce((sum, stage) => sum + stage.cashOnly, 0));
 		return {
 			type: bto ? "bto" : "resale",
+			staggered: bto && Boolean(input.staggered),
 			loanType: bank ? "bank" : "hdb",
 			// Only this has to be cash; CPF OA (and grants) can pay the rest.
 			mustBeCash,
