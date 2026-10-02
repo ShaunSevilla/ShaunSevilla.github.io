@@ -3677,3 +3677,61 @@ footer span {
 		grid-template-columns: 1fr;
 	}
 }
+
+.card-pick-sub {
+	margin: 0.8rem 0 0.2rem;
+	font-size: 0.72rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--gold);
+}
+
+.card-pick-procon {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 0 1rem;
+}
+
+.card-all {
+	margin: 1rem 0;
+	border: 1px solid var(--border);
+	padding: 0.8rem 1rem;
+}
+
+.card-all summary {
+	cursor: pointer;
+	color: var(--gold);
+	font-size: 0.9rem;
+}
+
+.card-all-row {
+	padding: 0.9rem 0;
+	border-top: 1px solid var(--border);
+	font-size: 0.85rem;
+	color: var(--text-muted);
+}
+
+.card-all-row p {
+	margin: 0.3rem 0 0;
+}
+
+.card-all-row em {
+	font-style: normal;
+	color: var(--text);
+}
+
+.card-all-head {
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+	color: var(--text);
+}
+
+.card-all-head span {
+	color: var(--gold);
+	white-space: nowrap;
+}
+
+.card-all-out {
+	opacity: 0.55;
+}
