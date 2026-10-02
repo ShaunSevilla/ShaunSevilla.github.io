@@ -144,7 +144,7 @@
 					cardDetail(best, "Top pick") + cardDetail(backup, "Also consider");
 				html += `<details class="card-all"><summary>See how all ${CARDS.length} cards compare for you</summary>`;
 				ranked.forEach((r, i) => {
-					html += `<div class="card-all-row${r.eligible ? "" : " card-all-out"}"><div class="card-all-head"><strong>${i + 1}. ${r.card.name}</strong><span>${r.eligible ? (r.s >= 6 ? "Strong fit" : r.s >= 2 ? "Decent fit" : "Weak fit") : "Not eligible"}</span></div>` +
+					html += `<div class="card-all-row${r.eligible ? "" : " card-all-out"}"><div class="card-all-head"><strong>${i + 1}. ${r.card.name}</strong> <span>${r.eligible ? (r.s >= 6 ? "Strong fit" : r.s >= 2 ? "Decent fit" : "Weak fit") : "Not eligible"}</span></div>` +
 						`<p>${esc(r.card.facts)}</p>` +
 						(r.fits.length ? `<p><em>Fits:</em> ${esc(r.fits.join("; "))}.</p>` : "") +
 						(r.misses.length ? `<p><em>Doesn't fit:</em> ${esc(r.misses.join("; "))}.</p>` : "") +

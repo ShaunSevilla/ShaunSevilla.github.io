@@ -33,7 +33,7 @@
 			html += `<div class="strength-rows">`;
 			r.results.forEach((x) => {
 				const fill = Math.max(2, Math.min(100, x.percentile));
-				html += `<div class="strength-row"><div class="strength-row-head"><span>${x.label} · ${x.value} ${x.unit}</span><strong>${x.level}</strong></div>` +
+				html += `<div class="strength-row"><div class="strength-row-head"><span>${x.label} · ${x.value} ${x.unit}</span> <strong>${x.level}</strong></div>` +
 					`<div class="strength-bar"><i style="width:${fill}%"></i></div>` +
 					`<p>Stronger than ${pct(x.percentile)} of lifters, about ${pct(x.world)} of adults.${x.next !== null ? ` ${x.nextLevel} at ${x.next} ${x.unit}.` : " That's Elite."}</p></div>`;
 			});
