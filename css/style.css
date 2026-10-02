@@ -3605,3 +3605,65 @@ footer span {
 	margin: 0 0 0.5rem;
 	color: var(--text-muted);
 }
+
+/* Fitness: strength check */
+.fitness-strength-section {
+	padding: var(--section-space) 0;
+	border-top: 1px solid var(--border);
+}
+
+.fitness-strength-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+	gap: var(--component-gap);
+	align-items: start;
+}
+
+.fitness-strength-copy h2 {
+	margin: 0.6rem 0 1rem;
+}
+
+.fitness-strength-copy p {
+	color: var(--text-muted);
+}
+
+.strength-rows {
+	display: grid;
+	gap: 1rem;
+	margin: 1.2rem 0;
+}
+
+.strength-row-head {
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+	font-size: 0.9rem;
+}
+
+.strength-row-head strong {
+	color: var(--gold);
+}
+
+.strength-bar {
+	height: 6px;
+	margin: 0.45rem 0;
+	background: var(--border);
+}
+
+.strength-bar i {
+	display: block;
+	height: 100%;
+	background: var(--gold);
+}
+
+.strength-row p {
+	margin: 0;
+	font-size: 0.82rem;
+	color: var(--text-muted);
+}
+
+@media (max-width: 980px) {
+	.fitness-strength-grid {
+		grid-template-columns: 1fr;
+	}
+}

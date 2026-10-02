@@ -77,10 +77,44 @@
 					</div>
 				</div>
 			</section>
+			<section class="fitness-strength-section" id="strength">
+				<div class="container">
+					<div class="fitness-strength-grid">
+						<div class="fitness-strength-copy">
+							<span class="section-label">Strength Check</span>
+							<h2>How strong are you, really?</h2>
+							<p>Fill in what you know. Skip the rest. See where you stand against people who lift, and against the world.</p>
+						</div>
+						<article class="calculator-card">
+							<form class="booking-form calculator-form" id="strength-form">
+								<label><span>Sex</span>
+									<select id="strength-sex">
+										<option value="male">Male</option>
+										<option value="female">Female</option>
+									</select>
+								</label>
+								<label><span>Bodyweight (kg)</span><input type="number" id="strength-bw" min="35" max="200" step="0.1" inputmode="decimal" placeholder="75" required /></label>
+								<p class="calculator-field-hint tax-group-hint">Your best for one rep. Leave blank if you don't do it.</p>
+								<label><span>Bench press (kg) <em>Optional</em></span><input type="number" id="strength-bench" min="0" max="400" step="0.5" inputmode="decimal" placeholder="Blank = skip" /></label>
+								<label><span>Squat (kg) <em>Optional</em></span><input type="number" id="strength-squat" min="0" max="500" step="0.5" inputmode="decimal" placeholder="Blank = skip" /></label>
+								<label><span>Deadlift (kg) <em>Optional</em></span><input type="number" id="strength-deadlift" min="0" max="500" step="0.5" inputmode="decimal" placeholder="Blank = skip" /></label>
+								<p class="calculator-field-hint tax-group-hint">Most in one go, good form.</p>
+								<label><span>Push-ups <em>Optional</em></span><input type="number" id="strength-pushups" min="0" max="300" step="1" inputmode="numeric" placeholder="Blank = skip" /></label>
+								<label><span>Pull-ups <em>Optional</em></span><input type="number" id="strength-pullups" min="0" max="100" step="1" inputmode="numeric" placeholder="Blank = skip" /></label>
+								<button type="submit" class="booking-submit">See where I rank</button>
+								<p class="booking-status" id="strength-status" role="status"></p>
+							</form>
+							<div class="calculator-result" id="strength-result" hidden></div>
+						</article>
+					</div>
+				</div>
+			</section>
 		</main>
 
 		<footer id="site-footer" class="site-footer"></footer>
 		<script src="../js/layout.js"></script>
 		<script src="../js/main.js"></script>
+		<script src="../js/shared/strengthStandards.js"></script>
+		<script src="../js/strength-check.js"></script>
 	</body>
 </html>
