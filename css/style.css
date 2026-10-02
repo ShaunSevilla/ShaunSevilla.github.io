@@ -3733,3 +3733,85 @@ footer span {
 .card-all-out {
 	opacity: 0.55;
 }
+
+/* Booking: what to expect */
+.booking-expect {
+	padding: 0 0 1rem;
+}
+
+.booking-expect-grid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 1rem;
+	margin-top: 1rem;
+}
+
+.booking-expect-grid article {
+	padding: 1.2rem 1.25rem;
+	border: 1px solid var(--border);
+	background: var(--surface);
+}
+
+.booking-expect-grid span {
+	color: var(--gold);
+	font-size: 0.75rem;
+	letter-spacing: 0.1em;
+}
+
+.booking-expect-grid h3 {
+	margin: 0.4rem 0 0.5rem;
+	font-size: 1.15rem;
+}
+
+.booking-expect-grid p {
+	margin: 0;
+	font-size: 0.88rem;
+	line-height: 1.6;
+	color: var(--text-muted);
+}
+
+@media (max-width: 980px) {
+	.booking-expect-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 560px) {
+	.booking-expect-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* Send this to a friend */
+.share-friend {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.share-friend-btn,
+.share-friend-links a,
+.share-friend-links button {
+	padding: 0.7rem 1rem;
+	border: 1px solid var(--gold-dim);
+	background: transparent;
+	color: var(--gold);
+	font: inherit;
+	font-size: 0.78rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.share-friend-links:not([hidden]) {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.share-friend-status {
+	font-size: 0.8rem;
+	color: var(--text-muted);
+}

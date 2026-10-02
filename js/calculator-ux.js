@@ -135,6 +135,11 @@
 		actions.innerHTML =
 			topicChips(details, summary) +
 			'<a class="bot-cta-link bot-cta-primary" href="booking.html?' + params.toString() + '">Discuss this with Shaun <i class="fas fa-arrow-right" aria-hidden="true"></i></a>';
+		if (window.ShareFriend) {
+			const url = location.origin + location.pathname + "#" + details.id;
+			const name = details.dataset.calculator || "money";
+			actions.appendChild(window.ShareFriend.shareButton(url, `Try this free ${name} calculator for Singapore:`));
+		}
 		resultBox.appendChild(actions);
 
 		// On phones the result lands below the fold; bring it up.

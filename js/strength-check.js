@@ -43,6 +43,12 @@
 			}
 			html += `<p class="calculator-note">How this works: lift levels come from Strength Level's standards, built from millions of lifts logged by its users (Beginner beats 5% of lifters, Novice 20%, Intermediate 50%, Advanced 80%, Elite 95%), adjusted for your bodyweight. "Of the world" is an estimate: only about 23% of adults strength train twice a week (a 2024 review of 2.6 million people), and we assume everyone else sits around the Beginner-to-Novice level. It doesn't adjust for age. Just for fun, not a fitness assessment.</p>`;
 			box.innerHTML = html;
+			if (window.ShareFriend) {
+				const actions = document.createElement("div");
+				actions.className = "calculator-actions";
+				actions.appendChild(window.ShareFriend.shareButton(location.origin + location.pathname + "#strength", "How strong are you compared with the world? Try this:"));
+				box.appendChild(actions);
+			}
 			box.hidden = false;
 			if (box.getBoundingClientRect().top > window.innerHeight * 0.6) box.scrollIntoView({ behavior: "smooth", block: "start" });
 		});
