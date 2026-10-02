@@ -773,6 +773,16 @@ section {
 	transform: scaleX(-1);
 }
 
+/* Desktop: bring the photo in next to the intro so he points at the
+   heading instead of standing at the far edge. */
+@media (min-width: 981px) {
+	.booking-hero .page-hero-photo {
+		right: auto;
+		left: min(calc(760px + 3rem), 72%);
+		opacity: 0.7;
+	}
+}
+
 .detail-intro {
 	max-width: 760px;
 	font-size: 1rem;
