@@ -4,11 +4,11 @@
 //   Prosperity_Bot/src/shared/insurance.js
 //   ShaunSevilla.github.io/js/shared/insurance.js
 //
-// Benchmarks (LIA Singapore / MoneySense Basic Financial Planning Guide):
-//   death and total permanent disability (TPD): 9x annual income
-//   critical illness (CI): 4x annual income
-//   premiums: at most 15% of take-home pay
-// Shaun's buffer for debts and inflation: 10x and 5x.
+// Shaun's planning benchmarks (a little above LIA Singapore / MoneySense's
+// 9x and 4x, to leave room for debts and inflation):
+//   death and total permanent disability (TPD): 10x annual income
+//   critical illness (CI): 5x annual income
+//   premiums: within about 10% of income
 (function (root, factory) {
 	if (typeof module === "object" && module.exports) {
 		module.exports = factory();
@@ -16,12 +16,9 @@
 		root.Insurance = factory();
 	}
 })(typeof self !== "undefined" ? self : this, function () {
-	const DEATH_TPD_X = 9;
-	const CI_X = 4;
-	const BUFFER_DEATH_TPD_X = 10;
-	const BUFFER_CI_X = 5;
-	const PREMIUM_CEILING = 0.15; // of take-home
-	const TAKE_HOME_SHARE = 0.8; // after 20% employee CPF
+	const DEATH_TPD_X = 10;
+	const CI_X = 5;
+	const PREMIUM_SHARE = 0.1; // of monthly income
 
 	function money(value) {
 		return `$${Math.round(Number(value) || 0).toLocaleString("en-SG")}`;
@@ -41,9 +38,7 @@
 			annualIncome: Math.round(annual),
 			deathTpd: Math.round(deathTpd),
 			ci: Math.round(ci),
-			bufferDeathTpd: Math.round(annual * BUFFER_DEATH_TPD_X),
-			bufferCi: Math.round(annual * BUFFER_CI_X),
-			premiumCeiling: Math.round(monthly * TAKE_HOME_SHARE * PREMIUM_CEILING),
+			premiumCeiling: Math.round(monthly * PREMIUM_SHARE),
 			existingDeathTpd,
 			existingCi,
 			gapDeathTpd: existingDeathTpd === null ? null : Math.max(0, Math.round(deathTpd - existingDeathTpd)),
@@ -63,14 +58,13 @@
 			rows.push(["Critical illness you have", money(r.existingCi)]);
 			rows.push(["Critical illness gap to the benchmark", r.gapCi > 0 ? money(r.gapCi) : "None, you're at or above it"]);
 		}
-		rows.push(["With debts or people depending on you, more makes sense", `${money(r.bufferDeathTpd)} death & TPD (10x), ${money(r.bufferCi)} CI (5x)`]);
 		const askedAboutCover = r.existingDeathTpd !== null || r.existingCi !== null;
 		const notes = [
 			askedAboutCover
 				? "Count all of it: your own policies, any cover from work, and CPF's Dependants' Protection Scheme (up to $70,000 until 65). MediShield Life and CareShield Life pay hospital bills and disability income, not these lump sums, so they don't count here."
 				: "Do you know how much you already have? Add your existing cover to see your gap. CPF's Dependants' Protection Scheme (up to $70,000 until 65) and cover from work count too.",
-			`Keep premiums under about ${money(r.premiumCeiling)}/month, 15% of your take-home pay (the MoneySense guide's ceiling, not a target).`,
-			"The benchmarks are LIA Singapore's and MoneySense's guide for people starting work: 9x annual income for death and disability, 4x for critical illness. A simple benchmark, not personalised advice; your real needs depend on dependants, debts, health and budget.",
+			`Aim to keep premiums within about ${money(r.premiumCeiling)}/month, 10% of your income.`,
+			"The benchmark is 10x annual income for death and disability and 5x for critical illness, a little above LIA Singapore's 9x and 4x guide to leave room for debts and inflation. A starting point, not personalised advice; your real needs depend on dependants, debts, health and budget.",
 		];
 		return { lead, rows, notes, askedAboutCover };
 	}

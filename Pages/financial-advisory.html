@@ -333,7 +333,7 @@
 						</summary>
 						<div class="calculator-dropdown-body">
 							<article class="calculator-card">
-								<p class="calculator-card-note">A simple benchmark based on your income, using the life insurance industry's guideline (9x annual income for death and total permanent disability, 4x for critical illness).</p>
+								<p class="calculator-card-note">A simple benchmark based on your income, planning for 10x annual income for death and total permanent disability and 5x for critical illness (a little above the industry's 9x and 4x guide), with premiums within about 10% of income.</p>
 								<form class="booking-form calculator-form" id="insurance-form">
 									<label><span>Monthly income ($)</span><input type="number" id="insurance-income" min="0" step="1" placeholder="4000" required /></label>
 									<label><span>Death & TPD cover you already have ($) <em>Optional</em></span><input type="number" id="insurance-have-life" min="0" step="1" placeholder="Blank = skip. Include work cover and CPF DPS" /></label>
@@ -369,6 +369,65 @@
 						</div>
 					</details>
 
+					<details class="calculator-dropdown" id="cards" data-calculator="Credit card finder" data-bot-start="cards">
+						<summary>
+							<div>
+								<h3><i class="fas fa-credit-card" aria-hidden="true"></i> Which Credit Card Suits Me?</h3>
+								<p>Six quick questions to find the card that fits how you actually spend.</p>
+							</div>
+							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
+						</summary>
+						<div class="calculator-dropdown-body">
+							<article class="calculator-card">
+								<form class="booking-form calculator-form" id="cards-form">
+									<label><span>Do you pay your card bill in full every month?</span>
+										<select id="cards-payfull">
+											<option value="yes">Yes, always</option>
+											<option value="no">Not always</option>
+										</select>
+									</label>
+									<label><span>What would you rather get back?</span>
+										<select id="cards-goal">
+											<option value="cash">Cash, now</option>
+											<option value="miles">Air miles, for trips</option>
+										</select>
+									</label>
+									<label><span>Roughly how much do you put on cards each month?</span>
+										<select id="cards-spend">
+											<option value="low">Under $600</option>
+											<option value="mid">$600 to $800</option>
+											<option value="upper">$800 to $1,500</option>
+											<option value="high">More than $1,500</option>
+										</select>
+									</label>
+									<label><span>Where does most of it go?</span>
+										<select id="cards-where">
+											<option value="mix">A bit of everything</option>
+											<option value="online">Online shopping and food delivery</option>
+											<option value="contactless">Tapping my phone in shops</option>
+											<option value="dining">Eating out</option>
+										</select>
+									</label>
+									<label><span>How much effort do you want to put in?</span>
+										<select id="cards-style">
+											<option value="simple">Keep it simple, one card</option>
+											<option value="optimise">Happy to track categories and caps</option>
+										</select>
+									</label>
+									<label><span>How often do you spend overseas?</span>
+										<select id="cards-travel">
+											<option value="rarely">Rarely</option>
+											<option value="often">A few trips a year or more</option>
+										</select>
+									</label>
+									<button type="submit" class="booking-submit">Find my card</button>
+									<p class="booking-status" id="cards-status" role="status"></p>
+								</form>
+								<div class="calculator-result" id="cards-result" hidden></div>
+							</article>
+						</div>
+					</details>
+
 					<p class="money-guide-disclaimer">Estimates based on today's rules, which can change. Not personalised advice.</p>
 				</div>
 			</section>
@@ -397,6 +456,7 @@
 		<script src="../js/shared/cpfProjection.js"></script>
 		<script src="../js/cpf-calculator.js"></script>
 		<script src="../js/compound-calculator.js"></script>
+		<script src="../js/card-finder.js"></script>
 		<script src="../js/shared/taxRelief.js"></script>
 		<script src="../js/shared/affordability.js"></script>
 		<script src="../js/tools.js"></script>
