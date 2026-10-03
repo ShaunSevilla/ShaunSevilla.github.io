@@ -13,6 +13,7 @@ education, leadership experience, and contact information.
 - `Pages/fitness-sports.html` — training and sports background
 - `Pages/contact.html` — email and social links
 - `Pages/booking.html` — live Supabase consultation booking
+- `Pages/market-update.html` — inflation, jobs and economy figures; shows only the snapshot Shaun approved on Telegram (`js/market-update.js`)
 
 ## Shared files
 
@@ -28,6 +29,7 @@ education, leadership experience, and contact information.
 - `supabase/migrations/001_create_consultation_bookings.sql` — clean booking database installation
 - `supabase/migrations/002_notify_telegram_on_booking.sql` — Telegram admin notification on new booking
 - `supabase/migrations/003_restore_notion_sync_trigger.sql` — Notion booking sync trigger
+- `supabase/migrations/004_market_update_and_bot_users.sql` — market snapshots (pending/published), `get_published_market_update()` for this site, and the bot's `bot_users` table; run it once in Supabase before the bot's new features work
 - `supabase/functions/notify-telegram-booking/index.ts` — sends a Telegram message on new booking
 - `supabase/functions/sync-booking-to-notion/index.ts` — one-way Notion booking synchronization
 
