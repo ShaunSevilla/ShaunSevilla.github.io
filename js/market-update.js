@@ -63,6 +63,34 @@ function buildSection(section) {
 	return wrapper;
 }
 
+const DAILY_BLOCKS = [
+	{ key: "drivers", title: "What's driving the market", max: 6, ordered: false },
+	{ key: "growth", title: "Growth to watch", max: 3, ordered: true },
+	{ key: "value", title: "Value to watch", max: 3, ordered: true },
+	{ key: "etfs", title: "ETFs to watch", max: 3, ordered: true },
+	{ key: "startups", title: "Startups to watch (high risk, often unlisted)", max: 3, ordered: true },
+];
+
+// Today's watchlist: sector drivers plus the top 3 of each list. Text only.
+function buildDaily(daily) {
+	const wrapper = el("section", "mu-section mu-daily");
+	wrapper.appendChild(el("h2", "mu-section-title", "☀️ Today's watchlist"));
+	const grid = el("div", "mu-daily-grid");
+	for (const block of DAILY_BLOCKS) {
+		const items = Array.isArray(daily[block.key]) ? daily[block.key].slice(0, block.max) : [];
+		if (!items.length) continue;
+		const card = el("div", "mu-daily-card");
+		card.appendChild(el("h3", "mu-daily-title", block.title));
+		const list = el(block.ordered ? "ol" : "ul", "mu-daily-list");
+		for (const item of items) list.appendChild(el("li", "", String(item).replace(/^\s*(?:[-•*]|\d+[.)])\s*/, "")));
+		card.appendChild(list);
+		grid.appendChild(card);
+	}
+	wrapper.appendChild(grid);
+	wrapper.appendChild(el("p", "mu-daily-note", "Research ideas for learning, not recommendations."));
+	return grid.children.length ? wrapper : null;
+}
+
 function formatPublished(value) {
 	const date = value ? new Date(value) : null;
 	if (!date || Number.isNaN(date.getTime())) return "";
@@ -93,6 +121,10 @@ async function initMarketUpdate() {
 		return;
 	}
 
+	if (result.data.daily) {
+		const daily = buildDaily(result.data.daily);
+		if (daily) container.appendChild(daily);
+	}
 	for (const section of sections) container.appendChild(buildSection(section));
 
 	const published = formatPublished(result.published_at);

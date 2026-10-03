@@ -3990,3 +3990,11 @@ footer span {
 		text-transform: uppercase;
 	}
 }
+
+/* Market Update: today's watchlist */
+.mu-daily-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.mu-daily-card { padding: 14px 16px; border: 1px solid var(--border, rgba(0, 0, 0, 0.12)); border-radius: 12px; }
+.mu-daily-title { margin: 0 0 8px; font-size: 1rem; }
+.mu-daily-list { margin: 0; padding-left: 1.2em; line-height: 1.5; }
+.mu-daily-list li + li { margin-top: 4px; }
+.mu-daily-note { margin: 10px 0 0; font-size: 0.85rem; opacity: 0.75; }
