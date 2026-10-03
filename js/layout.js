@@ -66,6 +66,8 @@
 					<a href="${root}/Pages/financial-advisory.html#calculators">Calculators</a>
 					<a href="${root}/Pages/money-quiz.html">Money Persona Quiz</a>
 					<a href="${root}/Pages/sg-money-guide.html">Money Guide</a>
+					<a href="${root}/Pages/financial-advisory.html#cards">Card Finder</a>
+					<a href="${root}/Pages/fitness-sports.html#strength">Strength Check</a>
 					<a href="https://t.me/ProsperityPath_bot?start=menu" target="_blank" rel="noopener noreferrer">Telegram Bot</a>
 					<a href="${root}/Pages/booking.html">Book a Chat</a>
 				</p>
