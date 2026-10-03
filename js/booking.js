@@ -4,6 +4,28 @@ const BOOKING_DAYS_TO_SHOW = 14;
 const CONTACT_STORAGE_KEY = "ss-booking-contact-v1";
 const TELEGRAM_URL = "https://t.me/ShaunSevilla";
 const SUBMIT_READY_LABEL = "Confirm Consultation";
+const SUBMIT_READY_LABEL_QUICK = "Confirm 15-minute chat";
+const QUICK_MINUTES = 15;
+// A quick chat still reserves the whole two-hour window on Shaun's side; it
+// runs for the first 15 minutes of it, and the notes are tagged so the
+// Telegram and Notion alerts show which kind it is.
+const QUICK_TAG = "[Quick 15-min chat]";
+
+function isQuick() {
+	const picked = document.querySelector('input[name="booking-type"]:checked');
+	return Boolean(picked && picked.value === "quick");
+}
+
+// "08:00:00" + 15 min -> "08:15:00"
+function addMinutes(value, minutes) {
+	const [h, m] = String(value).split(":").map(Number);
+	const total = h * 60 + m + minutes;
+	return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}:00`;
+}
+
+function displayEnd(slot) {
+	return isQuick() ? addMinutes(slot.start_time, QUICK_MINUTES) : slot.end_time;
+}
 const SUBMIT_WAITING_LABEL = "Choose a time first";
 
 const bookingState = {
@@ -53,7 +75,7 @@ function escapeHtml(value) {
 function setSubmitReady(ready) {
 	const submit = document.getElementById("booking-submit");
 	submit.disabled = !ready;
-	submit.textContent = ready ? SUBMIT_READY_LABEL : SUBMIT_WAITING_LABEL;
+	submit.textContent = ready ? (isQuick() ? SUBMIT_READY_LABEL_QUICK : SUBMIT_READY_LABEL) : SUBMIT_WAITING_LABEL;
 }
 
 function readSavedContact() {
@@ -81,8 +103,8 @@ function toCalendarTime(value) {
 function buildCalendarLinks(slot) {
 	const day = slot.booking_date.replace(/-/g, "");
 	const start = `${day}T${toCalendarTime(slot.start_time)}`;
-	const end = `${day}T${toCalendarTime(slot.end_time)}`;
-	const title = "Consultation with Shaun Sevilla";
+	const end = `${day}T${toCalendarTime(displayEnd(slot))}`;
+	const title = isQuick() ? "Quick chat with Shaun Sevilla" : "Consultation with Shaun Sevilla";
 	const details = "Shaun will reach out using the contact details you gave to confirm where to meet.";
 
 	const google = `https://calendar.google.com/calendar/render?${new URLSearchParams({
@@ -123,7 +145,7 @@ function showConfirmation(slot) {
 	const links = buildCalendarLinks(slot);
 	status.className = "booking-status success";
 	status.innerHTML = `
-		<strong>You're booked in: ${escapeHtml(formatDisplayDate(slot.booking_date))}, ${escapeHtml(formatTime(slot.start_time))} &ndash; ${escapeHtml(formatTime(slot.end_time))} (SGT).</strong>
+		<strong>You're booked in${isQuick() ? " for a quick 15-minute chat" : ""}: ${escapeHtml(formatDisplayDate(slot.booking_date))}, ${escapeHtml(formatTime(slot.start_time))} &ndash; ${escapeHtml(formatTime(displayEnd(slot)))} (SGT).</strong>
 		I&rsquo;ll contact you using the details you gave.
 		<span class="booking-calendar-links">
 			<a href="${links.google}" target="_blank" rel="noopener noreferrer">Add to Google Calendar</a>
@@ -224,7 +246,7 @@ function renderTimeSlots() {
 					data-slot="${slot.slot_key}"
 					${slot.is_available ? "" : "disabled"}
 				>
-					<span>${formatTime(slot.start_time)} &ndash; ${formatTime(slot.end_time)}</span>
+					<span>${formatTime(slot.start_time)} &ndash; ${formatTime(displayEnd(slot))}</span>
 					<small>${slot.is_available ? "Available" : "Booked"}</small>
 				</button>
 			`,
@@ -290,7 +312,7 @@ async function submitBooking(event) {
 			requested_slot: bookingState.selectedSlot,
 			requested_name: formData.get("name"),
 			requested_contact: formData.get("contact"),
-			requested_notes: formData.get("notes"),
+			requested_notes: isQuick() ? `${QUICK_TAG} ${formData.get("notes") || ""}`.trim().slice(0, 1000) : formData.get("notes"),
 		});
 
 		saveContact(formData.get("name"), formData.get("contact"));
@@ -317,6 +339,12 @@ function initializeBooking() {
 	const form = document.getElementById("booking-form");
 	if (!form) return;
 	form.addEventListener("submit", submitBooking);
+	document.querySelectorAll('input[name="booking-type"]').forEach((input) => {
+		input.addEventListener("change", () => {
+			renderTimeSlots();
+			setSubmitReady(Boolean(bookingState.selectedSlot));
+		});
+	});
 	applyPrefill(form);
 	loadAvailability();
 }

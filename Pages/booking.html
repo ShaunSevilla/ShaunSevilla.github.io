@@ -18,7 +18,7 @@
 		<meta name="twitter:card" content="summary_large_image" />
 		<link rel="icon" type="image/png" sizes="64x64" href="../assets/favicon-64.png" />
 		<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
-		<link rel="stylesheet" href="../css/style.css?v=20261003b" />
+		<link rel="stylesheet" href="../css/style.css?v=20261003c" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 	</head>
 	<body data-root=".." data-page="booking">
@@ -32,8 +32,8 @@
 						<h1 class="section-title">Book a Consultation</h1>
 						<div class="section-line"></div>
 						<p class="detail-intro">
-							Choose a two-hour consultation window and tell me what you would
-							like to discuss. Available times update automatically.
+							Book a full two-hour consultation, or a quick 15-minute chat if you'd
+							like to see whether it's a fit first. Available times update automatically.
 						</p>
 						<p class="detail-intro booking-alt">
 							Prefer Telegram? <a href="https://t.me/ProsperityPath_bot?start=book" target="_blank" rel="noopener noreferrer">Book in the ProsperityPath bot</a>
@@ -61,6 +61,10 @@
 			<section class="detail-section booking-section">
 				<div class="container booking-layout">
 					<div class="booking-picker">
+						<fieldset class="booking-type" aria-label="Type of session">
+							<label class="booking-type-option"><input type="radio" name="booking-type" value="full" checked /><span><strong>Full consultation</strong><small>Two hours. We go through everything.</small></span></label>
+							<label class="booking-type-option"><input type="radio" name="booking-type" value="quick" /><span><strong>Quick 15-minute chat</strong><small>A first hello. No preparation needed.</small></span></label>
+						</fieldset>
 						<div class="booking-step">
 							<span class="booking-step-number">01</span>
 							<div>
@@ -118,6 +122,6 @@
 		<footer id="site-footer" class="site-footer"></footer>
 		<script src="../js/layout.js?v=20261003"></script>
 		<script src="../js/main.js"></script>
-		<script src="../js/booking.js"></script>
+		<script src="../js/booking.js?v=20261003"></script>
 	</body>
 </html>
