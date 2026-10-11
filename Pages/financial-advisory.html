@@ -18,7 +18,7 @@
 		<meta name="twitter:card" content="summary_large_image" />
 		<link rel="icon" type="image/png" sizes="64x64" href="../assets/favicon-64.png" />
 		<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
-		<link rel="stylesheet" href="../css/style.css?v=20261012" />
+		<link rel="stylesheet" href="../css/style.css?v=20261012b" />
 		<link
 			rel="stylesheet"
 			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -183,7 +183,7 @@
 						</summary>
 						<div class="calculator-dropdown-body">
 							<article class="calculator-card">
-								<p class="calculator-card-note">Keeps an emergency buffer untouched first: 6 months of spending, or 6 months of pay if people depend on you.<span class="afford-home-fields"> Home: the loan instalment stays within 30% of your gross pay. Shows a BTO by default; tick a resale grant to see resale instead.</span><span class="afford-car-note"> Car or bike: the loan instalment stays under 10% of your take-home pay (15% is a stretch).</span></p>
+								<p class="calculator-card-note">Keeps an emergency buffer untouched first: 6 months of spending, or 6 months of pay if people depend on you.<span class="afford-home-fields"> Home: the loan instalment stays within 30% of your gross pay.</span><span class="afford-car-note"> Car or bike: the loan instalment stays under 10% of your take-home pay (15% is a stretch).</span></p>
 								<form class="booking-form calculator-form" id="afford-form">
 									<fieldset class="afford-plan">
 										<legend>What do you want to plan for? <em>Tick all that apply.</em></legend>
@@ -192,30 +192,37 @@
 										<label class="check-row"><input type="checkbox" id="afford-plan-bike" value="bike" /><span>🏍️ A motorbike</span></label>
 									</fieldset>
 									<label><span>Age</span><input type="number" id="afford-age" min="18" max="100" step="1" placeholder="28" required /></label>
-									<label><span>Monthly salary before CPF ($)</span><input type="number" id="afford-pay" min="0" step="1" placeholder="5000" required /></label>
-									<div class="afford-home-fields">
-										<label><span>Buying with</span>
-											<select id="afford-with">
-												<option value="alone">Just me</option>
-												<option value="partner">My partner</option>
-											</select>
-										</label>
-										<label id="afford-partner-field" hidden><span>Partner's monthly salary before CPF ($)</span><input type="number" id="afford-partner-pay" min="0" step="1" placeholder="4500" /></label>
-									</div>
+									<label class="afford-home-fields"><span>Buying with</span>
+										<select id="afford-with">
+											<option value="alone">Just me</option>
+											<option value="partner">My partner</option>
+										</select>
+									</label>
+									<label><span id="afford-pay-label">Monthly salary before CPF ($)</span><input type="number" id="afford-pay" min="0" step="1" placeholder="5000" required /></label>
 									<label><span>Cash in the bank ($)</span><input type="number" id="afford-savings" min="0" step="1" placeholder="40000" required /></label>
 									<label class="afford-home-fields"><span>CPF Ordinary Account balance ($) <em>Optional</em></span><input type="number" id="afford-cpf" min="0" step="1" placeholder="Blank = $0" /></label>
-									<fieldset class="afford-home-fields afford-grants">
-										<legend>Grants <em>Pick BTO or resale, not both.</em></legend>
-										<label class="check-row"><input type="checkbox" id="afford-ehg" /><span>BTO, first flat: Enhanced CPF Housing Grant <small id="afford-ehg-hint">(up to $120,000, household income up to $9,000)</small></span></label>
-										<label class="check-row"><input type="checkbox" id="afford-family-grant" /><span>Resale, first flat: CPF Housing Grant <small>($80,000 couples, $40,000 singles, plus your Enhanced CPF Housing Grant if eligible)</small></span></label>
-										<label><span>Resale near parents: Proximity Housing Grant</span>
-											<select id="afford-proximity">
-												<option value="none">No</option>
-												<option value="with">Living with parents ($30,000 couples, $15,000 singles)</option>
-												<option value="near">Within 4 km of parents ($20,000 couples, $10,000 singles)</option>
+									<div class="afford-home-fields">
+										<label><span>New or resale flat?</span>
+											<select id="afford-flat">
+												<option value="bto">BTO (new flat)</option>
+												<option value="resale">Resale</option>
 											</select>
 										</label>
-									</fieldset>
+										<label><span>First flat from HDB, and a Singapore citizen?</span>
+											<select id="afford-first">
+												<option value="yes">Yes, count the grants I'd qualify for</option>
+												<option value="no">No grants</option>
+											</select>
+										</label>
+										<p class="calculator-field-hint" id="afford-ehg-hint"></p>
+										<label id="afford-proximity-field"><span>Near your parents? Proximity Housing Grant</span>
+											<select id="afford-proximity">
+												<option value="none">No</option>
+												<option value="with">Living with them ($30,000 couples, $15,000 singles)</option>
+												<option value="near">Within 4 km ($20,000 couples, $10,000 singles)</option>
+											</select>
+										</label>
+									</div>
 									<label><span>Does anyone depend on you financially? <small>(sets your emergency buffer: 6 months of pay if yes, 6 months of spending if not)</small></span>
 										<select id="afford-dependants">
 											<option value="no">No</option>
@@ -548,9 +555,9 @@
 		<script src="../js/compound-calculator.js"></script>
 		<script src="../js/card-finder.js?v=20261002"></script>
 		<script src="../js/shared/taxRelief.js"></script>
-		<script src="../js/shared/affordability.js?v=20261012"></script>
-		<script src="../js/tools.js?v=20261012"></script>
+		<script src="../js/shared/affordability.js?v=20261012b"></script>
+		<script src="../js/tools.js?v=20261012b"></script>
 		<script src="../js/share.js?v=20261003"></script>
-		<script src="../js/calculator-ux.js?v=20261012"></script>
+		<script src="../js/calculator-ux.js?v=20261012b"></script>
 	</body>
 </html>

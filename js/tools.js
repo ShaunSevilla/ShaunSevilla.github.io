@@ -197,36 +197,24 @@
 			form.closest(".calculator-card").querySelectorAll(".afford-car-note").forEach(function (el) {
 				el.hidden = !plan().includes("car") && !plan().includes("bike");
 			});
-			document.getElementById("afford-partner-field").hidden = !wantsHome || value("afford-with") !== "partner";
+			const together = wantsHome && value("afford-with") === "partner";
+			document.getElementById("afford-pay-label").textContent = together ? "Combined monthly income before CPF, both of you ($)" : "Monthly salary before CPF ($)";
+			document.getElementById("afford-pay").placeholder = together ? "9500" : "5000";
+			document.getElementById("afford-proximity-field").hidden = value("afford-flat") !== "resale";
 			document.getElementById("afford-expenses-field").hidden = value("afford-dependants") === "yes";
-			const pay = (numberValue("afford-pay") || 0) + (value("afford-with") === "partner" ? numberValue("afford-partner-pay") || 0 : 0);
+			const pay = numberValue("afford-pay") || 0;
 			const hint = document.getElementById("afford-ehg-hint");
-			if (pay > 0) {
-				const amount = window.Affordability.ehgAmount(pay, value("afford-with") !== "partner");
-				hint.textContent = amount > 0 ? `(about ${formatCurrency(amount)} at your income)` : "($0 at your income, the ceiling is $9,000 for couples, $4,500 for singles)";
+			if (value("afford-first") !== "yes") {
+				hint.textContent = "";
+			} else if (pay > 0) {
+				const amount = window.Affordability.ehgAmount(pay, !together);
+				hint.textContent = amount > 0
+					? `Enhanced CPF Housing Grant: about ${formatCurrency(amount)} at this income.${value("afford-flat") === "resale" ? " Resale also gets the CPF Housing Grant ($80,000 couples, $40,000 singles)." : ""}`
+					: `Enhanced CPF Housing Grant: $0 at this income (it stops at $9,000 for couples, $4,500 for singles).${value("afford-flat") === "resale" ? " The CPF Housing Grant still counts if you're under HDB's income ceiling." : ""}`;
 			} else {
-				hint.textContent = "(up to $120,000, household income up to $9,000)";
+				hint.textContent = "Enhanced CPF Housing Grant: up to $120,000, household income up to $9,000.";
 			}
 		}
-
-		// BTO and resale grants are either/or: ticking one side locks the other.
-		const btoTick = document.getElementById("afford-ehg");
-		const resaleTick = document.getElementById("afford-family-grant");
-		const proximitySelect = document.getElementById("afford-proximity");
-		function lockGrants() {
-			const resalePicked = resaleTick.checked || proximitySelect.value !== "none";
-			resaleTick.disabled = btoTick.checked;
-			proximitySelect.disabled = btoTick.checked;
-			btoTick.disabled = resalePicked;
-			[btoTick, resaleTick, proximitySelect].forEach(function (el) {
-				const row = el.closest("label");
-				if (row) row.classList.toggle("is-disabled", el.disabled);
-			});
-		}
-		[btoTick, resaleTick, proximitySelect].forEach(function (el) {
-			el.addEventListener("change", lockGrants);
-		});
-		lockGrants();
 
 		form.addEventListener("change", updateVisibility);
 		form.addEventListener("input", updateVisibility);
@@ -250,21 +238,25 @@
 				return;
 			}
 			const wantsHome = picked.includes("home");
+			const together = wantsHome && value("afford-with") === "partner";
+			const first = value("afford-first") === "yes";
+			const resale = value("afford-flat") === "resale";
 			const r = window.Affordability.calculate({
 				plan: picked,
 				age,
-				monthlyPay,
-				alone: !wantsHome || value("afford-with") !== "partner",
-				partnerPay: numberValue("afford-partner-pay") || 0,
+				// Couples enter one combined figure, split evenly for CPF.
+				monthlyPay: together ? monthlyPay / 2 : monthlyPay,
+				alone: !together,
+				partnerPay: together ? monthlyPay / 2 : 0,
 				savings,
 				cpfOa: wantsHome ? numberValue("afford-cpf") || 0 : 0,
 				hasDependants: value("afford-dependants") === "yes",
 				monthlyExpenses: numberValue("afford-expenses") || 0,
 				otherDebt: numberValue("afford-debt") || 0,
-				// First-timers get the EHG on resale too, so the resale tick carries it.
-				ehg: wantsHome && (btoTick.checked || resaleTick.checked),
-				familyGrant: wantsHome && document.getElementById("afford-family-grant").checked,
-				proximity: wantsHome ? value("afford-proximity") : "none",
+				ehg: wantsHome && first,
+				familyGrant: wantsHome && first && resale,
+				proximity: wantsHome && resale ? value("afford-proximity") : "none",
+				resale: wantsHome && resale,
 			});
 
 			const bufferBasis = {
@@ -363,6 +355,7 @@
 			});
 			const s = window.Affordability.needSummary(n);
 			let html = headline(s.headlineLabel, s.headline, s.sub);
+			if (s.stretch) html += `<div class="earn-stretch">${headline(s.stretchLabel, s.stretch, s.stretchSub)}</div>`;
 			s.rows.forEach(function (row) { html += resultRow(row[0], row[1]); });
 			s.notes.forEach(function (text, index) { html += note(text, index === 0 ? "calculator-note-callout" : ""); });
 			html += note("Comfortable means the emergency buffer (6 months of spending, or of pay if people depend on you) stays untouched. Estimates only, not personalised advice.");

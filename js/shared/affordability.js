@@ -809,7 +809,6 @@
 			n.grants.items.forEach((item) => rows.push([item.label, item.amount > 0 ? money(item.amount) : "$0 at this income"]));
 			if (n.type === "bto") rows.push(["Your CPF OA by key collection (~3 years)", `about ${money(n.cpfAtKeys)}`]);
 			rows.push(["Kept aside as your emergency buffer", money(n.buffer)]);
-			if (n.stretchIncome && n.stretchIncome < n.income) rows.push(["Bare minimum the loan rules allow (stretch)", pay(n.stretchIncome)]);
 			const notes = [];
 			if (!n.hdbEligible) {
 				notes.push(`This pay is above HDB's ${money(n.ceiling)} household ceiling, so it's a bank loan with no Enhanced CPF Housing Grant or CPF Housing Grant counted.`);
@@ -817,26 +816,31 @@
 				notes.push("At this pay the Enhanced CPF Housing Grant is $0 (it stops at $9,000 household income, $4,500 for singles), so it isn't counted.");
 			}
 			if (n.singleUnder35) notes.push("Singles can only buy an HDB flat on their own from age 35.");
+			const hasStretch = n.stretchIncome && n.stretchIncome < n.income;
 			return {
 				ok: true,
 				headlineLabel: `To comfortably buy a ${flat} at ${money(n.price)}, you need about`,
 				headline: pay(n.income),
 				sub: `Gross pay before CPF${who}. The instalment stays within 30% of it.`,
+				stretchLabel: "Stretch: the least the loan rules allow",
+				stretch: hasStretch ? pay(n.stretchIncome) : null,
+				stretchSub: hasStretch ? "Passes HDB's and the banks' checks, but uses every dollar of savings and leaves little room each month." : "",
 				rows,
 				notes,
 			};
 		}
 		const name = n.kind === "car" ? "car" : "motorbike";
-		const t0 = n.tiers[0];
 		const twoTiers = n.tiers.length > 1;
 		const high = Math.max(...n.tiers.map((t) => t.income));
+		const low = Math.min(...n.tiers.map((t) => t.income));
+		const stretchHigh = Math.max(...n.tiers.map((t) => t.stretchIncome));
+		const stretchLow = Math.min(...n.tiers.map((t) => t.stretchIncome));
 		const rows = [];
 		n.tiers.forEach((t) => {
 			const tag = twoTiers ? `${t.label}: ` : "";
-			if (twoTiers) rows.push([`${t.label}`, `${pay(t.income)} · ${money(t.downpayment)} down (${Math.round((1 - t.ltv) * 100)}%)`]);
+			if (twoTiers) rows.push([`${t.label}`, `${pay(t.income)} (stretch ${pay(t.stretchIncome)}) · ${money(t.downpayment)} down (${Math.round((1 - t.ltv) * 100)}%)`]);
 			rows.push([`${tag}Loan instalment`, `${money(t.instalment)}/month over ${n.years} years at ${n.ratePercent}% flat`]);
 			if (!twoTiers) rows.push([`Downpayment (${Math.round((1 - t.ltv) * 100)}%, cash)`, money(t.downpayment)]);
-			rows.push([`${tag}Stretch (instalment at 15% of take-home)`, pay(t.stretchIncome)]);
 			rows.push([`${tag}All-in monthly cost`, `${money(t.allInLow)} to ${money(t.allInHigh)}${n.kind === "car" ? " (1.3 to 1.5x the instalment)" : " (instalment plus insurance, road tax, petrol, parking)"}`]);
 		});
 		const notes = [];
@@ -850,8 +854,11 @@
 		return {
 			ok: true,
 			headlineLabel: `To comfortably own a ${name} at ${money(n.price)}, you need about`,
-			headline: twoTiers && high !== t0.income ? `${pay(Math.min(...n.tiers.map((t) => t.income)))} to ${pay(high)}` : pay(t0.income),
+			headline: low !== high ? `${money(low)} to ${pay(high)}` : pay(high),
 			sub: `Gross pay before CPF. Keeps the loan instalment under 10% of your take-home pay.${twoTiers ? " It depends on the car's OMV, so both are shown." : ""}`,
+			stretchLabel: "Stretch: instalment at 15% of take-home",
+			stretch: stretchLow !== stretchHigh ? `${money(stretchLow)} to ${pay(stretchHigh)}` : pay(stretchHigh),
+			stretchSub: "Doable, but less room for savings and surprises.",
 			rows,
 			notes,
 		};

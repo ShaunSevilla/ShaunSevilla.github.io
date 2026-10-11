@@ -4062,3 +4062,14 @@ footer span {
 		grid-template-columns: 1fr;
 	}
 }
+
+/* How Much Do I Need to Earn: the stretch figure, under the comfortable one */
+.earn-stretch .calculator-result-headline {
+	border: 1px dashed var(--border);
+	background: transparent;
+}
+
+.earn-stretch .calculator-result-headline strong {
+	font-size: clamp(1.6rem, 4vw, 2rem);
+	color: var(--text);
+}
