@@ -89,6 +89,7 @@
 	const TOPICS = {
 		tax: ["Is SRS worth it for me?", "CPF top-ups for tax", "Planning for next year's tax"],
 		afford: ["Grants check", "BTO vs resale", "HDB vs bank loan", "Loan offsetting"],
+		earn: ["Can I afford this?", "Grants check", "Growing my income"],
 		hdb: ["Loan offsetting", "HDB vs bank loan", "CPF or cash for my loan?", "Refinancing"],
 		cpf: ["CPF optimisation", "Reaching my retirement sum", "CPF top-ups"],
 		vehicle: ["Loan offsetting", "Cash vs car loan", "Can I afford this car?"],

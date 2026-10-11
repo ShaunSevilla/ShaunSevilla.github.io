@@ -3998,3 +3998,67 @@ footer span {
 .mu-daily-list { margin: 0; padding-left: 1.2em; line-height: 1.5; }
 .mu-daily-list li + li { margin-top: 4px; }
 .mu-daily-note { margin: 10px 0 0; font-size: 0.85rem; opacity: 0.75; }
+
+/* Client services (advisory page) */
+.client-services {
+	padding: 1rem 0 2rem;
+}
+
+.client-services-intro {
+	margin: 0.75rem 0 0;
+	color: var(--text-muted);
+	max-width: 640px;
+}
+
+.client-services-grid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 1rem;
+	margin-top: 1.25rem;
+}
+
+.client-services-grid article {
+	padding: 1.2rem 1.25rem;
+	border: 1px solid var(--border);
+	background: var(--surface);
+}
+
+.client-services-grid i {
+	color: var(--gold);
+	font-size: 1.25rem;
+}
+
+.client-services-grid h3 {
+	margin: 0.6rem 0 0.45rem;
+	font-size: 1.1rem;
+}
+
+.client-services-grid p {
+	margin: 0;
+	font-size: 0.88rem;
+	line-height: 1.6;
+	color: var(--text-muted);
+}
+
+.consultation-perks {
+	margin-top: 0.5rem;
+	font-size: 0.9rem;
+	color: var(--text-muted);
+}
+
+.consultation-perks a {
+	color: var(--gold);
+	white-space: nowrap;
+}
+
+@media (max-width: 980px) {
+	.client-services-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 560px) {
+	.client-services-grid {
+		grid-template-columns: 1fr;
+	}
+}

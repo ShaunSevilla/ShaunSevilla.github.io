@@ -315,6 +315,62 @@
 		});
 	}
 
+	// ------------------------------------------- How much do I need to earn
+	function initEarn() {
+		const form = document.getElementById("earn-form");
+		if (!form || !window.Affordability || !window.Affordability.need) return;
+		const resultBox = document.getElementById("earn-result");
+		const status = document.getElementById("earn-status");
+
+		function updateVisibility() {
+			const item = value("earn-item");
+			const home = item === "bto" || item === "resale";
+			form.querySelectorAll(".earn-home-field").forEach(function (el) { el.hidden = !home; });
+			form.querySelectorAll(".earn-car-field").forEach(function (el) { el.hidden = item !== "car"; });
+			document.getElementById("earn-proximity-field").hidden = item !== "resale";
+			document.getElementById("earn-expenses-field").hidden = value("earn-dependants") === "yes";
+			document.getElementById("earn-price").placeholder = { bto: "450000", resale: "600000", car: "120000", bike: "20000" }[item];
+		}
+		form.addEventListener("change", updateVisibility);
+		updateVisibility();
+
+		form.addEventListener("submit", function (event) {
+			event.preventDefault();
+			setStatus(status, "");
+			const item = value("earn-item");
+			const home = item === "bto" || item === "resale";
+			const price = numberValue("earn-price");
+			const savings = numberValue("earn-savings");
+			const age = numberValue("earn-age");
+			if (!(price > 0) || savings === null || !(savings >= 0) || (home && !(age >= 18))) {
+				setStatus(status, home ? "Please fill in the price, your age and cash in the bank." : "Please fill in the price and cash in the bank.");
+				resultBox.hidden = true;
+				return;
+			}
+			const n = window.Affordability.need({
+				item,
+				price,
+				age,
+				alone: value("earn-with") !== "partner",
+				savings,
+				cpfOa: home ? numberValue("earn-cpf") || 0 : 0,
+				firstTimer: value("earn-first") === "yes",
+				proximity: value("earn-proximity"),
+				hasDependants: value("earn-dependants") === "yes",
+				monthlyExpenses: numberValue("earn-expenses") || 0,
+				otherDebt: numberValue("earn-debt") || 0,
+				omv: value("earn-omv"),
+			});
+			const s = window.Affordability.needSummary(n);
+			let html = headline(s.headlineLabel, s.headline, s.sub);
+			s.rows.forEach(function (row) { html += resultRow(row[0], row[1]); });
+			s.notes.forEach(function (text, index) { html += note(text, index === 0 ? "calculator-note-callout" : ""); });
+			html += note("Comfortable means the emergency buffer (6 months of spending, or of pay if people depend on you) stays untouched. Estimates only, not personalised advice.");
+			resultBox.innerHTML = html;
+			resultBox.hidden = false;
+		});
+	}
+
 	// ----------------------------------------------------------- Insurance
 	// Same benchmark as the bot's Insurance Calculator (calculatorService.js).
 	function initInsurance() {
@@ -346,6 +402,7 @@
 	function init() {
 		initTax();
 		initAfford();
+		initEarn();
 		initInsurance();
 	}
 

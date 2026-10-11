@@ -643,5 +643,219 @@
 		return parts.join(" ");
 	}
 
-	return { calculate, homeSummary, carSummary, bikeSummary, footnote, bsd, ehgAmount, CAR_COMFORT_SHARE, MSR, TDSR, HDB_INCOME_CEILING_FAMILY, HDB_INCOME_CEILING_SINGLE };
+	// ------------------------------------------------- How much do I need to earn?
+	// The reverse: you already have a price in mind. HOME: the lowest pay (in
+	// $100 steps) at which calculate() above calls that flat comfortable, so
+	// every rule is the same as the forward calculator: MSR/TDSR at the
+	// stress rates, 75% LTV, CPF OA, the emergency buffer, and grants only
+	// while the income is under their ceilings (over the HDB ceiling: no
+	// BTO, no HDB loan, no CPF Housing Grant; EHG shrinks to $0 by $9,000).
+	// Couples are taken as earning half each. CAR/BIKE: the pay whose
+	// take-home keeps the instalment under 10% (stretch 15%), and never
+	// below what TDSR needs.
+	const NEED_STEP = 100;
+	const NEED_MAX = 60000;
+
+	function homeAt(o, income) {
+		const half = o.alone ? income : income / 2;
+		return calculate({
+			plan: ["home"],
+			age: o.age,
+			monthlyPay: half,
+			alone: o.alone,
+			partnerPay: half,
+			savings: o.savings,
+			cpfOa: o.cpfOa,
+			hasDependants: o.hasDependants,
+			monthlyExpenses: o.monthlyExpenses,
+			otherDebt: o.otherDebt,
+			ehg: o.firstTimer,
+			familyGrant: o.firstTimer && o.resale,
+			proximity: o.resale ? o.proximity : "none",
+			resale: o.resale,
+		});
+	}
+
+	function homeNeed(o) {
+		const target = Math.ceil(o.price / 1000) * 1000;
+		const wantType = o.resale ? "resale" : "bto";
+		let comfortable = null;
+		let stretch = null;
+		for (let income = NEED_STEP; income <= NEED_MAX; income += NEED_STEP) {
+			const r = homeAt(o, income);
+			if (r.home.type !== wantType) continue;
+			if (!stretch && r.home.maxPrice >= target) stretch = { income, r };
+			if (r.home.price >= target) {
+				comfortable = { income, r };
+				break;
+			}
+		}
+		const due = o.price * (1 - LTV) + bsd(o.price) + LEGAL_AND_FEES;
+		const out = {
+			kind: "home",
+			type: wantType,
+			price: o.price,
+			alone: o.alone,
+			upfront: Math.round(due),
+			stampDuty: bsd(o.price),
+			signing: Math.round(o.price * BTO_SIGNING_SHARE.hdb + bsd(o.price)),
+			ceiling: o.alone ? HDB_INCOME_CEILING_SINGLE : HDB_INCOME_CEILING_FAMILY,
+			singleUnder35: o.alone && o.age < SINGLES_MIN_AGE,
+			stretchIncome: stretch ? stretch.income : null,
+		};
+		if (!comfortable) {
+			out.found = false;
+			// BTO needs income under the HDB ceiling; past it, only resale works.
+			out.btoCeilingHit = wantType === "bto";
+			return out;
+		}
+		const h = comfortable.r.home;
+		const best = h.best;
+		out.found = true;
+		out.income = comfortable.income;
+		out.perPerson = o.alone ? null : comfortable.income / 2;
+		out.hdbEligible = h.hdbEligible;
+		out.loan = best.loan;
+		out.years = best.years;
+		out.ratePercent = best.ratePercent;
+		out.monthly = best.monthly;
+		out.cpfCovers = best.cpfCovers;
+		out.loanAmount = best.loanAmount;
+		out.grants = h.grants;
+		out.buffer = comfortable.r.buffer;
+		out.cpfAtKeys = h.cpfAtKeys;
+		// Grants they asked about that this income no longer gets.
+		out.grantsLost = o.firstTimer && h.grants.items.every((item) => item.key !== "ehg" || item.amount === 0);
+		out.ceilingLost = o.firstTimer && o.resale && !h.hdbEligible;
+		return out;
+	}
+
+	function vehicleNeed(o, kind) {
+		const car = kind === "car";
+		const tiers = car
+			? CAR_TIERS.filter((tier) => !o.omv || o.omv === "unknown" || tier.key === o.omv)
+			: [{ key: "bike", label: "Motorbike", ltv: BIKE_LTV }];
+		const rate = car ? CAR_FLAT_RATE : BIKE_FLAT_RATE;
+		const years = car ? CAR_LOAN_YEARS : BIKE_LOAN_YEARS;
+		const up = (value) => Math.ceil(value / 100) * 100;
+		const rows = tiers.map((tier) => {
+			const inst = o.price * perDollar(tier.ltv, rate, years);
+			const byTdsr = (inst + o.otherDebt) / TDSR;
+			const income = up(Math.max(inst / VEHICLE_COMFORT_SHARE / TAKE_HOME_SHARE, byTdsr));
+			const stretchIncome = up(Math.max(inst / VEHICLE_STRETCH_SHARE / TAKE_HOME_SHARE, byTdsr));
+			const downpayment = Math.round(o.price * (1 - tier.ltv));
+			const expenses = o.monthlyExpenses > 0 ? o.monthlyExpenses : income * TAKE_HOME_SHARE * DEFAULT_SPEND_SHARE;
+			const buffer = Math.round(o.hasDependants ? income * 6 : expenses * 6);
+			const spare = Math.max(0, o.savings - buffer);
+			return {
+				key: tier.key,
+				label: tier.label,
+				ltv: tier.ltv,
+				instalment: Math.round(inst),
+				income,
+				stretchIncome,
+				downpayment,
+				buffer,
+				cashShort: Math.max(0, downpayment - spare),
+				allInLow: Math.round(car ? inst * CAR_ALL_IN_LOW : inst + BIKE_RUNNING_LOW),
+				allInHigh: Math.round(car ? inst * CAR_ALL_IN_HIGH : inst + BIKE_RUNNING_HIGH),
+				tdsrBound: byTdsr > inst / VEHICLE_COMFORT_SHARE / TAKE_HOME_SHARE,
+			};
+		});
+		return { kind, price: o.price, years, ratePercent: rate * 100, tiers: rows };
+	}
+
+	// input: { item: "bto"|"resale"|"car"|"bike", price, age, alone, savings,
+	//          cpfOa, firstTimer, proximity, hasDependants, monthlyExpenses,
+	//          otherDebt, omv: "unknown"|"low"|"high" }
+	function need(input) {
+		const o = {
+			price: Math.max(0, Number(input.price) || 0),
+			age: Math.max(18, Number(input.age) || 30),
+			alone: input.alone !== false,
+			savings: Math.max(0, Number(input.savings) || 0),
+			cpfOa: Math.max(0, Number(input.cpfOa) || 0),
+			firstTimer: Boolean(input.firstTimer),
+			proximity: input.proximity || "none",
+			hasDependants: Boolean(input.hasDependants),
+			monthlyExpenses: Math.max(0, Number(input.monthlyExpenses) || 0),
+			otherDebt: Math.max(0, Number(input.otherDebt) || 0),
+			omv: input.omv || "unknown",
+			resale: input.item === "resale",
+		};
+		if (input.item === "car") return vehicleNeed(o, "car");
+		if (input.item === "bike") return vehicleNeed(o, "bike");
+		return homeNeed(o);
+	}
+
+	// Plain-language result for need(), shared by the bot and the website.
+	function needSummary(n) {
+		const pay = (value) => `${money(value)}/month`;
+		if (n.kind === "home") {
+			const flat = n.type === "bto" ? "BTO flat" : "resale flat";
+			const who = n.alone ? "" : " between the two of you";
+			if (!n.found) {
+				const notes = [];
+				if (n.type === "bto") notes.push(`About ${money(n.signing)} is due when you sign the Agreement for Lease (10% of the price plus stamp duty), from the cash and CPF OA you have today. Pay can't speed that up.`);
+				if (n.btoCeilingHit) notes.push(`A BTO also caps household income at ${money(n.ceiling)}, so earning more stops helping past that. A resale flat with a bank loan has no income ceiling.`);
+				notes.push(`Upfront, a flat at ${money(n.price)} needs about ${money(n.upfront)} from cash, CPF OA and grants: the 25% downpayment, ${money(n.stampDuty)} stamp duty and about ${money(LEGAL_AND_FEES)} in fees, with your emergency buffer kept aside. More savings or CPF moves this more than more pay does.`);
+				if (n.singleUnder35) notes.push("Singles can only buy an HDB flat on their own from age 35.");
+				return { ok: false, headlineLabel: `A ${flat} at ${money(n.price)}`, headline: "Pay alone won't get you there", sub: "It's the upfront money (downpayment) holding this back, not your income.", rows: [], notes };
+			}
+			const rows = [];
+			if (n.perPerson) rows.push(["That's each of you earning about", pay(n.perPerson)]);
+			rows.push([n.loan === "hdb" ? "HDB loan" : "Bank loan", `${money(n.loanAmount)} over ${n.years} years at ${n.ratePercent}%`]);
+			rows.push(["Monthly instalment", `${money(n.monthly)}, of which CPF OA covers about ${money(n.cpfCovers)}`]);
+			n.grants.items.forEach((item) => rows.push([item.label, item.amount > 0 ? money(item.amount) : "$0 at this income"]));
+			if (n.type === "bto") rows.push(["Your CPF OA by key collection (~3 years)", `about ${money(n.cpfAtKeys)}`]);
+			rows.push(["Kept aside as your emergency buffer", money(n.buffer)]);
+			if (n.stretchIncome && n.stretchIncome < n.income) rows.push(["Bare minimum the loan rules allow (stretch)", pay(n.stretchIncome)]);
+			const notes = [];
+			if (!n.hdbEligible) {
+				notes.push(`This pay is above HDB's ${money(n.ceiling)} household ceiling, so it's a bank loan with no Enhanced CPF Housing Grant or CPF Housing Grant counted.`);
+			} else if (n.grantsLost) {
+				notes.push("At this pay the Enhanced CPF Housing Grant is $0 (it stops at $9,000 household income, $4,500 for singles), so it isn't counted.");
+			}
+			if (n.singleUnder35) notes.push("Singles can only buy an HDB flat on their own from age 35.");
+			return {
+				ok: true,
+				headlineLabel: `To comfortably buy a ${flat} at ${money(n.price)}, you need about`,
+				headline: pay(n.income),
+				sub: `Gross pay before CPF${who}. The instalment stays within 30% of it.`,
+				rows,
+				notes,
+			};
+		}
+		const name = n.kind === "car" ? "car" : "motorbike";
+		const t0 = n.tiers[0];
+		const twoTiers = n.tiers.length > 1;
+		const high = Math.max(...n.tiers.map((t) => t.income));
+		const rows = [];
+		n.tiers.forEach((t) => {
+			const tag = twoTiers ? `${t.label}: ` : "";
+			if (twoTiers) rows.push([`${t.label}`, `${pay(t.income)} · ${money(t.downpayment)} down (${Math.round((1 - t.ltv) * 100)}%)`]);
+			rows.push([`${tag}Loan instalment`, `${money(t.instalment)}/month over ${n.years} years at ${n.ratePercent}% flat`]);
+			if (!twoTiers) rows.push([`Downpayment (${Math.round((1 - t.ltv) * 100)}%, cash)`, money(t.downpayment)]);
+			rows.push([`${tag}Stretch (instalment at 15% of take-home)`, pay(t.stretchIncome)]);
+			rows.push([`${tag}All-in monthly cost`, `${money(t.allInLow)} to ${money(t.allInHigh)}${n.kind === "car" ? " (1.3 to 1.5x the instalment)" : " (instalment plus insurance, road tax, petrol, parking)"}`]);
+		});
+		const notes = [];
+		const short = n.tiers.filter((t) => t.cashShort > 0);
+		if (short.length) {
+			const t = short[0];
+			notes.push(`Savings are the other half: after keeping a ${money(t.buffer)} emergency buffer, you'd need about ${money(t.cashShort)} more in cash for the ${money(t.downpayment)} downpayment.`);
+		}
+		if (n.tiers.some((t) => t.tdsrBound)) notes.push("Your other loan repayments push this up: banks cap all your loan repayments at 55% of gross pay.");
+		if (n.kind === "car" && twoTiers) notes.push("Not sure of the car's OMV? The dealer can tell you, and it decides how much you can borrow.");
+		return {
+			ok: true,
+			headlineLabel: `To comfortably own a ${name} at ${money(n.price)}, you need about`,
+			headline: twoTiers && high !== t0.income ? `${pay(Math.min(...n.tiers.map((t) => t.income)))} to ${pay(high)}` : pay(t0.income),
+			sub: `Gross pay before CPF. Keeps the loan instalment under 10% of your take-home pay.${twoTiers ? " It depends on the car's OMV, so both are shown." : ""}`,
+			rows,
+			notes,
+		};
+	}
+
+	return { calculate, need, needSummary, homeSummary, carSummary, bikeSummary, footnote, bsd, ehgAmount, CAR_COMFORT_SHARE, MSR, TDSR, HDB_INCOME_CEILING_FAMILY, HDB_INCOME_CEILING_SINGLE };
 });
