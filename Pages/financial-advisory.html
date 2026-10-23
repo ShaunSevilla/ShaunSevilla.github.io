@@ -18,7 +18,7 @@
 		<meta name="twitter:card" content="summary_large_image" />
 		<link rel="icon" type="image/png" sizes="64x64" href="../assets/favicon-64.png" />
 		<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
-		<link rel="stylesheet" href="../css/style.css?v=20261023b" />
+		<link rel="stylesheet" href="../css/style.css?v=20261023c" />
 		<link
 			rel="stylesheet"
 			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -420,11 +420,21 @@
 						</summary>
 						<div class="calculator-dropdown-body">
 							<article class="calculator-card">
-								<p class="calculator-card-note">A simple benchmark based on your income, planning for 10x annual income for death and total permanent disability and 5x for critical illness (a little above the industry's 9x and 4x guide), with premiums within about 10% of income.</p>
-								<form class="booking-form calculator-form" id="insurance-form">
+								<div class="calc-mode" role="group" aria-label="Calculator mode">
+									<button type="button" class="is-on" data-mode="quick" aria-pressed="true">Quick</button>
+									<button type="button" data-mode="detailed" aria-pressed="false">Detailed</button>
+								</div>
+								<p class="calculator-card-note" id="insurance-mode-note">Two answers in 10 seconds: how much cover you need, and what it should cost.</p>
+								<form class="booking-form calculator-form" id="insurance-form" data-mode="quick">
 									<label><span>Monthly income ($)</span><input type="number" id="insurance-income" min="0" step="1" placeholder="4000" required /></label>
-									<label><span>Death & TPD cover you already have ($) <em>Optional</em></span><input type="number" id="insurance-have-life" min="0" step="1" placeholder="Blank = skip. Include work cover and CPF DPS" /></label>
-									<label><span>Critical illness cover you already have ($) <em>Optional</em></span><input type="number" id="insurance-have-ci" min="0" step="1" placeholder="Blank = skip" /></label>
+									<label><span>You are</span>
+										<select id="insurance-residency">
+											<option value="local">A Singapore citizen or PR</option>
+											<option value="foreigner">A foreigner working here (EP, S Pass, WP)</option>
+										</select>
+									</label>
+									<label class="ins-detail-only"><span>Death &amp; TPD cover you already have ($) <em>Optional</em></span><input type="number" id="insurance-have-life" min="0" step="1" placeholder="Blank = skip" /></label>
+									<label class="ins-detail-only"><span>Critical illness cover you already have ($) <em>Optional</em></span><input type="number" id="insurance-have-ci" min="0" step="1" placeholder="Blank = skip" /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="insurance-status" role="status"></p>
 								</form>
@@ -545,7 +555,7 @@
 		<script src="../js/main.js"></script>
 		<script src="../js/shared/hdbPayments.js"></script>
 		<script src="../js/shared/vehicleLoan.js"></script>
-		<script src="../js/shared/insurance.js?v=20261023"></script>
+		<script src="../js/shared/insurance.js?v=20261023c"></script>
 		<script src="../js/loan-calculators.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 		<script src="../js/shared/cpfProjection.js"></script>
@@ -554,9 +564,9 @@
 		<script src="../js/card-finder.js?v=20261002"></script>
 		<script src="../js/shared/taxRelief.js"></script>
 		<script src="../js/shared/affordability.js?v=20261012b"></script>
-		<script src="../js/tools.js?v=20261023"></script>
+		<script src="../js/tools.js?v=20261023c"></script>
 		<script src="../js/share.js?v=20261003"></script>
-		<script src="../js/calculator-ux.js?v=20261023"></script>
+		<script src="../js/calculator-ux.js?v=20261023c"></script>
 		<script src="../js/telegram-app.js?v=20261023"></script>
 	</body>
 </html>

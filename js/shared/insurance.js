@@ -20,6 +20,13 @@
 //   rider bought from 1 Apr 2026: can't cover the deductible; then 5% of the
 //     rest, capped at $6,000 a year (panel / pre-authorised claims)
 // Assumes the whole bill is claimable and within the plan's limits.
+//
+// Foreigners (EP, S Pass, Work Permit, Dependant's Pass): no MediShield Life,
+// no Shield plans, no subsidised wards, no CPF Dependants' Protection Scheme.
+// Their hospital cover is a company or private plan with a yearly limit
+// (employers must insure S Pass and Work Permit holders for at least $60,000
+// a year, MOM, since 1 Jul 2023; there's no such rule for EP holders), so
+// foreignerShare() is simply what's above that limit.
 (function (root, factory) {
 	if (typeof module === "object" && module.exports) {
 		module.exports = factory();
@@ -35,7 +42,7 @@
 		return `$${Math.round(Number(value) || 0).toLocaleString("en-SG")}`;
 	}
 
-	// input: { monthlyIncome, existingDeathTpd (optional), existingCi (optional) }
+	// input: { monthlyIncome, existingDeathTpd (optional), existingCi (optional), foreigner (optional) }
 	function calculate(input) {
 		const monthly = Math.max(0, Number(input.monthlyIncome) || 0);
 		const annual = monthly * 12;
@@ -54,6 +61,7 @@
 			existingCi,
 			gapDeathTpd: existingDeathTpd === null ? null : Math.max(0, Math.round(deathTpd - existingDeathTpd)),
 			gapCi: existingCi === null ? null : Math.max(0, Math.round(ci - existingCi)),
+			foreigner: Boolean(input.foreigner),
 		};
 	}
 
@@ -70,10 +78,15 @@
 			rows.push(["Critical illness gap to the benchmark", r.gapCi > 0 ? money(r.gapCi) : "None, you're at or above it"]);
 		}
 		const askedAboutCover = r.existingDeathTpd !== null || r.existingCi !== null;
-		const notes = [
-			askedAboutCover
+		const countIt = r.foreigner
+			? (askedAboutCover
+				? "Count all of it: your own policies, cover from work, and any policy back home that still pays out if you live in Singapore."
+				: "Do you know how much you already have? Add your existing cover to see your gap, including cover from work and any policy back home.")
+			: (askedAboutCover
 				? "Count all of it: your own policies, any cover from work, and CPF's Dependants' Protection Scheme (up to $70,000 until 65). MediShield Life and CareShield Life pay hospital bills and disability income, not these lump sums, so they don't count here."
-				: "Do you know how much you already have? Add your existing cover to see your gap. CPF's Dependants' Protection Scheme (up to $70,000 until 65) and cover from work count too.",
+				: "Do you know how much you already have? Add your existing cover to see your gap. CPF's Dependants' Protection Scheme (up to $70,000 until 65) and cover from work count too.");
+		const notes = [
+			countIt,
 			`Aim to keep premiums within about ${money(r.premiumCeiling)}/month, 10% of your income.`,
 			"The benchmark is 10x annual income for death and disability and 5x for critical illness, a little above LIA Singapore's 9x and 4x guide to leave room for debts and inflation. A starting point, not personalised advice; your real needs depend on dependants, debts, health and budget.",
 		];
@@ -120,11 +133,20 @@
 		};
 	}
 
+	// Foreigners: the part of the bill above the plan's yearly limit.
+	// input: { bill, limit } (limit 0 = no health insurance)
+	function foreignerShare(input) {
+		const bill = Math.max(0, Number(input.bill) || 0);
+		const limit = Math.max(0, Number(input.limit) || 0);
+		const you = Math.max(0, bill - limit);
+		return { bill: Math.round(bill), you: Math.round(you), insurer: Math.round(bill - you), limit };
+	}
+
 	// How long a lump sum replaces income, in months.
 	function runwayMonths(cover, monthlyIncome) {
 		const m = Number(monthlyIncome) || 0;
 		return m > 0 ? Math.floor((Number(cover) || 0) / m) : 0;
 	}
 
-	return { calculate, summary, hospitalShare, runwayMonths, DEDUCTIBLE, COVER, DEATH_TPD_X, CI_X };
+	return { calculate, summary, hospitalShare, foreignerShare, runwayMonths, DEDUCTIBLE, COVER, DEATH_TPD_X, CI_X };
 });

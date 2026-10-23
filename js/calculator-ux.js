@@ -99,6 +99,11 @@
 
 	// What Can I Afford: topics follow what they're buying.
 	function topicsFor(details) {
+		if (details.id === "insurance") {
+			const res = details.querySelector("#insurance-residency");
+			if (res && res.value === "foreigner") return ["Reviewing my policies", "Health cover as a foreigner", "Closing my protection gap"];
+			return TOPICS.insurance;
+		}
 		if (details.id === "earn") {
 			const item = (details.querySelector("#earn-item") || {}).value;
 			if (item === "car" || item === "bike") return ["Can I afford this?", `Cash vs ${item} loan`, "Growing my income"];
