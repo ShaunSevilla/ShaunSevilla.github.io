@@ -4154,7 +4154,7 @@ footer span {
 .in-telegram .guide-entry,
 .in-telegram .booking-expect,
 .in-telegram .calculator-intro,
-.in-telegram .quiz-teaser {
+.in-telegram #calculators .quiz-teaser {
 	display: none !important;
 }
 
@@ -4865,4 +4865,20 @@ input[type="range"] {
 
 .footer-tools > span {
 	padding: 0.4rem 0;
+}
+
+/* Mini app: quiz banner like the website's, and an odd last tile spans both columns */
+.mini-app-quiz {
+	margin: 0 0 1.75rem;
+}
+
+.mini-app-quiz-arrow {
+	color: var(--gold);
+	font-weight: 400;
+	font-size: 1.1rem;
+	margin-left: auto;
+}
+
+.mini-app-grid a:last-child:nth-child(odd) {
+	grid-column: 1 / -1;
 }
