@@ -4144,3 +4144,132 @@ footer span {
 		line-height: 1.45;
 	}
 }
+
+/* Telegram Mini App (app.html, and every page while in the app) */
+.in-telegram #site-nav,
+.in-telegram #site-footer,
+.in-telegram .detail-hero,
+.in-telegram .client-services,
+.in-telegram .consultation-cta,
+.in-telegram .guide-entry,
+.in-telegram .booking-expect,
+.in-telegram .calculator-intro,
+.in-telegram .quiz-teaser {
+	display: none !important;
+}
+
+.in-telegram main {
+	padding-top: 0;
+}
+
+.in-telegram {
+	--nav-height: 0px;
+}
+
+.in-telegram .compound-calculator-section,
+.in-telegram .booking-section {
+	padding-top: 1.25rem;
+}
+
+.mini-app-main {
+	padding: 2rem 1rem 2.5rem;
+	max-width: 560px;
+	margin: 0 auto;
+}
+
+.mini-app-head h1 {
+	font-family: "Cormorant Garamond", serif;
+	font-size: 2.1rem;
+	font-weight: 600;
+	line-height: 1.1;
+	margin: 0.35rem 0 0.4rem;
+}
+
+.mini-app-head p:last-child {
+	color: var(--text-muted);
+	font-size: 0.88rem;
+	line-height: 1.5;
+}
+
+.mini-app-book {
+	display: block;
+	margin: 1.25rem 0 1.75rem;
+	padding: 1rem 1.1rem;
+	background: var(--gold);
+	color: #0b0b0b;
+}
+
+.mini-app-book strong {
+	display: block;
+	font-size: 1rem;
+}
+
+.mini-app-book span {
+	font-size: 0.8rem;
+	opacity: 0.75;
+}
+
+.mini-app-heading {
+	font-size: 0.66rem;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--gold);
+	margin: 0 0 0.7rem;
+	font-weight: 500;
+}
+
+.mini-app-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.55rem;
+	margin-bottom: 1.75rem;
+}
+
+.mini-app-grid a,
+.mini-app-list a {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	padding: 0.85rem 0.9rem;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	color: inherit;
+}
+
+.mini-app-grid a:active,
+.mini-app-list a:active {
+	border-color: var(--gold-dim);
+	background: var(--surface-2);
+}
+
+.mini-app-grid b {
+	font-size: 1.2rem;
+	font-weight: 400;
+	margin-bottom: 0.2rem;
+}
+
+.mini-app-grid strong,
+.mini-app-list strong {
+	font-size: 0.92rem;
+	font-weight: 600;
+	line-height: 1.25;
+}
+
+.mini-app-grid span,
+.mini-app-list span {
+	font-size: 0.74rem;
+	color: var(--text-muted);
+	line-height: 1.35;
+}
+
+.mini-app-list {
+	display: grid;
+	gap: 0.55rem;
+	margin-bottom: 1.75rem;
+}
+
+.mini-app-foot {
+	font-size: 0.7rem;
+	color: var(--text-muted);
+	line-height: 1.5;
+}
