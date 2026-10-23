@@ -4717,3 +4717,152 @@ footer span {
 	border-radius: var(--r-lg);
 	border-color: var(--soft-border);
 }
+
+/* ---------------------------------------------------------------------------
+   Soft style, site-wide (Oct 2026): the calculators' look everywhere.
+   Rounded cards, pill buttons, quieter borders, bigger tap targets.
+   --------------------------------------------------------------------------- */
+:root {
+	--r-lg: 18px;
+	--r-md: 12px;
+	--soft-border: rgba(255, 255, 255, 0.07);
+}
+
+/* Cards and panels */
+.tool-card,
+.pillar-card,
+.skill-card,
+.quiz-card,
+.leadership-item,
+.home-overview > section,
+.home-profile-grid > section,
+.home-overview .consultation-cta,
+.booking-expect-grid article,
+.booking-picker,
+.booking-section .booking-form,
+.booking-type-option,
+.booking-prefill-note,
+.client-services-grid article,
+.contact-list li a,
+.fitness-tile,
+.calculator-card,
+.card-all,
+.card-pick,
+.afford-plan,
+.afford-grants,
+.pay-plan,
+.pay-plan-totals div,
+.loan-offset-panel,
+.offset-scenario,
+.mu-table,
+.quiz-teaser,
+.quiz-lineup,
+.insurance-alarm,
+.calculator-result-headline,
+.calculator-note-callout,
+.ins-sim,
+.ins-quick > div,
+.mini-app-grid a,
+.mini-app-list a,
+.mini-app-book {
+	border-radius: var(--r-lg);
+	border-color: var(--soft-border);
+}
+
+.fitness-tile,
+.quiz-lineup,
+.contact-list li a {
+	overflow: hidden;
+}
+
+/* Fields and small tiles */
+input,
+select,
+textarea,
+.booking-date,
+.booking-time,
+.consultation-hours span,
+.quiz-option {
+	border-radius: var(--r-md);
+}
+
+.booking-form input,
+.booking-form select,
+.booking-form textarea,
+.booking-date,
+.booking-time,
+.consultation-hours span,
+.quiz-option {
+	border-color: var(--soft-border);
+}
+
+.booking-form input:focus,
+.booking-form select:focus,
+.booking-form textarea:focus {
+	border-color: rgba(201, 168, 76, 0.6);
+	box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12);
+}
+
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"] {
+	border-radius: revert;
+	box-shadow: none !important;
+}
+
+/* Buttons and chips: pills */
+.booking-submit,
+.bot-cta-link,
+.hero-booking-link,
+.share-friend-btn,
+.share-friend-links a,
+.share-friend-links button,
+.footer-contact-links a,
+.skill-tags span,
+.money-guide-jump a,
+.github-preview-meta a,
+.github-preview-meta span,
+.booking-retry,
+.topic-chip {
+	border-radius: 999px;
+}
+
+.footer-contact-links a,
+.money-guide-jump a,
+.skill-tags span {
+	border-color: var(--soft-border);
+}
+
+/* Tap targets: at least ~40px tall on phones */
+.footer-contact-links a {
+	min-height: 36px;
+	padding: 0.45rem 0.85rem;
+}
+
+.footer-tools a {
+	display: inline-block;
+	padding: 0.4rem 0;
+}
+
+@media (max-width: 560px) {
+	.footer-contact-links a {
+		min-height: 40px;
+	}
+}
+
+/* Sections that run edge to edge on phones keep square corners. */
+@media (max-width: 760px) {
+	.home-overview > section,
+	.home-profile-grid > section,
+	.home-overview .consultation-cta {
+		border-radius: 0;
+	}
+}
+
+.footer-tools {
+	align-items: center;
+}
+
+.footer-tools > span {
+	padding: 0.4rem 0;
+}
