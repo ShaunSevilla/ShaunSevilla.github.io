@@ -9,6 +9,17 @@
 //   death and total permanent disability (TPD): 10x annual income
 //   critical illness (CI): 5x annual income
 //   premiums: within about 10% of income
+//
+// Hospital bill split (hospitalShare), Integrated Shield Plan rules (MOH,
+// Nov 2025 announcement; new riders from 1 Apr 2026):
+//   minimum deductible per policy year: Private/A $3,500, B1 $2,500,
+//     B2 $2,000, C $1,500
+//   no rider: you pay the deductible, then 10% of the rest
+//   rider bought before 1 Apr 2026: typically covers the deductible; you pay
+//     5% of the bill, capped at $3,000 a year (panel / pre-authorised claims)
+//   rider bought from 1 Apr 2026: can't cover the deductible; then 5% of the
+//     rest, capped at $6,000 a year (panel / pre-authorised claims)
+// Assumes the whole bill is claimable and within the plan's limits.
 (function (root, factory) {
 	if (typeof module === "object" && module.exports) {
 		module.exports = factory();
@@ -69,5 +80,51 @@
 		return { lead, rows, notes, askedAboutCover };
 	}
 
-	return { calculate, summary };
+	const DEDUCTIBLE = { private: 3500, b1: 2500, b2: 2000, c: 1500 };
+	const COVER = {
+		none: { label: "Shield plan, no rider" },
+		old: { label: "Shield plan + rider bought before Apr 2026" },
+		new: { label: "Shield plan + rider bought from Apr 2026" },
+	};
+
+	// input: { bill, ward: private|b1|b2|c, cover: none|old|new }
+	function hospitalShare(input) {
+		const bill = Math.max(0, Number(input.bill) || 0);
+		const deductible = DEDUCTIBLE[input.ward] || DEDUCTIBLE.private;
+		const cover = COVER[input.cover] ? input.cover : "none";
+		const ded = Math.min(bill, deductible);
+		const rest = Math.max(0, bill - deductible);
+		let you;
+		let parts;
+		if (cover === "old") {
+			const copay = Math.min(bill * 0.05, 3000);
+			you = copay;
+			parts = [["5% co-payment (capped at $3,000)", copay]];
+		} else if (cover === "new") {
+			const copay = Math.min(rest * 0.05, 6000);
+			you = ded + copay;
+			parts = [["Deductible", ded], ["5% of the rest (capped at $6,000)", copay]];
+		} else {
+			const coins = rest * 0.1;
+			you = ded + coins;
+			parts = [["Deductible", ded], ["10% of the rest", coins]];
+		}
+		return {
+			bill: Math.round(bill),
+			you: Math.round(you),
+			insurer: Math.round(bill - you),
+			parts: parts.map(([label, amount]) => [label, Math.round(amount)]),
+			deductible,
+			cover,
+			coverLabel: COVER[cover].label,
+		};
+	}
+
+	// How long a lump sum replaces income, in months.
+	function runwayMonths(cover, monthlyIncome) {
+		const m = Number(monthlyIncome) || 0;
+		return m > 0 ? Math.floor((Number(cover) || 0) / m) : 0;
+	}
+
+	return { calculate, summary, hospitalShare, runwayMonths, DEDUCTIBLE, COVER, DEATH_TPD_X, CI_X };
 });

@@ -364,6 +364,126 @@
 		});
 	}
 
+	// "What if it happens?" under the insurance result: drag a hospital bill,
+	// a critical illness payout or a death/disability payout and see what it
+	// means in dollars and months, live. Hospital rules live in shared/insurance.js.
+	function insuranceScenarios(r) {
+		const I = window.Insurance;
+		if (!I || !I.hospitalShare) return "";
+		const ciStart = r.existingCi !== null ? r.existingCi : r.ci;
+		const lifeStart = r.existingDeathTpd !== null ? r.existingDeathTpd : r.deathTpd;
+		const ciMax = Math.max(r.ci * 2, ciStart, 100000);
+		const lifeMax = Math.max(r.deathTpd * 2, lifeStart, 200000);
+		const step = (max) => (max > 1000000 ? 10000 : 5000);
+		return `
+		<div class="ins-sim" data-monthly="${r.monthlyIncome}">
+			<h4 class="ins-sim-title">What if it happens?</h4>
+			<p class="ins-sim-lead">Drag the numbers. See what your cover actually does.</p>
+			<div class="ins-tabs" role="tablist">
+				<button type="button" role="tab" class="is-on" data-tab="hosp">🏥 Hospital</button>
+				<button type="button" role="tab" data-tab="ci">🎗️ Illness</button>
+				<button type="button" role="tab" data-tab="life">🕊️ Death &amp; TPD</button>
+			</div>
+
+			<div class="ins-pane" data-pane="hosp">
+				<div class="ins-row">
+					<label><span>Ward</span><select data-k="ward"><option value="private">Private / A</option><option value="b1">B1</option><option value="b2">B2</option><option value="c">C</option></select></label>
+					<label><span>Your hospital cover</span><select data-k="cover"><option value="none">Shield plan, no rider</option><option value="old">Shield + rider before Apr 2026</option><option value="new">Shield + rider from Apr 2026</option></select></label>
+				</div>
+				<label class="ins-slider"><span>Hospital bill <strong data-o="bill"></strong></span><input type="range" data-k="bill" min="2000" max="150000" step="1000" value="20000" /></label>
+				<div class="ins-out"><span>You pay</span><strong data-o="you"></strong><em data-o="youSub"></em></div>
+				<div class="ins-bar" aria-hidden="true"><i class="ins-bar-you" data-o="barYou"></i><i class="ins-bar-ins" data-o="barIns"></i></div>
+				<div class="ins-legend"><span><i class="ins-dot-you"></i>You</span><span><i class="ins-dot-ins"></i>Insurer</span></div>
+				<p class="ins-compare" data-o="compare"></p>
+				<p class="calculator-note">Assumes the whole bill is claimable, within your plan's limits, and done by a panel or pre-approved doctor. MediSave can pay part of your share, within its limits.</p>
+			</div>
+
+			<div class="ins-pane" data-pane="ci" hidden>
+				<label class="ins-slider"><span>Critical illness payout <strong data-o="ciAmt"></strong></span><input type="range" data-k="ci" min="0" max="${ciMax}" step="${step(ciMax)}" value="${ciStart}" /></label>
+				<div class="ins-out"><span>Time off you can afford</span><strong data-o="ciRun"></strong><em>Your pay replaced while you get treated and recover, without touching savings.</em></div>
+				<div class="ins-meter" aria-hidden="true"><i data-o="ciFill"></i><b style="left:50%"></b></div>
+				<div class="ins-legend"><span>0</span><span>Benchmark: 5 years</span><span>10 years</span></div>
+				<p class="ins-compare" data-o="ciNote"></p>
+			</div>
+
+			<div class="ins-pane" data-pane="life" hidden>
+				<label class="ins-slider"><span>Death &amp; TPD payout <strong data-o="lifeAmt"></strong></span><input type="range" data-k="life" min="0" max="${lifeMax}" step="${step(lifeMax)}" value="${lifeStart}" /></label>
+				<div class="ins-out"><span>Your family gets</span><strong data-o="lifeRun"></strong><em>Of your income, if you pass away or can never work again.</em></div>
+				<div class="ins-meter" aria-hidden="true"><i data-o="lifeFill"></i><b style="left:50%"></b></div>
+				<div class="ins-legend"><span>0</span><span>Benchmark: 10 years</span><span>20 years</span></div>
+				<p class="ins-compare" data-o="lifeNote"></p>
+			</div>
+
+			<div class="ins-ask">
+				<h5>5 questions worth asking about your policies</h5>
+				<ol>
+					<li>Is my hospital rider on the old rules or the new April 2026 ones?</li>
+					<li>Does my critical illness cover pay at an early stage, or only when it's severe?</li>
+					<li>Does any of my cover stop or drop at 65 or 70?</li>
+					<li>Are my premiums guaranteed, or can they go up?</li>
+					<li>Is anything excluded because of my health history?</li>
+				</ol>
+				<p>Not sure of the answers? Bring your policies to a chat and I'll go through them with you.</p>
+			</div>
+		</div>`;
+	}
+
+	function bindInsuranceScenarios(box) {
+		const sim = box.querySelector(".ins-sim");
+		if (!sim) return;
+		const I = window.Insurance;
+		const monthly = Number(sim.dataset.monthly) || 0;
+		const k = (name) => sim.querySelector(`[data-k="${name}"]`);
+		const o = (name) => sim.querySelector(`[data-o="${name}"]`);
+		const years = (months) => {
+			if (months < 12) return `${months} month${months === 1 ? "" : "s"}`;
+			const y = Math.floor(months / 12);
+			const m = months % 12;
+			return `${y} year${y === 1 ? "" : "s"}${m ? `, ${m} month${m === 1 ? "" : "s"}` : ""}`;
+		};
+		const pct = (part, whole) => `${Math.max(0, Math.min(100, (part / whole) * 100))}%`;
+
+		function update() {
+			const bill = Number(k("bill").value);
+			const ward = k("ward").value;
+			const h = I.hospitalShare({ bill, ward, cover: k("cover").value });
+			o("bill").textContent = formatCurrency(bill);
+			o("you").textContent = formatCurrency(h.you);
+			o("youSub").textContent = `Insurer pays ${formatCurrency(h.insurer)}. ` + h.parts.map((p) => `${p[0]}: ${formatCurrency(p[1])}`).join(" · ");
+			o("barYou").style.width = pct(h.you, bill);
+			o("barIns").style.width = pct(h.insurer, bill);
+			const all = ["none", "old", "new"].map((cover) => I.hospitalShare({ bill, ward, cover }).you);
+			o("compare").innerHTML = `Same bill: no rider <strong>${formatCurrency(all[0])}</strong> · old rider <strong>${formatCurrency(all[1])}</strong> · new rider <strong>${formatCurrency(all[2])}</strong>`;
+
+			const ci = Number(k("ci").value);
+			const ciMonths = I.runwayMonths(ci, monthly);
+			o("ciAmt").textContent = formatCurrency(ci);
+			o("ciRun").textContent = ci > 0 ? years(ciMonths) : "None";
+			o("ciFill").style.width = pct(ciMonths, 120);
+			o("ciNote").textContent = ci <= 0
+				? "With no payout, treatment and time off come out of savings, or someone else's pocket."
+				: ciMonths >= 60 ? "At or above the benchmark: room to recover properly." : `${years(60 - ciMonths)} short of the 5-year benchmark.`;
+
+			const life = Number(k("life").value);
+			const lifeMonths = I.runwayMonths(life, monthly);
+			o("lifeAmt").textContent = formatCurrency(life);
+			o("lifeRun").textContent = life > 0 ? years(lifeMonths) : "Nothing";
+			o("lifeFill").style.width = pct(lifeMonths, 240);
+			o("lifeNote").textContent = life <= 0
+				? "Count CPF's Dependants' Protection Scheme (up to $70,000 until 65) and any cover from work."
+				: lifeMonths >= 120 ? "At or above the benchmark: debts cleared and time for your family to adjust." : `${years(120 - lifeMonths)} short of the 10-year benchmark.`;
+		}
+
+		sim.querySelectorAll("[data-tab]").forEach(function (tab) {
+			tab.addEventListener("click", function () {
+				sim.querySelectorAll("[data-tab]").forEach((t) => t.classList.toggle("is-on", t === tab));
+				sim.querySelectorAll("[data-pane]").forEach((p) => { p.hidden = p.dataset.pane !== tab.dataset.tab; });
+			});
+		});
+		sim.querySelectorAll("[data-k]").forEach((el) => el.addEventListener("input", update));
+		update();
+	}
+
 	// ----------------------------------------------------------- Insurance
 	// Same benchmark as the bot's Insurance Calculator (calculatorService.js).
 	function initInsurance() {
@@ -387,7 +507,9 @@
 			let html = `<div class="insurance-alarm"><p>${sum.lead.replace(formatCurrency(r.deathTpd), `<strong>${formatCurrency(r.deathTpd)}</strong>`).replace(formatCurrency(r.ci) + " for", `<strong>${formatCurrency(r.ci)}</strong> for`)}</p></div>`;
 			sum.rows.forEach(function (row) { html += resultRow(row[0], row[1]); });
 			sum.notes.forEach(function (text, index) { html += note(text, index === 0 && !sum.askedAboutCover ? "calculator-note-callout" : ""); });
+			html += insuranceScenarios(r);
 			resultBox.innerHTML = html;
+			bindInsuranceScenarios(resultBox);
 			resultBox.hidden = false;
 		});
 	}

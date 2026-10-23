@@ -93,7 +93,7 @@
 		hdb: ["Loan offsetting", "HDB vs bank loan", "CPF or cash for my loan?", "Refinancing"],
 		cpf: ["CPF optimisation", "Reaching my retirement sum", "CPF top-ups"],
 		vehicle: ["Loan offsetting", "Cash vs car loan", "Can I afford this car?"],
-		insurance: ["Coverage review", "Closing my protection gap", "Cover on a budget"],
+		insurance: ["Reviewing my policies", "Is my rider old or new?", "Closing my protection gap"],
 		compound: ["Where to invest", "A regular investing plan", "Investing my SRS"],
 	};
 
