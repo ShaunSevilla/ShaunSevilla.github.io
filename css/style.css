@@ -4882,3 +4882,235 @@ input[type="range"] {
 .mini-app-grid a:last-child:nth-child(odd) {
 	grid-column: 1 / -1;
 }
+
+/* ---------------------------------------------------------------------------
+   Calculators: sliders, visuals, folded small print (Oct 2026)
+   --------------------------------------------------------------------------- */
+/* Slider under each number box */
+.calc-range {
+	-webkit-appearance: none;
+	appearance: none;
+	display: block;
+	width: 100%;
+	height: 22px;
+	margin: 0.45rem 0 0.15rem;
+	padding: 0;
+	border: 0 !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	cursor: pointer;
+	--fill: 50%;
+}
+
+.calc-range::-webkit-slider-runnable-track {
+	height: 6px;
+	border-radius: 999px;
+	background: linear-gradient(to right, var(--gold) 0 var(--fill), rgba(255, 255, 255, 0.1) var(--fill) 100%);
+}
+
+.calc-range::-moz-range-track {
+	height: 6px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.1);
+}
+
+.calc-range::-moz-range-progress {
+	height: 6px;
+	border-radius: 999px;
+	background: var(--gold);
+}
+
+.calc-range::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: 22px;
+	height: 22px;
+	margin-top: -8px;
+	border-radius: 50%;
+	background: #f4e2ad;
+	border: 3px solid var(--gold);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.calc-range::-moz-range-thumb {
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: #f4e2ad;
+	border: 3px solid var(--gold);
+}
+
+/* Visuals */
+.viz {
+	margin: 0.25rem 0 1rem;
+	padding: 1rem 1.1rem;
+	border-radius: var(--r-lg, 18px);
+	background: rgba(255, 255, 255, 0.03);
+	border: 1px solid var(--soft-border, var(--border));
+}
+
+.viz figcaption {
+	font-size: 0.66rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--text-muted);
+	margin-bottom: 0.75rem;
+}
+
+.viz-bar {
+	display: grid;
+	grid-template-columns: minmax(70px, 30%) 1fr auto;
+	align-items: center;
+	gap: 0.65rem;
+	margin-bottom: 0.5rem;
+	font-size: 0.8rem;
+}
+
+.viz-bar:last-child {
+	margin-bottom: 0;
+}
+
+.viz-bar-label {
+	color: var(--text-muted);
+}
+
+.viz-bar-track {
+	height: 10px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.06);
+	overflow: hidden;
+}
+
+.viz-bar-track i {
+	display: block;
+	height: 100%;
+	border-radius: 999px;
+	background: #5c5c5c;
+	transition: width 0.25s ease;
+}
+
+.viz-bar.is-strong .viz-bar-track i {
+	background: var(--gold);
+}
+
+.viz-bar b {
+	font-weight: 600;
+	font-size: 0.8rem;
+	white-space: nowrap;
+}
+
+.viz-bar.is-strong b,
+.viz-bar.is-strong .viz-bar-label {
+	color: var(--text);
+}
+
+.viz-stack {
+	display: flex;
+	height: 14px;
+	border-radius: 999px;
+	overflow: hidden;
+	gap: 2px;
+}
+
+.viz-stack i {
+	display: block;
+	height: 100%;
+	transition: width 0.25s ease;
+}
+
+.viz-legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem 1rem;
+	margin-top: 0.7rem;
+	font-size: 0.76rem;
+	color: var(--text-muted);
+}
+
+.viz-legend i {
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	margin-right: 0.35rem;
+}
+
+.viz-legend b {
+	color: var(--text);
+	font-weight: 600;
+}
+
+.tone-gold { background: var(--gold); }
+.tone-gold2 { background: #8a7334; }
+.tone-grey { background: #5c5c5c; }
+.tone-light { background: #d9d9d9; }
+
+.viz-growth {
+	display: block;
+	width: 100%;
+	height: 140px;
+}
+
+.viz-area-total { fill: rgba(201, 168, 76, 0.22); }
+.viz-area-base { fill: rgba(255, 255, 255, 0.1); }
+.viz-line-total { fill: none; stroke: var(--gold); stroke-width: 2; vector-effect: non-scaling-stroke; }
+
+.viz-axis {
+	display: flex;
+	justify-content: space-between;
+	font-size: 0.68rem;
+	color: var(--text-muted);
+	margin-top: 0.3rem;
+}
+
+/* Folded small print */
+.calc-info {
+	margin: 0.75rem 0 0.25rem;
+}
+
+.calc-info summary {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	cursor: pointer;
+	list-style: none;
+	font-size: 0.78rem;
+	color: var(--text-muted);
+	padding: 0.35rem 0;
+}
+
+.calc-info summary::-webkit-details-marker {
+	display: none;
+}
+
+.calc-info summary::before {
+	content: "+";
+	display: grid;
+	place-items: center;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	border: 1px solid var(--soft-border, var(--border));
+	font-size: 0.75rem;
+	line-height: 1;
+}
+
+.calc-info[open] summary::before {
+	content: "−";
+}
+
+.calc-info > *:not(summary) {
+	font-size: 0.78rem;
+}
+
+.calc-info-top {
+	margin: 0 0 0.9rem;
+}
+
+/* Field hints show only while that field is in use */
+#calculators .calculator-field-hint:not([id]):not(.tax-group-hint) {
+	display: none;
+}
+
+#calculators label:focus-within + .calculator-field-hint:not([id]):not(.tax-group-hint) {
+	display: block;
+}

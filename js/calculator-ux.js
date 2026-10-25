@@ -132,8 +132,26 @@
 		return '<div class="topic-chips"><span>Ask Shaun about</span>' + chips.join("") + "</div>";
 	}
 
+	// Small print folds away: the answer stays on screen, the assumptions sit
+	// behind one "Details & assumptions" tap (kept open across live updates).
+	function foldNotes(resultBox) {
+		if (resultBox.querySelector(":scope > .calc-info")) return;
+		const notes = Array.from(resultBox.children).filter(function (el) {
+			return (el.matches("p.calculator-note") && !el.classList.contains("calculator-note-callout")) || el.matches("ul.calculator-note-list");
+		});
+		if (!notes.length) return;
+		const fold = document.createElement("details");
+		fold.className = "calc-info";
+		fold.open = resultBox.dataset.infoOpen === "1";
+		fold.innerHTML = "<summary>Details &amp; assumptions</summary>";
+		notes.forEach(function (el) { fold.appendChild(el); });
+		fold.addEventListener("toggle", function () { resultBox.dataset.infoOpen = fold.open ? "1" : ""; });
+		resultBox.appendChild(fold);
+	}
+
 	function addResultActions(details, form, resultBox) {
 		if (resultBox.hidden || resultBox.querySelector(".calculator-actions")) return;
+		foldNotes(resultBox);
 
 		const summary = summarise(details, form, resultBox);
 		const params = new URLSearchParams({
@@ -153,7 +171,9 @@
 		}
 		resultBox.appendChild(actions);
 
-		// On phones the result lands below the fold; bring it up.
+		// On phones the result lands below the fold; bring it up (not while
+		// they're dragging a slider: live updates stay where they are).
+		if (window.__calcLive) return;
 		const top = resultBox.getBoundingClientRect().top;
 		if (top > window.innerHeight * 0.6 || top < 0) {
 			resultBox.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -162,6 +182,15 @@
 
 	function init() {
 		const saved = readSaved();
+
+		// The explainer above each form folds into "How it works".
+		document.querySelectorAll("#calculators .calculator-card-note:not([id])").forEach(function (note) {
+			const fold = document.createElement("details");
+			fold.className = "calc-info calc-info-top";
+			fold.innerHTML = "<summary>How it works</summary>";
+			note.replaceWith(fold);
+			fold.appendChild(note);
+		});
 
 		document.querySelectorAll(".calculator-dropdown").forEach(function (details) {
 			const form = details.querySelector("form");

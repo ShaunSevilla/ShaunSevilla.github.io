@@ -47,7 +47,7 @@
 			const ratePercent = Number(document.getElementById("compound-rate").value);
 
 			if (!(principal >= 0) || !(annualAddition >= 0) || !(years > 0) || !Number.isInteger(years) || years > 60 || !(ratePercent >= 0) || ratePercent > 12) {
-				setStatus(status, years > 60 ? "Please pick 60 years or fewer." : ratePercent > 12 ? "Please assume 12% a year or less. Even 8% is optimistic over long periods." : "Please fill in every field with a valid number.", true);
+				setStatus(status, years > 60 ? "Please pick 60 years or fewer." : ratePercent > 12 ? "Please assume 12% a year or less. Even 8% is optimistic over long periods." : "Please fill in every field.", true);
 				resultBox.hidden = true;
 				return;
 			}
@@ -58,11 +58,15 @@
 			const lowerCase = calculateCompoundInterest({ principal, annualAddition, years, ratePercent: lower });
 			resultBox.innerHTML =
 				`<div class="calculator-result-headline"><span>In ${years} years, at ${ratePercent}% a year</span><strong>${formatCurrency(futureValue)}</strong></div>` +
+				(window.CalcViz ? window.CalcViz.growth("How it grows", Array.from({ length: years + 1 }, function (_, y) {
+					const v = calculateCompoundInterest({ principal, annualAddition, years: y, ratePercent });
+					return { x: y === 0 ? "Today" : `Year ${y}`, total: v.futureValue, base: v.totalContributions };
+				}), ["Total", "You put in"]) : "") +
 				resultRow("You put in", formatCurrency(totalContributions)) +
 				resultRow("Investment growth (not guaranteed)", formatCurrency(totalInterest)) +
 				resultRow(`If returns are ${lower}% instead`, formatCurrency(lowerCase.futureValue)) +
 				resultRow("In today's money (2% inflation)", `about ${formatCurrency(futureValue / Math.pow(1.02, years))}`) +
-				`<p class="calculator-note">Compounded yearly, with each year's addition made at the end of the year. Fees (often 0.5% to 1% a year) come off the return. ${ratePercent > 8 ? "Above 8% a year is optimistic over long periods. " : ""}Projection only: returns aren't guaranteed and can be negative.</p>`;
+				`<p class="calculator-note">Compounded yearly, additions at year end. Fees (0.5% to 1% a year) come off the return. ${ratePercent > 8 ? "Above 8% is optimistic. " : ""}Not guaranteed.</p>`;
 			resultBox.hidden = false;
 		});
 	}

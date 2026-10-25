@@ -83,8 +83,8 @@
 		html += resultRow("Bank interest paid", `${formatCurrency(bank.totalInterest)} (${signedDifference(interestDiff)})`);
 		html += resultRow("Cash you'd need", `${formatCurrency(bank.cash)}${cashDiff > 0 ? ` (${formatCurrency(cashDiff)} more: banks need 5% of the price in cash)` : ""}`);
 		html += `<ul class="calculator-note-list">`;
-		html += `<li><strong>HDB loan:</strong> 2.6%, pegged to the CPF rate so it rarely moves. The whole 25% can come from CPF, no early repayment penalty, but only if your household earns up to $16,000 a month ($8,000 for singles).</li>`;
-		html += `<li><strong>Bank loan:</strong> ${bank.ratePercent < 2.6 ? "cheaper at this rate" : "no cheaper at this rate"}, and up to 25 years for the full 75% loan (MAS cuts it to 55% beyond that), but the rate is only fixed for 2 to 3 years, then it floats. If bank rates average above 2.6% over your loan, HDB ends up cheaper. Once you leave the HDB loan you can't switch back.</li>`;
+		html += `<li><strong>HDB loan:</strong> 2.6%, rarely moves, all of the 25% can come from CPF. Household income up to $16,000 ($8,000 singles).</li>`;
+		html += `<li><strong>Bank loan:</strong> ${bank.ratePercent < 2.6 ? "cheaper now" : "no cheaper now"}, but only fixed for 2 to 3 years, then it floats. You can't switch back to HDB.</li>`;
 		html += `</ul></div>`;
 		return html;
 	}
@@ -268,6 +268,10 @@
 
 			resultBox.innerHTML =
 				headline("HDB loan: monthly payment", formatCurrency(monthlyPayment), `${years} years at ${(HDB_LOAN_ANNUAL_RATE * 100).toFixed(1)}% p.a. on a ${formatCurrency(loanAmount)} loan${loanAmount < hdbPlan.fullLoan ? ` (75% of the price, less ${formatCurrency(hdbPlan.fullLoan - loanAmount)} of grants and CPF OA)` : ""}`) +
+				(window.CalcViz ? window.CalcViz.bars(`HDB vs bank loan, over ${years} years`, [
+					{ label: "HDB interest", value: totalInterest, text: `${formatCurrency(totalInterest)} · ${formatCurrency(monthlyPayment)}/mo`, strong: true },
+					{ label: "Bank interest", value: bankInterest, text: `${formatCurrency(bankInterest)} · ${formatCurrency(bankMonthly)}/mo` },
+				]) : "") +
 				buildPaymentPlan(hdbPlan, cpfAvailable) +
 				resultRow("Total interest paid", formatCurrency(totalInterest)) +
 				buildBankComparison(
@@ -362,6 +366,13 @@
 			}
 
 			let html = headline("Monthly payment", formatCurrency(result.monthlyPayment), `${result.years} years at ${result.ratePercent}% p.a. flat${result.rateIsTypical ? " (typical bank rate)" : ""}`);
+			if (window.CalcViz) {
+				html += window.CalcViz.stack(`What it really costs: ${formatCurrency(result.downpayment + result.totalRepayment)}`, [
+					{ label: "Downpayment", value: result.downpayment },
+					{ label: "Loan", value: result.loanAmount },
+					{ label: "Interest", value: result.totalInterest },
+				]);
+			}
 			html += resultRow("Real (effective) rate", `about ${result.eirPercent}% a year`);
 			html += resultRow("Downpayment", formatCurrency(result.downpayment));
 			html += resultRow("Loan amount", `${formatCurrency(result.loanAmount)} (${result.loanPercent}% of the price)`);

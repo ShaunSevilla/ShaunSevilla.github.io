@@ -130,6 +130,14 @@
 					? `in tax, ${percent(result.effectiveRate)} of your ${formatCurrency(result.income)} income. The bill comes next year, and IRAS lets you spread it over up to 12 interest-free GIRO payments (about ${formatCurrency(result.tax / 12)}/month).`
 					: `in tax on ${formatCurrency(result.income)} of income.`,
 			);
+			if (window.CalcViz && result.taxWithoutReliefs > 0) {
+				const items = [
+					{ label: "No reliefs", value: result.taxWithoutReliefs },
+					{ label: "Your tax", value: result.tax, strong: true },
+				];
+				if (result.opportunities.length && result.taxAfterOpportunities < result.tax) items.push({ label: "With top-ups", value: result.taxAfterOpportunities });
+				html += window.CalcViz.bars("Your tax bill", items);
+			}
 			html += `<p class="calculator-note"><strong>Your reliefs: ${formatCurrency(result.totalRelief)}</strong>${result.capped ? " (capped at $80,000)" : ""}</p><ul class="calculator-note-list">`;
 			result.items.forEach(function (item) {
 				html += `<li>${item.label}: <strong>${formatCurrency(item.amount)}</strong>${item.auto ? " (automatic)" : ""}</li>`;
@@ -176,6 +184,21 @@
 		if (!Pay || !home || home.price <= 0) return [];
 		const plan = Pay.schedule({ price: home.price, type: home.type, loan: home.best.loan, oa: home.cpfNow, oaAtKeys: home.cpfAtKeys, grants: home.grants.total });
 		return Pay.summaryRows(plan);
+	}
+
+	// How a flat gets paid for: loan, grants, CPF OA, cash (price plus stamp
+	// duty and about $3,000 of fees).
+	function homeFundingViz(price, loan, grants, cpfAvailable) {
+		if (!window.CalcViz || !(price > 0)) return "";
+		const total = price + window.Affordability.bsd(price) + 3000;
+		const rest = Math.max(0, total - loan - grants);
+		const cpf = Math.min(Math.max(0, cpfAvailable), rest);
+		return window.CalcViz.stack(`How ${formatCurrency(price)} gets paid (with stamp duty and fees)`, [
+			{ label: "Loan", value: loan },
+			{ label: "CPF OA", value: cpf },
+			{ label: "Grants", value: grants },
+			{ label: "Cash", value: rest - cpf },
+		]);
 	}
 
 	// -------------------------------------------------------------- Afford
@@ -270,6 +293,13 @@
 				const summary = window.Affordability.homeSummary(r);
 				summary.rows.unshift(...paymentRows(r.home, window.HdbPayments));
 				html += headline(summary.headlineLabel, summary.headline, summary.sub);
+				if (window.CalcViz && r.home.price > 0) {
+					html += window.CalcViz.bars("Flat price", [
+						{ label: "Comfortable", value: r.home.price, strong: true },
+						{ label: "Stretch", value: Math.max(r.home.price, r.home.maxPrice) },
+					]);
+					html += homeFundingViz(r.home.price, r.home.best.loanAmount, r.home.grants.total, r.home.cpfAtKeys);
+				}
 				summary.rows.forEach(function (row) {
 					html += resultRow(row[0], row[1]);
 				});
@@ -281,6 +311,12 @@
 			if (r.car) {
 				const cs = window.Affordability.carSummary(r);
 				html += `<div class="afford-car">` + headline(cs.headlineLabel, cs.headline, cs.sub);
+				if (window.CalcViz && r.car.realistic) {
+					html += window.CalcViz.bars("Car price", r.car.tiers.flatMap(function (tier) {
+						const tag = tier.key === "low" ? "OMV ≤$20k" : "OMV >$20k";
+						return [{ label: `${tag}`, value: tier.price, strong: true }, { label: `${tag} stretch`, value: tier.stretchPrice }];
+					}));
+				}
 				cs.rows.forEach(function (row) { html += resultRow(row[0], row[1]); });
 				cs.notes.forEach(function (text) { html += note(text); });
 				html += `</div>`;
@@ -289,6 +325,12 @@
 			if (r.bike) {
 				const bs = window.Affordability.bikeSummary(r);
 				html += `<div class="afford-car">` + headline(bs.headlineLabel, bs.headline, bs.sub);
+				if (window.CalcViz && r.bike.realistic) {
+					html += window.CalcViz.bars("Bike price", [
+						{ label: "Comfortable", value: r.bike.price, strong: true },
+						{ label: "Stretch", value: r.bike.stretchPrice },
+					]);
+				}
 				bs.rows.forEach(function (row) { html += resultRow(row[0], row[1]); });
 				bs.notes.forEach(function (text) { html += note(text); });
 				html += `</div>`;
@@ -355,7 +397,19 @@
 			});
 			const s = window.Affordability.needSummary(n);
 			let html = headline(s.headlineLabel, s.headline, s.sub);
-			if (s.stretch) html += `<div class="earn-stretch">${headline(s.stretchLabel, s.stretch, s.stretchSub)}</div>`;
+			if (window.CalcViz && n.kind === "home" && n.found) {
+				html += window.CalcViz.bars("Monthly pay needed", [
+					{ label: "Comfortable", value: n.income, strong: true },
+					...(n.stretchIncome && n.stretchIncome < n.income ? [{ label: "Stretch", value: n.stretchIncome }] : []),
+				]);
+				html += homeFundingViz(n.price, n.loanAmount, n.grants.total, n.cpfAtKeys || 0);
+			} else if (window.CalcViz && n.kind !== "home") {
+				html += window.CalcViz.bars("Monthly pay needed", n.tiers.flatMap(function (t) {
+					const tag = n.tiers.length > 1 ? (t.key === "low" ? "OMV ≤$20k" : "OMV >$20k") : "";
+					return [{ label: tag || "Comfortable", value: t.income, strong: true }, { label: tag ? `${tag} stretch` : "Stretch", value: t.stretchIncome }];
+				}));
+			}
+			if (s.stretch && !window.CalcViz) html += `<div class="earn-stretch">${headline(s.stretchLabel, s.stretch, s.stretchSub)}</div>`;
 			s.rows.forEach(function (row) { html += resultRow(row[0], row[1]); });
 			s.notes.forEach(function (text, index) { html += note(text, index === 0 ? "calculator-note-callout" : ""); });
 			html += note("Comfortable means the emergency buffer (6 months of spending, or of pay if people depend on you) stays untouched. Estimates only, not personalised advice.");
