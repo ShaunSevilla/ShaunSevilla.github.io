@@ -91,6 +91,49 @@ function buildDaily(daily) {
 	return grid.children.length ? wrapper : null;
 }
 
+// Market Pulse: index ETFs and gauges, each with what it tells you.
+const PULSE_INFO = [
+	[/s&p|spy/i, "The whole US market: the general mood"],
+	[/nasdaq|qqq/i, "Big tech"],
+	[/russell|iwm/i, "Small companies, the most sensitive to interest rates"],
+	[/dow|dia\b/i, "30 old-economy blue chips"],
+	[/sti\b|straits|es3/i, "Singapore's top 30 companies"],
+	[/treasur|tlt|bond/i, "Long-term bonds: rise when markets expect rate cuts"],
+	[/gold|gld/i, "The safe haven"],
+	[/vix|fear/i, "The fear gauge: higher means more nervous"],
+];
+
+const DASH_ONLY = /^(?:[—–-]+|n\/a)?$/i;
+
+// Green for good, red for bad. For the VIX (fear) a fall is the good news.
+function changeTone(value, name) {
+	const s = String(value || "").trim();
+	if (DASH_ONLY.test(s) || /^\+?0(?:\.0+)?%?$/.test(s)) return "is-flat";
+	const down = /^[-−–]/.test(s);
+	const fear = /vix|fear/i.test(name || "");
+	return down !== fear ? "is-down" : "is-up";
+}
+
+function buildPulse(pulse) {
+	const wrapper = el("section", "mu-section mu-pulse");
+	wrapper.appendChild(el("h2", "mu-section-title", "📊 Market pulse"));
+	const grid = el("div", "mu-pulse-grid");
+	for (const g of pulse) {
+		const card = el("div", "mu-pulse-card");
+		const head = el("div", "mu-pulse-head");
+		head.appendChild(el("span", "mu-pulse-name", g.name));
+		head.appendChild(el("span", `mu-pulse-day ${changeTone(g.day, g.name)}`, g.day || "—"));
+		card.appendChild(head);
+		card.appendChild(el("strong", "mu-pulse-price", g.price));
+		if (g.ytd && !DASH_ONLY.test(g.ytd.trim())) card.appendChild(el("span", `mu-pulse-ytd ${changeTone(g.ytd, g.name)}`, `${g.ytd} this year`));
+		const info = PULSE_INFO.find(([pattern]) => pattern.test(g.name));
+		if (info) card.appendChild(el("p", "mu-pulse-info", info[1]));
+		grid.appendChild(card);
+	}
+	wrapper.appendChild(grid);
+	return wrapper;
+}
+
 function formatPublished(value) {
 	const date = value ? new Date(value) : null;
 	if (!date || Number.isNaN(date.getTime())) return "";
@@ -121,6 +164,9 @@ async function initMarketUpdate() {
 		return;
 	}
 
+	if (Array.isArray(result.data.pulse) && result.data.pulse.length) {
+		container.appendChild(buildPulse(result.data.pulse));
+	}
 	if (result.data.daily) {
 		const daily = buildDaily(result.data.daily);
 		if (daily) container.appendChild(daily);
