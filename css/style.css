@@ -5114,3 +5114,14 @@ input[type="range"] {
 #calculators label:focus-within + .calculator-field-hint:not([id]):not(.tax-group-hint) {
 	display: block;
 }
+
+/* Quick / Detailed on the longer calculators */
+form.is-quick .calc-detail {
+	display: none !important;
+}
+
+.calc-mode-note {
+	margin: -0.35rem 0 0.9rem;
+	font-size: 0.78rem;
+	color: var(--text-muted);
+}
