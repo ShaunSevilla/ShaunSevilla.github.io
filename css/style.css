@@ -239,7 +239,6 @@ section {
 		transparent 68%
 	);
 	pointer-events: none;
-	animation: heroBreath 4.2s ease-in-out infinite;
 }
 
 @keyframes heroBreath {
@@ -362,7 +361,6 @@ section {
 	width: 1px;
 	height: 38px;
 	background: linear-gradient(to bottom, var(--gold-dim), transparent);
-	animation: scrollPulse 2s ease-in-out infinite;
 }
 
 @keyframes scrollPulse {
@@ -1469,7 +1467,7 @@ section {
 }
 
 .fitness-tile-photo img {
-	transition: transform 0.55s ease, filter 0.55s ease;
+	transition: transform 0.3s ease-out, filter 0.3s ease-out;
 }
 
 .fitness-tile-photo:hover img {
@@ -2730,11 +2728,11 @@ footer span {
 	font-size: 0.7rem;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
-	transition: gap var(--transition);
 }
 
 .guide-tool-link:hover {
-	gap: 0.7rem;
+	text-decoration: underline;
+	text-underline-offset: 4px;
 }
 
 /* Loan offsetting (under HDB and car loan results) */
@@ -3023,7 +3021,6 @@ footer span {
 	height: 100%;
 	width: 0;
 	background: var(--gold);
-	transition: width 0.25s ease;
 }
 
 .quiz-count {
@@ -4423,7 +4420,6 @@ footer span {
 .ins-bar i,
 .ins-meter i {
 	display: block;
-	transition: width 0.15s ease;
 }
 
 .ins-legend {
@@ -4985,7 +4981,6 @@ input[type="range"] {
 	height: 100%;
 	border-radius: 999px;
 	background: #5c5c5c;
-	transition: width 0.25s ease;
 }
 
 .viz-bar.is-strong .viz-bar-track i {
@@ -5014,7 +5009,6 @@ input[type="range"] {
 .viz-stack i {
 	display: block;
 	height: 100%;
-	transition: width 0.25s ease;
 }
 
 .viz-legend {
@@ -5224,3 +5218,62 @@ form.is-quick .calc-detail {
 	.mu-signal .mu-tone-why { display: inline; margin: 0 0 0 0.5rem; }
 	.mu-tone-overall { display: table; margin: 0.4rem 0 0; }
 }
+
+/* Calculators: "Play with the numbers" sliders, shown above the result once it's in */
+.calc-tweak {
+	margin: 1.25rem 0 1rem;
+	padding: 1rem 1.1rem 0.5rem;
+	border: 1px solid rgba(201, 168, 76, 0.35);
+	border-radius: 14px;
+	background: rgba(201, 168, 76, 0.05);
+}
+.calc-tweak[hidden],
+.calc-tweak-row[hidden] { display: none; }
+.calc-tweak-title {
+	margin: 0 0 0.5rem;
+	font-size: 0.7rem;
+	font-weight: 600;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--gold);
+}
+.calc-tweak-row {
+	display: block;
+	padding: 0.5rem 0;
+	cursor: pointer;
+}
+.calc-tweak-row + .calc-tweak-row { border-top: 1px solid var(--border); }
+.calc-tweak-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 1rem;
+	font-size: 0.85rem;
+	color: var(--text-muted);
+}
+.calc-tweak-head strong {
+	color: var(--text);
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+.calc-tweak .calc-range { height: 32px; margin: 0.2rem 0 0; }
+.calc-range:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; border-radius: 6px; }
+@media (min-width: 861px) {
+	.calc-tweak { display: grid; grid-template-columns: 1fr 1fr; column-gap: 2rem; }
+	.calc-tweak[hidden] { display: none; }
+	.calc-tweak-title { grid-column: 1 / -1; }
+	.calc-tweak-row + .calc-tweak-row { border-top: 0; }
+}
+
+/* Tap targets: 44px minimum (VectorLab viewports / WCAG 2.5.8) */
+.nav-logo { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }
+.footer-tools a,
+.footer-tools > span { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.15rem; }
+.footer-contact-links a { min-height: 44px; display: inline-flex; align-items: center; }
+.calc-mode button { min-height: 44px; padding: 0 1.2rem; }
+.booking-retry { min-height: 44px; padding: 0 1rem; margin: 0.35rem 0.25rem; }
+.money-guide-jump a { min-height: 44px; display: inline-flex; align-items: center; }
+.guide-tool-link { min-height: 44px; margin-top: 0.5rem; }
+.booking-form .check-row input,
+.booking-form input[type="radio"] { width: 20px; height: 20px; flex: none; }

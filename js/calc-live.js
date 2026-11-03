@@ -1,4 +1,4 @@
-// Sliders for every number field, and live results: once someone has hit
+// Sliders under "Play with the numbers" once there's a result, and live results: once someone has hit
 // Calculate, any change (drag, type, pick) re-runs the calculator straight
 // away. calculator-ux.js sees window.__calcLive and skips its scroll.
 (function () {
@@ -48,35 +48,90 @@
 		slider.style.setProperty("--fill", `${Math.max(0, Math.min(100, pct))}%`);
 	}
 
-	function attach(input) {
-		const r = rangeFor(input);
-		if (!r || input.dataset.slider) return;
-		input.dataset.slider = "1";
-		const slider = document.createElement("input");
-		slider.type = "range";
-		slider.className = "calc-range";
-		slider.tabIndex = -1; // the number box stays the keyboard control
-		slider.setAttribute("aria-hidden", "true");
-		const sync = function () {
-			const r2 = rangeFor(input);
-			slider.min = r2.min;
-			slider.step = r2.step;
-			const v = input.value === "" ? r2.def : Number(input.value);
-			slider.max = Math.max(r2.max, Number.isFinite(v) ? v : 0);
-			slider.value = Number.isFinite(v) ? v : r2.def;
-			fill(slider);
+	function show(input, value) {
+		if (!Number.isFinite(value)) return "—";
+		if (/rate/.test(input.id)) return `${value}%`;
+		if (/years/.test(input.id)) return `${value} ${value === 1 ? "year" : "years"}`;
+		return `$${Math.round(value).toLocaleString("en-SG")}`;
+	}
+
+	function labelText(input) {
+		const label = input.closest("label");
+		const span = label && label.querySelector("span");
+		const text = span ? span.childNodes[0].textContent : input.id;
+		return text.replace(/\s*\((?:\$|%)\)/g, "").trim();
+	}
+
+	// "Play with the numbers": once there's a result, the key numbers get a
+	// slider right above it, so a drag changes the answer in view. The form
+	// itself stays plain number boxes.
+	function tweakPanel(form) {
+		const inputs = Array.from(form.querySelectorAll('input[type="number"]')).filter(rangeFor);
+		const card = form.closest(".calculator-card");
+		const box = card && card.querySelector(".calculator-result");
+		if (!inputs.length || !box) return;
+
+		const panel = document.createElement("div");
+		panel.className = "calc-tweak";
+		panel.hidden = true;
+		const title = document.createElement("p");
+		title.className = "calc-tweak-title";
+		title.textContent = "Play with the numbers";
+		panel.appendChild(title);
+
+		const rows = inputs.map(function (input) {
+			const row = document.createElement("label");
+			row.className = "calc-tweak-row";
+			const head = document.createElement("span");
+			head.className = "calc-tweak-head";
+			const name = document.createElement("span");
+			name.textContent = labelText(input);
+			const val = document.createElement("strong");
+			head.append(name, val);
+			const slider = document.createElement("input");
+			slider.type = "range";
+			slider.className = "calc-range";
+			row.append(head, slider);
+			panel.appendChild(row);
+
+			const sync = function () {
+				const r = rangeFor(input);
+				const v = input.value === "" ? r.def : Number(input.value);
+				slider.min = r.min;
+				slider.step = r.step;
+				slider.max = Math.max(r.max, Number.isFinite(v) ? v : 0);
+				slider.value = Number.isFinite(v) ? v : r.def;
+				val.textContent = show(input, Number(slider.value));
+				slider.setAttribute("aria-valuetext", val.textContent);
+				fill(slider);
+			};
+			slider.addEventListener("input", function () {
+				input.value = slider.value;
+				val.textContent = show(input, Number(slider.value));
+				slider.setAttribute("aria-valuetext", val.textContent);
+				fill(slider);
+				input.dispatchEvent(new Event("input", { bubbles: true }));
+			});
+			input.addEventListener("input", function (event) {
+				if (event.isTrusted) sync();
+			});
+			input._syncSlider = sync;
+			return { input, row, sync };
+		});
+
+		// Only numbers that are on screen in the form get a slider (Quick hides some).
+		const refresh = function () {
+			panel.hidden = box.hidden;
+			if (box.hidden) return;
+			rows.forEach(function (r) {
+				const label = r.input.closest("label") || r.input;
+				r.row.hidden = !label.getClientRects().length;
+				r.sync();
+			});
 		};
-		sync();
-		input.insertAdjacentElement("afterend", slider);
-		slider.addEventListener("input", function () {
-			input.value = slider.value;
-			fill(slider);
-			input.dispatchEvent(new Event("input", { bubbles: true }));
-		});
-		input.addEventListener("input", function (event) {
-			if (event.isTrusted) sync();
-		});
-		input._syncSlider = sync;
+		box.insertAdjacentElement("beforebegin", panel);
+		new MutationObserver(refresh).observe(box, { attributes: true, attributeFilter: ["hidden"], childList: true });
+		refresh();
 	}
 
 	function live(form) {
@@ -161,7 +216,7 @@
 	function init() {
 		document.querySelectorAll("#calculators form.calculator-form").forEach(function (form) {
 			setupModes(form);
-			form.querySelectorAll('input[type="number"]').forEach(attach);
+			tweakPanel(form);
 			live(form);
 		});
 		// The price slider's range follows what they're buying.

@@ -74,7 +74,9 @@ function escapeHtml(value) {
 
 function setSubmitReady(ready) {
 	const submit = document.getElementById("booking-submit");
-	submit.disabled = !ready;
+	// Never disabled: a tap without a time explains what's missing instead.
+	submit.disabled = false;
+	submit.setAttribute("aria-describedby", "booking-status");
 	submit.textContent = ready ? (isQuick() ? SUBMIT_READY_LABEL_QUICK : SUBMIT_READY_LABEL) : SUBMIT_WAITING_LABEL;
 }
 
@@ -291,7 +293,14 @@ async function loadAvailability(preserveStatus = false) {
 
 async function submitBooking(event) {
 	event.preventDefault();
-	if (!bookingState.selectedDate || !bookingState.selectedSlot) return;
+	if (!bookingState.selectedDate || !bookingState.selectedSlot) {
+		const status = document.getElementById("booking-status");
+		status.textContent = bookingState.selectedDate ? "Pick a time above, then confirm." : "Pick a date and a time above, then confirm.";
+		status.className = "booking-status error";
+		const target = document.getElementById(bookingState.selectedDate ? "booking-time-step" : "booking-dates");
+		target?.scrollIntoView({ behavior: "smooth", block: "center" });
+		return;
+	}
 
 	const form = event.currentTarget;
 	const submit = document.getElementById("booking-submit");
@@ -328,8 +337,12 @@ async function submitBooking(event) {
 			status.className = "booking-status success";
 		}
 	} catch (error) {
-		status.textContent = error.message;
+		// Show the server's own sentence when it's a plain one (e.g. the slot was
+		// just taken); never raw database text. Always offer a way forward.
+		const raw = String(error.message || "");
+		const plain = raw && raw.length < 140 && !/violat|function|constraint|PGRST|syntax|null value|relation|unable to complete/i.test(raw);
 		status.className = "booking-status error";
+		status.innerHTML = `${plain ? escapeHtml(raw) : "That booking didn't go through."} Pick another time, or <a href="${TELEGRAM_URL}" target="_blank" rel="noopener noreferrer">message me on Telegram</a>.`;
 	} finally {
 		setSubmitReady(Boolean(bookingState.selectedSlot));
 	}
