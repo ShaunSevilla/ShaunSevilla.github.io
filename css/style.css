@@ -5192,3 +5192,35 @@ form.is-quick .calc-detail {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
+
+/* Market Update: bullish / bearish signal per indicator */
+.mu-signal { white-space: nowrap; }
+.mu-tone {
+	display: inline-block;
+	font-size: 0.72rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	padding: 0.12rem 0.55rem;
+	border-radius: 999px;
+	color: var(--text-muted);
+	background: rgba(255, 255, 255, 0.06);
+}
+.mu-tone.is-bullish { color: #7fd18b; background: rgba(127, 209, 139, 0.12); }
+.mu-tone.is-bearish { color: #f08a7e; background: rgba(240, 138, 126, 0.12); }
+.mu-tone-why {
+	display: block;
+	margin-top: 0.3rem;
+	font-size: 0.72rem;
+	color: var(--text-muted);
+	white-space: normal;
+}
+.mu-tone-overall {
+	margin-left: 0.75rem;
+	vertical-align: middle;
+	font-family: "Inter", system-ui, sans-serif;
+}
+@media (max-width: 700px) {
+	.mu-signal { margin-top: 0.4rem; }
+	.mu-signal .mu-tone-why { display: inline; margin: 0 0 0 0.5rem; }
+	.mu-tone-overall { display: table; margin: 0.4rem 0 0; }
+}

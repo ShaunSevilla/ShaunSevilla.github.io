@@ -34,20 +34,108 @@ function el(tag, className, text) {
 	return node;
 }
 
+// Bullish or bearish: did the figure come in above or below what was expected
+// (or the last reading when there's no forecast), and is higher good news?
+// Higher inflation and joblessness weigh on stocks; growth and spending help.
+const SENTIMENT_RULES = [
+	{ test: /fed funds|interest rate|policy rate/i, kind: "rate" },
+	{ test: /cpi|pce|ppi|inflation|price/i, higherIs: "bearish", up: "Hotter than", down: "Cooler than" },
+	{ test: /unemployment|jobless|claims/i, higherIs: "bearish", up: "Higher than", down: "Lower than" },
+	{ test: /payroll|gdp|sentiment|confidence|pmi|retail|spending|income/i, higherIs: "bullish", up: "Stronger than", down: "Weaker than" },
+];
+
+const NUMBER = /([+\-−]?\d[\d,]*(?:\.\d+)?)/;
+
+function toNumber(text) {
+	return Number(String(text).replace(/,/g, "").replace("−", "-"));
+}
+
+// The number tagged with a unit (YoY or MoM), or the first number in the cell.
+function readFigure(text, unit) {
+	const s = String(text || "");
+	if (unit) {
+		const tagged = s.match(new RegExp(`${NUMBER.source}\\s*%?\\s*${unit}`, "i"));
+		return tagged ? toNumber(tagged[1]) : null;
+	}
+	const first = s.match(NUMBER);
+	return first ? toNumber(first[1]) : null;
+}
+
+// Compare like with like: YoY with YoY, MoM with MoM, else the headline numbers.
+function compareFigures(current, target) {
+	if (DASH_ONLY.test(String(target || "").trim())) return null;
+	for (const unit of ["YoY", "MoM"]) {
+		const t = readFigure(target, unit);
+		const c = readFigure(current, unit);
+		if (t !== null && c !== null) return c - t;
+		if (t !== null) return null;
+	}
+	const t = readFigure(target);
+	const c = readFigure(current);
+	return t === null || c === null || Number.isNaN(t) || Number.isNaN(c) ? null : c - t;
+}
+
+function sentimentFor(row) {
+	const rule = SENTIMENT_RULES.find((r) => r.test.test(row.name || ""));
+	if (!rule || DASH_ONLY.test(String(row.current || "").trim())) return null;
+	if (rule.kind === "rate") {
+		const change = compareFigures(row.current, row.previous);
+		if (change === null) return null;
+		if (/hike/i.test(row.current) || change > 0) return { tone: "bearish", reason: "Rate hike" };
+		if (/cut/i.test(row.current) || change < 0) return { tone: "bullish", reason: "Rate cut" };
+		return { tone: "neutral", reason: "Rate held" };
+	}
+	let diff = compareFigures(row.current, row.consensus);
+	let versus = "expected";
+	if (diff === null) {
+		diff = compareFigures(row.current, row.previous);
+		versus = "before";
+	}
+	if (diff === null) return null;
+	if (Math.abs(diff) < 1e-9) return { tone: "neutral", reason: versus === "expected" ? "In line with expected" : "Same as before" };
+	const higher = diff > 0;
+	const tone = higher === (rule.higherIs === "bullish") ? "bullish" : "bearish";
+	return { tone, reason: `${higher ? rule.up : rule.down} ${versus}` };
+}
+
+const TONE_LABEL = { bullish: "Bullish", bearish: "Bearish", neutral: "Neutral" };
+
+function buildSignal(signal) {
+	const cell = el("td", "mu-signal");
+	cell.setAttribute("data-label", "Signal");
+	if (!signal) {
+		cell.textContent = "—";
+		return cell;
+	}
+	cell.appendChild(el("span", `mu-tone is-${signal.tone}`, TONE_LABEL[signal.tone]));
+	cell.appendChild(el("span", "mu-tone-why", signal.reason));
+	return cell;
+}
+
 function buildSection(section) {
 	const wrapper = el("section", "mu-section");
-	wrapper.appendChild(el("h2", "mu-section-title", section.title));
+	const signals = section.rows.map(sentimentFor);
+	const title = el("h2", "mu-section-title", section.title);
+	const bulls = signals.filter((x) => x && x.tone === "bullish").length;
+	const bears = signals.filter((x) => x && x.tone === "bearish").length;
+	if (bulls || bears) {
+		const overall = bulls > bears ? "bullish" : bears > bulls ? "bearish" : "neutral";
+		const label = overall === "neutral" ? "Mixed" : `Mostly ${overall}`;
+		title.appendChild(el("span", `mu-tone mu-tone-overall is-${overall}`, `${label} · ${bulls} bullish, ${bears} bearish`));
+	}
+	wrapper.appendChild(title);
 
 	const table = el("table", "mu-table");
 	const head = el("thead");
 	const headRow = el("tr");
 	headRow.appendChild(el("th", "", "Indicator"));
 	for (const column of MARKET_COLUMNS) headRow.appendChild(el("th", "", column.label));
+	headRow.appendChild(el("th", "", "Signal"));
 	head.appendChild(headRow);
 	table.appendChild(head);
 
 	const body = el("tbody");
-	for (const row of section.rows) {
+	section.rows.forEach((row, index) => {
 		const tr = el("tr");
 		tr.appendChild(el("th", "mu-name", row.name));
 		for (const column of MARKET_COLUMNS) {
@@ -56,8 +144,9 @@ function buildSection(section) {
 			cell.setAttribute("data-label", column.label);
 			tr.appendChild(cell);
 		}
+		tr.appendChild(buildSignal(signals[index]));
 		body.appendChild(tr);
-	}
+	});
 	table.appendChild(body);
 	wrapper.appendChild(table);
 	return wrapper;
