@@ -5277,3 +5277,6 @@ form.is-quick .calc-detail {
 .guide-tool-link { min-height: 44px; margin-top: 0.5rem; }
 .booking-form .check-row input,
 .booking-form input[type="radio"] { width: 20px; height: 20px; flex: none; }
+
+/* Logo mark in the nav */
+.nav-logo img { display: block; width: 34px; height: 34px; }

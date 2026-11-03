@@ -47,7 +47,7 @@
 
 		return `
 			<div class="nav-inner">
-				<a href="${root}/index.html" class="nav-logo">SS</a>
+				<a href="${root}/index.html" class="nav-logo" aria-label="Shaun Sevilla, home"><img src="${root}/assets/logo/favicon.svg" alt="" width="34" height="34" /></a>
 				<button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle navigation" aria-controls="nav-links" aria-expanded="false">
 					<span></span><span></span><span></span>
 				</button>
