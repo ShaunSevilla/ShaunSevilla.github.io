@@ -313,6 +313,9 @@
 			: null;
 		return {
 			type: bto ? "bto" : "resale",
+			// What they asked for in the dropdown, so a switch to resale is said out loud.
+			wanted: input.resale ? "resale" : "bto",
+			income,
 			price: best.price,
 			maxPrice: Math.max(...options.map((option) => option.maxPrice)),
 			best,
@@ -560,9 +563,10 @@
 		const home = result.home;
 		const best = home.best;
 		const flat = home.type === "bto" ? "BTO flat" : "resale flat";
+		const btoBlocked = home.wanted === "bto" && home.type !== "bto";
 		const summary = {
-			title: home.type === "bto" ? "Home (BTO)" : "Home (resale)",
-			headlineLabel: `Comfortable: a ${flat} up to`,
+			title: home.type === "bto" ? "Home (BTO)" : btoBlocked ? "Home (resale, BTO not open at this pay)" : "Home (resale)",
+			headlineLabel: btoBlocked ? "No BTO at this pay. Comfortable resale flat instead, up to" : `Comfortable: a ${flat} up to`,
 			headline: money(home.price),
 			sub: "",
 			rows: [],
@@ -618,7 +622,9 @@
 		if (home.singleUnder35) {
 			summary.notes.push("Singles can only buy an HDB flat on their own from age 35. Before that, it's with a partner or family, or private property.");
 		}
-		if (!home.hdbEligible) {
+		if (btoBlocked && !home.hdbEligible) {
+			summary.notes.unshift(`You picked BTO, but a BTO needs household income of ${money(home.ceiling)} or less. At ${money(home.income)}, the numbers above are for a resale flat with a bank loan (no HDB loan or CPF Housing Grant). At ${money(home.ceiling)} or below, BTO comes back.`);
+		} else if (!home.hdbEligible) {
 			summary.notes.push(`Your household income is above HDB's ${money(home.ceiling)} ceiling, so no BTO, HDB loan or CPF Housing Grant. This is a resale flat with a bank loan.`);
 		}
 		if (home.price > 1000000) {
