@@ -2,7 +2,6 @@
    SHAUN SEVILLA  —  Black · White · Gold
    ============================================================ */
 
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap");
 
 :root {
 	--bg: #080808;
@@ -242,11 +241,6 @@ section {
 	pointer-events: none;
 }
 
-@keyframes heroBreath {
-	0%, 100% { opacity: 0.7; transform: scale(0.96); }
-	50% { opacity: 1; transform: scale(1.04); }
-}
-
 .hero-inner {
 	position: relative;
 	z-index: 2;
@@ -319,11 +313,39 @@ section {
 	text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
 }
 
+.hero-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	gap: 0.5rem 1.25rem;
+	margin-top: 2rem;
+}
+
+.hero-secondary-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.55rem;
+	min-height: 44px;
+	padding: 0 0.5rem;
+	color: var(--text-muted);
+	font-size: 0.72rem;
+	font-weight: 500;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
+	transition: color var(--transition);
+}
+
+.hero-secondary-link:hover,
+.hero-secondary-link:focus-visible {
+	color: var(--gold);
+}
+
 .hero-booking-link {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.55rem;
-	margin-top: 2rem;
 	padding: 0.8rem 1.15rem;
 	background: rgba(10, 10, 10, 0.72);
 	border: 1px solid var(--gold-dim);
@@ -341,77 +363,7 @@ section {
 	gap: 0.85rem;
 }
 
-.hero-scroll {
-	position: absolute;
-	bottom: 2.5rem;
-	left: 50%;
-	transform: translateX(-50%);
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 0.6rem;
-	color: var(--text-muted);
-	font-size: 0.6rem;
-	letter-spacing: 0.25em;
-	text-transform: uppercase;
-}
-
-.hero-scroll::after {
-	content: "";
-	display: block;
-	width: 1px;
-	height: 38px;
-	background: linear-gradient(to bottom, var(--gold-dim), transparent);
-}
-
-@keyframes scrollPulse {
-	0% {
-		opacity: 0;
-		transform: scaleY(0.2);
-		transform-origin: top;
-	}
-	45% {
-		opacity: 1;
-		transform: scaleY(1);
-		transform-origin: top;
-	}
-	100% {
-		opacity: 0;
-		transform: scaleY(1);
-		transform-origin: bottom;
-	}
-}
-
-/* PILLARS */
-.home-profile-grid {
-	max-width: var(--container-width);
-	margin: 0 auto;
-	padding: var(--section-space) 2rem;
-	display: grid;
-	grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
-	gap: var(--component-gap);
-	align-items: start;
-	padding-bottom: 0.5rem;
-}
-
-.home-profile-grid > section {
-	padding: 2.25rem;
-	border: 1px solid var(--border);
-	background: var(--surface);
-}
-
-.home-profile-grid > section > .container {
-	max-width: none;
-	padding: 0;
-}
-
-.home-profile-grid #credentials,
-.home-profile-grid #work {
-	border: 0;
-	background: transparent;
-}
-
-.home-profile-grid .pillars-grid {
+.pillars-grid {
 	grid-template-columns: 1fr;
 }
 
@@ -581,83 +533,6 @@ section {
 	color: var(--text-muted);
 }
 
-/* LEADERSHIP */
-.home-overview {
-	max-width: var(--container-width);
-	margin: 0 auto;
-	padding: var(--section-space) 2rem;
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: var(--component-gap);
-	align-items: stretch;
-	padding-top: 0.5rem;
-}
-
-.home-overview > section {
-	padding: 2.25rem;
-	border: 1px solid var(--border);
-	background: var(--surface);
-}
-
-.home-overview > section > .container {
-	max-width: none;
-	padding: 0;
-}
-
-.home-overview .consultation-cta {
-	border: 1px solid var(--border);
-}
-
-.home-overview .consultation-cta-inner {
-	grid-template-columns: 1fr;
-	gap: 2rem;
-}
-
-.home-overview .consultation-hours {
-	grid-template-columns: repeat(2, 1fr);
-}
-
-.home-overview .leadership-grid {
-	grid-template-columns: 1fr;
-}
-
-.leadership-grid {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: var(--component-gap);
-}
-
-@media (max-width: 600px) {
-	.leadership-grid {
-		grid-template-columns: 1fr;
-	}
-}
-
-.leadership-item {
-	background: var(--surface);
-	border: 1px solid var(--border);
-	padding: var(--card-padding);
-	transition: background var(--transition), border-color var(--transition), transform var(--transition);
-}
-.leadership-item:hover {
-	background: var(--surface-2);
-	border-color: var(--gold-dim);
-	transform: translateY(-2px);
-}
-.leadership-role {
-	font-family: "Cormorant Garamond", serif;
-	font-size: 1.15rem;
-	font-weight: 600;
-	color: #ffffff;
-	margin-bottom: 0.4rem;
-}
-.leadership-date {
-	font-size: 0.68rem;
-	letter-spacing: 0.12em;
-	text-transform: uppercase;
-	color: var(--gold);
-}
-
 /* CONTACT */
 .contact-list {
 	list-style: none;
@@ -799,76 +674,6 @@ section {
 .detail-section + .detail-section,
 .github-preview-section {
 	padding-top: 0;
-}
-
-.skills-grid {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: var(--component-gap);
-}
-
-.skill-card {
-	background: var(--surface);
-	border: 1px solid var(--border);
-	padding: var(--card-padding);
-	transition: background var(--transition), border-color var(--transition), transform var(--transition);
-}
-
-.skill-card:hover {
-	background: var(--surface-2);
-	border-color: var(--gold-dim);
-	transform: translateY(-2px);
-}
-
-.skill-card h3 {
-	font-size: var(--card-title-size);
-	margin-bottom: 0.7rem;
-}
-
-.skill-card p {
-	color: var(--text-muted);
-	font-size: 0.9rem;
-	line-height: 1.75;
-	margin-bottom: 1.1rem;
-}
-
-.skill-tags {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.55rem;
-}
-
-.skill-tags span {
-	border: 1px solid var(--gold-dim);
-	color: var(--gold);
-	font-size: 0.68rem;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
-	padding: 0.32rem 0.58rem;
-	line-height: 1.4;
-}
-
-.advisory-flow {
-	display: flex;
-	flex-direction: column;
-	gap: 1.4rem;
-}
-
-.advisory-step {
-	padding: 0;
-}
-
-.advisory-step h2 {
-	font-size: clamp(1.7rem, 3vw, 2.3rem);
-	margin-bottom: 0.75rem;
-}
-
-.advisory-step p {
-	max-width: 780px;
-	font-size: 0.95rem;
-	line-height: 1.85;
-	color: var(--text-muted);
-	margin-bottom: 1rem;
 }
 
 .bot-cta-link {
@@ -1452,14 +1257,12 @@ section {
 	color: var(--text-muted);
 }
 
-.fitness-tile-hyrox h2,
-.fitness-tile-manifesto h2 {
+.fitness-tile-hyrox h2 {
 	font-size: clamp(2.3rem, 4vw, 4rem);
 	margin-bottom: 0.6rem;
 }
 
-.fitness-tile-hyrox p,
-.fitness-tile-manifesto p {
+.fitness-tile-hyrox p {
 	color: var(--text-muted);
 }
 
@@ -1498,20 +1301,6 @@ section {
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
 	color: var(--gold);
-}
-
-.fitness-tile-manifesto {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	padding: clamp(1.5rem, 4vw, 3rem);
-	background: var(--gold-faint);
-}
-
-.fitness-tile-manifesto > i {
-	font-size: 2rem;
-	color: var(--gold);
-	margin-bottom: 2rem;
 }
 
 .fitness-cta {
@@ -1796,21 +1585,10 @@ section {
 	margin-top: 0;
 }
 
-.money-guide-calculators {
-	border-top: 1px solid var(--border);
-}
-
 .calculator-intro {
 	color: var(--text-muted);
 	max-width: 46rem;
 	margin-top: 0.5rem;
-}
-
-.calculator-grid {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: var(--component-gap);
-	margin-top: 2rem;
 }
 
 .calculator-card {
@@ -1931,58 +1709,6 @@ section {
 	margin-bottom: 0.2rem;
 }
 
-.hdb-timeline-bar {
-	display: flex;
-	width: 100%;
-	height: 12px;
-	border-radius: 6px;
-	overflow: hidden;
-	margin: 0.6rem 0;
-	background: var(--border);
-}
-
-.hdb-timeline-otp {
-	display: block;
-	height: 100%;
-	background: var(--gold, #c9a84c);
-}
-
-.hdb-timeline-completion {
-	display: block;
-	height: 100%;
-	background: #6fae9c;
-}
-
-.hdb-timeline-legend {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 1rem;
-	margin-bottom: 0.6rem;
-	font-size: 0.78rem;
-	color: var(--text-muted);
-}
-
-.hdb-timeline-legend span {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.35rem;
-}
-
-.hdb-timeline-swatch {
-	display: inline-block;
-	width: 10px;
-	height: 10px;
-	border-radius: 2px;
-}
-
-.hdb-timeline-swatch-otp {
-	background: var(--gold, #c9a84c);
-}
-
-.hdb-timeline-swatch-completion {
-	background: #6fae9c;
-}
-
 .money-guide-resources {
 	border-top: 1px solid var(--border);
 }
@@ -2080,10 +1806,6 @@ footer span {
 }
 
 @media (max-width: 1200px) {
-	.home-profile-grid,
-	.home-overview {
-		padding-inline: 1.5rem;
-	}
 
 	.container {
 		padding: 0 1.5rem;
@@ -2100,10 +1822,6 @@ footer span {
 }
 
 @media (max-width: 980px) {
-	.home-profile-grid,
-	.home-overview {
-		grid-template-columns: 1fr;
-	}
 
 	section {
 		padding: 4.75rem 0;
@@ -2113,20 +1831,8 @@ footer span {
 		padding: 5rem 1.5rem 6.5rem;
 	}
 
-	.hero-scroll {
-		display: none;
-	}
-
 	.nav-links {
 		gap: 1.6rem;
-	}
-
-	.leadership-grid {
-		grid-template-columns: 1fr;
-	}
-
-	.skills-grid {
-		grid-template-columns: 1fr;
 	}
 
 	.consultation-cta-inner {
@@ -2260,10 +1966,6 @@ footer span {
 		grid-template-columns: repeat(3, 1fr);
 	}
 
-	.calculator-grid {
-		grid-template-columns: 1fr;
-	}
-
 	/* Behind-the-heading, aligned-right treatment, matching the rest of the
 	   site's hero photos, instead of the desktop bottom-right placement
 	   (which has nothing to sit next to once the copy stacks to one column). */
@@ -2311,19 +2013,6 @@ footer span {
 
 	.page-hero-grid > :first-child {
 		max-width: 82%;
-	}
-
-	.home-overview {
-		padding: 0.5rem 1.25rem var(--section-space);
-	}
-
-	.home-profile-grid {
-		padding: var(--section-space) 1.25rem 0.5rem;
-	}
-
-	.home-profile-grid > section,
-	.home-overview > section {
-		padding: var(--card-padding);
 	}
 
 	.detail-hero {
@@ -2511,12 +2200,6 @@ footer span {
 	}
 }
 
-@media (max-width: 760px) {
-	.skills-grid {
-		grid-template-columns: 1fr;
-	}
-}
-
 /* Inner-page heroes on small screens: the cutout sits behind the intro copy,
    so keep that copy legible. */
 @media (max-width: 768px) {
@@ -2604,17 +2287,113 @@ footer span {
 
 @media (max-width: 980px) {
 	.tools-grid {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
 }
 
 @media (max-width: 560px) {
-	.tools-grid {
+	.tools-intro {
+		margin-top: -1rem;
+	}
+}
+
+.tools-more {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0 1.75rem;
+	margin-top: 1.75rem;
+}
+
+.tools-more a {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.55rem;
+	min-height: 44px;
+	color: var(--text-muted);
+	font-size: 0.82rem;
+	transition: color var(--transition);
+}
+
+.tools-more a:hover,
+.tools-more a:focus-visible {
+	color: var(--gold);
+}
+
+.tools-more i {
+	color: var(--gold);
+}
+
+/* HOME: about (what I do + background), same order on every screen */
+.home-about {
+	border-top: 1px solid var(--border);
+}
+
+.home-about-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+	gap: clamp(2.5rem, 6vw, 5rem);
+	align-items: start;
+}
+
+.home-about .pillars-grid {
+	grid-template-columns: 1fr;
+}
+
+.home-sub {
+	margin: 2.5rem 0 1rem;
+	font-size: 1.35rem;
+}
+
+.role-list {
+	display: grid;
+	gap: 0.75rem;
+	list-style: none;
+}
+
+.role-list li {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 1rem;
+	padding: 1rem 1.25rem;
+	border: 1px solid var(--soft-border);
+	border-radius: var(--r-md);
+	background: var(--surface);
+}
+
+.role-list span {
+	font-family: "Cormorant Garamond", serif;
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: var(--text);
+}
+
+.role-list small {
+	color: var(--gold);
+	font-size: 0.72rem;
+	letter-spacing: 0.12em;
+	white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+	.home-about-grid {
 		grid-template-columns: 1fr;
 	}
 
-	.tools-intro {
-		margin-top: -1rem;
+	.home-about .pillars-grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 720px) {
+	.home-about .pillars-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.role-list li {
+		flex-direction: column;
+		gap: 0.25rem;
 	}
 }
 
@@ -3006,15 +2785,6 @@ footer span {
 	background: var(--gold);
 }
 
-.quiz-alt {
-	margin-top: 1.25rem;
-	font-size: 0.85rem;
-}
-
-.quiz-alt a {
-	color: var(--gold);
-}
-
 .quiz-progress {
 	height: 3px;
 	background: var(--border);
@@ -3222,7 +2992,6 @@ footer span {
 }
 
 /* Grant ticks in the affordability calculator */
-.afford-grants,
 .afford-plan {
 	border: 1px solid var(--border);
 	padding: 0.9rem 1rem 0.2rem;
@@ -3234,16 +3003,13 @@ footer span {
 	margin-right: 1.2rem;
 }
 
-.afford-grants legend,
 .afford-plan legend {
 	padding: 0 0.4rem;
 	font-size: 0.85rem;
 	color: var(--text);
 }
 
-.afford-grants legend em,
 .afford-plan legend em,
-.afford-grants small,
 .booking-form label small {
 	font-style: normal;
 	font-size: 0.78rem;
@@ -3285,10 +3051,6 @@ footer span {
 }
 
 /* Affordability grants: the side not picked (BTO vs resale) is greyed out. */
-.afford-grants label.is-disabled {
-	opacity: 0.4;
-	cursor: not-allowed;
-}
 
 
 /* "Ask Shaun about..." topic buttons under calculator and quiz results. */
@@ -3511,10 +3273,6 @@ footer span {
 		padding-top: 0;
 	}
 
-	.leadership-role {
-		line-height: 1.3;
-	}
-
 	/* HOME: text sits low over the two portraits, no empty band on top. */
 	.hero {
 		min-height: calc(100svh - var(--nav-height));
@@ -3544,48 +3302,17 @@ footer span {
 		opacity: 0.65;
 	}
 
-	/* Tagline on two tidy lines: "Computer Scientist · Financial Adviser" / "Athlete". */
+	/* Tagline on two tidy lines: "Financial Adviser · Developer" / "Athlete". */
+	.hero-tagline {
+		text-shadow: 0 1px 2px #000, 0 0 14px rgba(0, 0, 0, 0.95);
+	}
+
 	.hero-tagline span:last-of-type {
 		display: block;
 		height: 0;
 		overflow: hidden;
 	}
 
-	/* HOME order on phones: tools, booking, what I do, background, roles. */
-	body[data-page="home"] main {
-		display: flex;
-		flex-direction: column;
-	}
-
-	body[data-page="home"] .home-profile-grid,
-	body[data-page="home"] .home-overview {
-		display: contents;
-	}
-
-	body[data-page="home"] .hero { order: 0; }
-	body[data-page="home"] .tools-section { order: 1; }
-	body[data-page="home"] .consultation-cta { order: 2; }
-	body[data-page="home"] #work { order: 3; }
-	body[data-page="home"] #credentials { order: 4; }
-	body[data-page="home"] #leadership { order: 5; }
-
-	.home-profile-grid > section,
-	.home-overview > section {
-		padding: var(--m-space) var(--m-gutter);
-		border: 0;
-		border-top: 1px solid var(--border);
-		background: transparent;
-	}
-
-	.home-overview > .consultation-cta {
-		background: var(--surface);
-		border-bottom: 1px solid var(--border);
-	}
-
-	.home-overview > .consultation-cta + #leadership,
-	body[data-page="home"] #work {
-		border-top: 0;
-	}
 }
 
 /* Credit card finder result */
@@ -4560,8 +4287,7 @@ footer span {
 #calculators .insurance-alarm,
 #calculators .card-pick,
 #calculators .ins-sim,
-#calculators .ins-quick > div,
-#calculators .tax-relief-panel {
+#calculators .ins-quick > div {
 	border-radius: var(--r-lg);
 	border-color: var(--soft-border);
 }
@@ -4732,12 +4458,7 @@ footer span {
 /* Cards and panels */
 .tool-card,
 .pillar-card,
-.skill-card,
 .quiz-card,
-.leadership-item,
-.home-overview > section,
-.home-profile-grid > section,
-.home-overview .consultation-cta,
 .booking-expect-grid article,
 .booking-picker,
 .booking-section .booking-form,
@@ -4750,7 +4471,6 @@ footer span {
 .card-all,
 .card-pick,
 .afford-plan,
-.afford-grants,
 .pay-plan,
 .pay-plan-totals div,
 .loan-offset-panel,
@@ -4819,7 +4539,6 @@ input[type="range"] {
 .share-friend-links a,
 .share-friend-links button,
 .footer-contact-links a,
-.skill-tags span,
 .money-guide-jump a,
 .github-preview-meta a,
 .github-preview-meta span,
@@ -4829,8 +4548,7 @@ input[type="range"] {
 }
 
 .footer-contact-links a,
-.money-guide-jump a,
-.skill-tags span {
+.money-guide-jump a {
 	border-color: var(--soft-border);
 }
 
@@ -4852,13 +4570,6 @@ input[type="range"] {
 }
 
 /* Sections that run edge to edge on phones keep square corners. */
-@media (max-width: 760px) {
-	.home-overview > section,
-	.home-profile-grid > section,
-	.home-overview .consultation-cta {
-		border-radius: 0;
-	}
-}
 
 .footer-tools {
 	align-items: center;
@@ -5117,12 +4828,6 @@ input[type="range"] {
 /* Quick / Detailed on the longer calculators */
 form.is-quick .calc-detail {
 	display: none !important;
-}
-
-.calc-mode-note {
-	margin: -0.35rem 0 0.9rem;
-	font-size: 0.78rem;
-	color: var(--text-muted);
 }
 
 /* Market Update: Market Pulse cards */

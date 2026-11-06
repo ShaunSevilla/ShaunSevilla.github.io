@@ -2,6 +2,8 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://rubfkxwhieqwqjeaoszi.supabase.co https://api.github.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" />
+		<meta name="referrer" content="strict-origin-when-cross-origin" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Free Tax Relief, HDB, CPF & Car Calculators | Shaun Sevilla</title>
 		<meta name="description" content="Free Singapore calculators: what you can afford, the pay you need, insurance, tax relief, HDB, CPF, car loans and credit cards." />
@@ -18,11 +20,11 @@
 		<meta name="twitter:card" content="summary_large_image" />
 		<link rel="icon" type="image/png" sizes="64x64" href="../assets/favicon-64.png" />
 		<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
-		<link rel="stylesheet" href="../css/style.css?v=20261107" />
-		<link
-			rel="stylesheet"
-			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-		/>
+		<link rel="preload" href="../assets/vendor/cormorant-garamond-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href="../assets/vendor/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="stylesheet" href="../assets/vendor/fonts.css?v=20261107c" />
+		<link rel="stylesheet" href="../assets/vendor/icons.css?v=20261107c" />
+		<link rel="stylesheet" href="../css/style.css?v=20261107c" />
 	</head>
 	<body data-root=".." data-page="financial">
 		<nav id="site-nav"></nav>
@@ -85,11 +87,13 @@
 						<i class="fas fa-arrow-right" aria-hidden="true"></i>
 					</a>
 
+					<h3 class="calc-group">Home</h3>
+
 					<details class="calculator-dropdown" id="afford" data-calculator="What can I afford" data-bot-start="afford">
 						<summary>
 							<div>
 								<h3><i class="fas fa-wallet" aria-hidden="true"></i> What Can I Afford?</h3>
-								<p>The home, car or bike you can comfortably buy, and the stretch.</p>
+								<p>The home, car or bike you can comfortably buy.</p>
 							</div>
 							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
 						</summary>
@@ -155,7 +159,7 @@
 						<summary>
 							<div>
 								<h3><i class="fas fa-coins" aria-hidden="true"></i> How Much Do I Need to Earn?</h3>
-								<p>Put in the price, see the pay you need.</p>
+								<p>The pay you need for the home or car you want.</p>
 							</div>
 							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
 						</summary>
@@ -219,10 +223,98 @@
 						</div>
 					</details>
 
+					<details class="calculator-dropdown" id="hdb" data-calculator="HDB loan" data-bot-start="hdbloan">
+						<summary>
+							<div>
+								<h3><i class="fas fa-house" aria-hidden="true"></i> HDB Loan</h3>
+								<p>HDB vs bank loan: downpayment, CPF and instalment.</p>
+							</div>
+							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
+						</summary>
+						<div class="calculator-dropdown-body">
+							<article class="calculator-card">
+								<p class="calculator-card-note">Shows what you pay at each stage, and how much must be cash vs CPF OA, for an HDB loan (2.6%) and a bank loan on the same flat. Doesn't check your income limits or age-based tenure.</p>
+								<form class="booking-form calculator-form" id="hdb-loan-form">
+									<label><span>New (BTO) or resale?</span>
+										<select id="hdb-type">
+											<option value="resale">Resale</option>
+											<option value="bto">BTO</option>
+										</select>
+									</label>
+									<label><span>Flat purchase price ($)</span><input type="number" inputmode="numeric" id="hdb-price" min="0" step="1" placeholder="500000" required /></label>
+									<p class="calculator-field-hint" id="hdb-price-hint"></p>
+									<label><span>CPF Ordinary Account today ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="hdb-cpf" min="0" step="1" placeholder="Blank = show where CPF OA can pay" /></label>
+									<p class="calculator-field-hint" id="hdb-cpf-hint"></p>
+									<label id="hdb-pay-field"><span>Monthly salary before CPF ($) <em>Optional, BTO</em></span><input type="number" inputmode="numeric" id="hdb-pay" min="0" step="1" placeholder="Combined if buying together. Blank = skip" /></label>
+									<p class="calculator-field-hint" id="hdb-pay-hint">Counts the CPF OA you'll build up in the ~3 years before key collection, so more of the downpayment comes from CPF instead of cash.</p>
+									<label class="check-row" id="hdb-staggered-field"><input type="checkbox" id="hdb-staggered" /><span>Staggered Downpayment Scheme: pay 5% at signing, the rest at keys</span></label>
+									<p class="calculator-field-hint" id="hdb-staggered-hint">For first-timer couples where the younger one got the HFE letter before turning 30, buying a 5-room or smaller BTO. HDB tells you if you qualify when you book.</p>
+									<label><span>Grants you expect (EHG, CPF Housing Grant, PHG, etc.) ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="hdb-grants" min="0" step="1" placeholder="Blank = none" /></label>
+									<p class="calculator-field-hint" id="hdb-grants-hint">Paid into your CPF OA at key collection (BTO) or completion (resale). Leave blank if none.</p>
+									<label><span>Loan tenure (years, max 25) <em>Optional</em></span><input type="number" inputmode="numeric" id="hdb-years" min="1" max="25" step="1" placeholder="Blank = 25" /></label>
+									<label><span>Bank loan rate (% p.a.) <em>Optional</em></span><input type="number" inputmode="decimal" id="hdb-bank-rate" min="0" max="15" step="0.01" placeholder="Don't know? Blank = typical 1.6%" /></label>
+									<button type="submit" class="booking-submit">Calculate</button>
+									<p class="booking-status" id="hdb-status" role="status"></p>
+								</form>
+								<div class="calculator-result" id="hdb-result" hidden></div>
+							</article>
+						</div>
+					</details>
+
+					<details class="calculator-dropdown" id="sell-flat" data-calculator="Selling my flat">
+						<summary>
+							<div>
+								<h3><i class="fas fa-key" aria-hidden="true"></i> Selling My Flat</h3>
+								<p>What goes back to CPF, and the cash you keep.</p>
+							</div>
+							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
+						</summary>
+						<div class="calculator-dropdown-body">
+							<article class="calculator-card">
+								<p class="calculator-card-note">When you sell, any HDB loan left is paid first. Then every CPF dollar you used, grants included, goes back into your own CPF OA with the 2.5% a year it would have earned. Only what's left is cash.</p>
+								<form class="booking-form calculator-form" id="bto-sale-form">
+									<label><span>CPF you've used on the flat so far ($)</span><input type="number" inputmode="numeric" id="bto-sale-cpf" min="1" step="1" placeholder="150000" required /></label>
+									<p class="calculator-field-hint">Downpayment, stamp duty and monthly instalments from CPF. The CPF app shows it under Home Ownership.</p>
+									<label><span>Housing grants used ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="bto-sale-grants" min="0" step="1" placeholder="EHG, CPF Housing Grant, PHG. Blank = none" /></label>
+									<label><span>How old is the flat? (years since you got the keys)</span><input type="number" inputmode="numeric" id="bto-sale-age" min="1" max="99" step="1" placeholder="8" required /></label>
+									<label><span>Price you'd sell at ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="bto-sale-sell" min="0" step="1" placeholder="Blank = just show the CPF refund" /></label>
+									<label><span>HDB loan still owed ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="bto-sale-loan" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label id="bto-sale-interest-field"><span>Accrued interest so far, from the CPF app ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="bto-sale-interest" min="0" step="1" placeholder="Blank = estimate it" /></label>
+									<label id="bto-sale-upfront-field"><span>Of your CPF, how much went into the downpayment ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="bto-sale-upfront" min="0" step="1" placeholder="Blank = about a third" /></label>
+									<label id="bto-sale-scheme-field"><span>Type of flat</span>
+										<select id="bto-sale-scheme">
+											<option value="standard">Standard (or bought before Oct 2024)</option>
+											<option value="plus">Plus</option>
+											<option value="prime">Prime</option>
+										</select>
+									</label>
+									<label id="bto-sale-clawback-field"><span>Subsidy clawback (% of the sale price) <em>From your sales brochure</em></span><input type="number" inputmode="decimal" id="bto-sale-clawback" min="0" max="20" step="0.5" placeholder="6 to 9" /></label>
+									<label id="bto-sale-agent-field"><span>Agent fee (% of the sale price, before GST) <em>Optional</em></span><input type="number" inputmode="decimal" id="bto-sale-agent" min="0" max="5" step="0.1" placeholder="Blank = 2%. Selling yourself = 0" /></label>
+									<label id="bto-sale-next-field"><span>Next home also subsidised? (BTO, EC, or resale with grants)</span>
+										<select id="bto-sale-next">
+											<option value="none">No, or not sure</option>
+											<option value="2-room">Yes, and I'm selling a 2-room</option>
+											<option value="3-room">Yes, and I'm selling a 3-room</option>
+											<option value="4-room">Yes, and I'm selling a 4-room</option>
+											<option value="5-room">Yes, and I'm selling a 5-room</option>
+											<option value="executive">Yes, and I'm selling an Executive flat</option>
+										</select>
+									</label>
+									<label class="check-row" id="bto-sale-singles-field"><input type="checkbox" id="bto-sale-singles" /><span>I bought it as a single (the resale levy is halved)</span></label>
+									<button type="submit" class="booking-submit">Calculate</button>
+									<p class="booking-status" id="bto-sale-status" role="status"></p>
+								</form>
+								<div class="calculator-result" id="bto-sale-result" hidden></div>
+							</article>
+						</div>
+					</details>
+
+					<h3 class="calc-group">Protection, tax &amp; CPF</h3>
+
 					<details class="calculator-dropdown" id="insurance" data-calculator="Insurance" data-bot-start="insurance">
 						<summary>
 							<div>
-								<h3><i class="fas fa-umbrella" aria-hidden="true"></i> Insurance Calculator</h3>
+								<h3><i class="fas fa-umbrella" aria-hidden="true"></i> Insurance</h3>
 								<p>The cover you need, what you have, and the gap.</p>
 							</div>
 							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
@@ -255,8 +347,8 @@
 					<details class="calculator-dropdown" id="tax" data-calculator="Tax relief" data-bot-start="tax">
 						<summary>
 							<div>
-								<h3><i class="fas fa-receipt" aria-hidden="true"></i> Tax Relief Calculator</h3>
-								<p>Every relief, your tax, and what you can still save by 31 Dec.</p>
+								<h3><i class="fas fa-receipt" aria-hidden="true"></i> Tax Relief</h3>
+								<p>Your tax, and what you can still save by 31 Dec.</p>
 							</div>
 							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
 						</summary>
@@ -341,8 +433,8 @@
 					<details class="calculator-dropdown" id="srs" data-calculator="SRS">
 						<summary>
 							<div>
-								<h3><i class="fas fa-piggy-bank" aria-hidden="true"></i> Is SRS Worth It for Me?</h3>
-								<p>Tax saved now, tax paid later, and SRS vs investing it yourself.</p>
+								<h3><i class="fas fa-hourglass-half" aria-hidden="true"></i> Is SRS Worth It?</h3>
+								<p>Tax saved now vs tax paid later.</p>
 							</div>
 							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
 						</summary>
@@ -377,96 +469,10 @@
 						</div>
 					</details>
 
-					<details class="calculator-dropdown" id="hdb" data-calculator="HDB loan" data-bot-start="hdbloan">
-						<summary>
-							<div>
-								<h3><i class="fas fa-house" aria-hidden="true"></i> HDB Loan Calculator</h3>
-								<p>HDB vs bank loan: downpayment, CPF and instalment.</p>
-							</div>
-							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
-						</summary>
-						<div class="calculator-dropdown-body">
-							<article class="calculator-card">
-								<p class="calculator-card-note">Shows what you pay at each stage, and how much must be cash vs CPF OA, for an HDB loan (2.6%) and a bank loan on the same flat. Doesn't check your income limits or age-based tenure.</p>
-								<form class="booking-form calculator-form" id="hdb-loan-form">
-									<label><span>New (BTO) or resale?</span>
-										<select id="hdb-type">
-											<option value="resale">Resale</option>
-											<option value="bto">BTO</option>
-										</select>
-									</label>
-									<label><span>Flat purchase price ($)</span><input type="number" inputmode="numeric" id="hdb-price" min="0" step="1" placeholder="500000" required /></label>
-									<p class="calculator-field-hint" id="hdb-price-hint"></p>
-									<label><span>CPF Ordinary Account today ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="hdb-cpf" min="0" step="1" placeholder="Blank = show where CPF OA can pay" /></label>
-									<p class="calculator-field-hint" id="hdb-cpf-hint"></p>
-									<label id="hdb-pay-field"><span>Monthly salary before CPF ($) <em>Optional, BTO</em></span><input type="number" inputmode="numeric" id="hdb-pay" min="0" step="1" placeholder="Combined if buying together. Blank = skip" /></label>
-									<p class="calculator-field-hint" id="hdb-pay-hint">Counts the CPF OA you'll build up in the ~3 years before key collection, so more of the downpayment comes from CPF instead of cash.</p>
-									<label class="check-row" id="hdb-staggered-field"><input type="checkbox" id="hdb-staggered" /><span>Staggered Downpayment Scheme: pay 5% at signing, the rest at keys</span></label>
-									<p class="calculator-field-hint" id="hdb-staggered-hint">For first-timer couples where the younger one got the HFE letter before turning 30, buying a 5-room or smaller BTO. HDB tells you if you qualify when you book.</p>
-									<label><span>Grants you expect (EHG, CPF Housing Grant, PHG, etc.) ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="hdb-grants" min="0" step="1" placeholder="Blank = none" /></label>
-									<p class="calculator-field-hint" id="hdb-grants-hint">Paid into your CPF OA at key collection (BTO) or completion (resale). Leave blank if none.</p>
-									<label><span>Loan tenure (years, max 25) <em>Optional</em></span><input type="number" inputmode="numeric" id="hdb-years" min="1" max="25" step="1" placeholder="Blank = 25" /></label>
-									<label><span>Bank loan rate (% p.a.) <em>Optional</em></span><input type="number" inputmode="decimal" id="hdb-bank-rate" min="0" max="15" step="0.01" placeholder="Don't know? Blank = typical 1.6%" /></label>
-									<button type="submit" class="booking-submit">Calculate</button>
-									<p class="booking-status" id="hdb-status" role="status"></p>
-								</form>
-								<div class="calculator-result" id="hdb-result" hidden></div>
-							</article>
-						</div>
-					</details>
-
-					<details class="calculator-dropdown" id="sell-flat" data-calculator="Selling my flat">
-						<summary>
-							<div>
-								<h3><i class="fas fa-key" aria-hidden="true"></i> Selling My Flat: What Goes Back to CPF?</h3>
-								<p>The CPF and grants you used, the interest on top, and the cash you keep.</p>
-							</div>
-							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
-						</summary>
-						<div class="calculator-dropdown-body">
-							<article class="calculator-card">
-								<p class="calculator-card-note">When you sell, any HDB loan left is paid first. Then every CPF dollar you used, grants included, goes back into your own CPF OA with the 2.5% a year it would have earned. Only what's left is cash.</p>
-								<form class="booking-form calculator-form" id="bto-sale-form">
-									<label><span>CPF you've used on the flat so far ($)</span><input type="number" inputmode="numeric" id="bto-sale-cpf" min="1" step="1" placeholder="150000" required /></label>
-									<p class="calculator-field-hint">Downpayment, stamp duty and monthly instalments from CPF. The CPF app shows it under Home Ownership.</p>
-									<label><span>Housing grants used ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="bto-sale-grants" min="0" step="1" placeholder="EHG, CPF Housing Grant, PHG. Blank = none" /></label>
-									<label><span>How old is the flat? (years since you got the keys)</span><input type="number" inputmode="numeric" id="bto-sale-age" min="1" max="99" step="1" placeholder="8" required /></label>
-									<label><span>Price you'd sell at ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="bto-sale-sell" min="0" step="1" placeholder="Blank = just show the CPF refund" /></label>
-									<label><span>HDB loan still owed ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="bto-sale-loan" min="0" step="1" placeholder="Blank = $0" /></label>
-									<label id="bto-sale-interest-field"><span>Accrued interest so far, from the CPF app ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="bto-sale-interest" min="0" step="1" placeholder="Blank = estimate it" /></label>
-									<label id="bto-sale-upfront-field"><span>Of your CPF, how much went into the downpayment ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="bto-sale-upfront" min="0" step="1" placeholder="Blank = about a third" /></label>
-									<label id="bto-sale-scheme-field"><span>Type of flat</span>
-										<select id="bto-sale-scheme">
-											<option value="standard">Standard (or bought before Oct 2024)</option>
-											<option value="plus">Plus</option>
-											<option value="prime">Prime</option>
-										</select>
-									</label>
-									<label id="bto-sale-clawback-field"><span>Subsidy clawback (% of the sale price) <em>From your sales brochure</em></span><input type="number" inputmode="decimal" id="bto-sale-clawback" min="0" max="20" step="0.5" placeholder="6 to 9" /></label>
-									<label id="bto-sale-agent-field"><span>Agent fee (% of the sale price, before GST) <em>Optional</em></span><input type="number" inputmode="decimal" id="bto-sale-agent" min="0" max="5" step="0.1" placeholder="Blank = 2%. Selling yourself = 0" /></label>
-									<label id="bto-sale-next-field"><span>Next home also subsidised? (BTO, EC, or resale with grants)</span>
-										<select id="bto-sale-next">
-											<option value="none">No, or not sure</option>
-											<option value="2-room">Yes, and I'm selling a 2-room</option>
-											<option value="3-room">Yes, and I'm selling a 3-room</option>
-											<option value="4-room">Yes, and I'm selling a 4-room</option>
-											<option value="5-room">Yes, and I'm selling a 5-room</option>
-											<option value="executive">Yes, and I'm selling an Executive flat</option>
-										</select>
-									</label>
-									<label class="check-row" id="bto-sale-singles-field"><input type="checkbox" id="bto-sale-singles" /><span>I bought it as a single (the resale levy is halved)</span></label>
-									<button type="submit" class="booking-submit">Calculate</button>
-									<p class="booking-status" id="bto-sale-status" role="status"></p>
-								</form>
-								<div class="calculator-result" id="bto-sale-result" hidden></div>
-							</article>
-						</div>
-					</details>
-
 					<details class="calculator-dropdown" id="cpf" data-calculator="CPF growth" data-bot-start="cpf">
 						<summary>
 							<div>
-								<h3><i class="fas fa-piggy-bank" aria-hidden="true"></i> CPF Growth Calculator</h3>
+								<h3><i class="fas fa-piggy-bank" aria-hidden="true"></i> CPF Growth</h3>
 								<p>Your OA, SA/RA and MediSave, projected forward.</p>
 							</div>
 							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
@@ -497,10 +503,12 @@
 						</div>
 					</details>
 
+					<h3 class="calc-group">Spending &amp; growing</h3>
+
 					<details class="calculator-dropdown" id="cards" data-calculator="Credit card finder" data-bot-start="cards">
 						<summary>
 							<div>
-								<h3><i class="fas fa-credit-card" aria-hidden="true"></i> Which Credit Card Suits Me?</h3>
+								<h3><i class="fas fa-credit-card" aria-hidden="true"></i> Which Credit Card?</h3>
 								<p>The card that fits how you actually spend.</p>
 							</div>
 							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
@@ -567,8 +575,8 @@
 					<details class="calculator-dropdown" id="vehicle" data-calculator="Vehicle loan" data-bot-start="carloan">
 						<summary>
 							<div>
-								<h3><i class="fas fa-car" aria-hidden="true"></i> Vehicle Loan Calculator</h3>
-								<p>Instalment, MAS loan caps and the real interest rate.</p>
+								<h3><i class="fas fa-car" aria-hidden="true"></i> Car &amp; Bike Loan</h3>
+								<p>Instalment, MAS loan limits and the real rate.</p>
 							</div>
 							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
 						</summary>
@@ -600,8 +608,8 @@
 					<details class="calculator-dropdown" id="compound" data-calculator="Compound interest" data-bot-start="compound">
 						<summary>
 							<div>
-								<h3><i class="fas fa-chart-line" aria-hidden="true"></i> Compound Interest Calculator</h3>
-								<p>What a starting amount and yearly top-ups grow to.</p>
+								<h3><i class="fas fa-chart-line" aria-hidden="true"></i> Compound Interest</h3>
+								<p>What a lump sum and monthly top-ups grow to.</p>
 							</div>
 							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
 						</summary>
@@ -644,7 +652,6 @@
 		<script src="../js/shared/vehicleLoan.js"></script>
 		<script src="../js/shared/insurance.js?v=20261023c"></script>
 		<script src="../js/loan-calculators.js?v=20261025"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 		<script src="../js/shared/cpfProjection.js"></script>
 		<script src="../js/cpf-calculator.js"></script>
 		<script src="../js/compound-calculator.js?v=20261025"></script>

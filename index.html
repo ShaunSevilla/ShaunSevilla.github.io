@@ -2,6 +2,8 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://rubfkxwhieqwqjeaoszi.supabase.co https://api.github.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" />
+		<meta name="referrer" content="strict-origin-when-cross-origin" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Shaun Sevilla | Financial Adviser in Singapore</title>
 		<meta name="description" content="Financial adviser in Singapore. Free tax, HDB, CPF, insurance and affordability calculators, a money persona quiz, and easy booking." />
@@ -18,37 +20,30 @@
 		<meta name="twitter:card" content="summary_large_image" />
 		<link rel="icon" type="image/png" sizes="64x64" href="assets/favicon-64.png" />
 		<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
-		<link rel="stylesheet" href="css/style.css?v=20261107" />
-		<link
-			rel="stylesheet"
-			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-		/>
+		<link rel="preload" href="./assets/vendor/cormorant-garamond-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href="./assets/vendor/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="stylesheet" href="./assets/vendor/fonts.css?v=20261107c" />
+		<link rel="stylesheet" href="./assets/vendor/icons.css?v=20261107c" />
+		<link rel="stylesheet" href="./css/style.css?v=20261107c" />
 	</head>
 	<body data-root="." data-page="home">
 		<nav id="site-nav"></nav>
 
 		<main>
-			<!-- HERO -->
 			<section class="hero">
-				<img width="184" height="654" src="assets/Subject.webp" alt="Shaun Sevilla in casual wear" class="hero-portrait hero-portrait-casual" />
+				<img width="184" height="654" src="assets/Subject.webp" alt="Shaun Sevilla in casual wear" class="hero-portrait hero-portrait-casual" fetchpriority="high" />
 				<div class="hero-inner">
-					<p class="hero-tagline">
-						Computer Scientist <span>&middot;</span> Financial Adviser
-						<span>&middot;</span> Athlete
-					</p>
+					<p class="hero-tagline">Financial Adviser <span>&middot;</span> Developer <span>&middot;</span> Athlete</p>
 					<h1 class="hero-name">Shaun Sevilla</h1>
-					<p class="hero-statement">
-						Hard work is not a strategy. It&rsquo;s a standard.
-					</p>
-					<a href="Pages/booking.html" class="hero-booking-link">
-						Book a Consultation <i class="fas fa-arrow-right"></i>
-					</a>
+					<p class="hero-statement">Hard work is not a strategy. It&rsquo;s a standard.</p>
+					<div class="hero-actions">
+						<a href="Pages/booking.html" class="hero-booking-link">Book a free chat <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+						<a href="#tools" class="hero-secondary-link">Free calculators <i class="fas fa-arrow-down" aria-hidden="true"></i></a>
+					</div>
 				</div>
-				<img width="700" height="1438" src="assets/hero-suit-cutout.webp" alt="Shaun Sevilla in professional attire" class="hero-portrait hero-portrait-professional" />
-				<div class="hero-scroll">Scroll</div>
+				<img width="700" height="1438" src="assets/hero-suit-cutout.webp" alt="Shaun Sevilla in professional attire" class="hero-portrait hero-portrait-professional" fetchpriority="high" />
 			</section>
 
-			<!-- FREE TOOLS -->
 			<section class="tools-section" id="tools">
 				<div class="container">
 					<span class="section-label">Free Money Tools</span>
@@ -56,213 +51,77 @@
 					<div class="section-line"></div>
 					<p class="tools-intro">Built on today&rsquo;s IRAS, CPF, HDB and MAS rules. No sign-up.</p>
 					<div class="tools-grid">
-						<a href="Pages/money-quiz.html" class="tool-card">
-							<i class="fas fa-theater-masks" aria-hidden="true"></i>
-							<h3>Money Persona Quiz</h3>
-							<p>15 taps. Kiasu Hoarder or Crypto Kaki?</p>
-							<span>Take the quiz <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-						</a>
-						<a href="Pages/financial-advisory.html#afford" class="tool-card">
-							<i class="fas fa-wallet" aria-hidden="true"></i>
-							<h3>What Can I Afford?</h3>
-							<p>The home, car or bike you can comfortably buy.</p>
-							<span>Open calculator <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-						</a>
-						<a href="Pages/financial-advisory.html#earn" class="tool-card">
-							<i class="fas fa-coins" aria-hidden="true"></i>
-							<h3>How Much Do I Need to Earn?</h3>
-							<p>The pay you need for the flat, car or bike you want.</p>
-							<span>Open calculator <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-						</a>
-						<a href="Pages/financial-advisory.html#insurance" class="tool-card">
-							<i class="fas fa-umbrella" aria-hidden="true"></i>
-							<h3>Insurance</h3>
-							<p>How much cover you need, and what it should cost.</p>
-							<span>Open calculator <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-						</a>
-						<a href="Pages/financial-advisory.html#tax" class="tool-card">
-							<i class="fas fa-receipt" aria-hidden="true"></i>
-							<h3>Tax Relief</h3>
-							<p>Every relief, and what you can still save by 31 Dec.</p>
-							<span>Open calculator <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-						</a>
-						<a href="Pages/financial-advisory.html#hdb" class="tool-card">
-							<i class="fas fa-house" aria-hidden="true"></i>
-							<h3>HDB Loan</h3>
-							<p>Downpayment, CPF, grants and monthly instalment.</p>
-							<span>Open calculator <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-						</a>
-						<a href="Pages/financial-advisory.html#cpf" class="tool-card">
-							<i class="fas fa-piggy-bank" aria-hidden="true"></i>
-							<h3>CPF Growth</h3>
-							<p>Your OA, SA and MediSave, projected to 65.</p>
-							<span>Open calculator <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-						</a>
-						<a href="Pages/financial-advisory.html#cards" class="tool-card">
-							<i class="fas fa-credit-card" aria-hidden="true"></i>
-							<h3>Which Credit Card?</h3>
-							<p>The card that fits how you actually spend.</p>
-							<span>Find my card <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-						</a>
-						<a href="Pages/financial-advisory.html#vehicle" class="tool-card">
-							<i class="fas fa-car" aria-hidden="true"></i>
-							<h3>Car &amp; Bike Loan</h3>
-							<p>Instalment, MAS loan limits and the real rate.</p>
-							<span>Open calculator <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-						</a>
-						<a href="Pages/financial-advisory.html#compound" class="tool-card">
-							<i class="fas fa-chart-line" aria-hidden="true"></i>
-							<h3>Compound Interest</h3>
-							<p>What a lump sum and yearly top-ups grow to.</p>
-							<span>Open calculator <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-						</a>
-						<a href="Pages/sg-money-guide.html" class="tool-card">
-							<i class="fas fa-book-open" aria-hidden="true"></i>
-							<h3>Money Guide</h3>
-							<p>Buffer, CPF, housing, insurance, tax and SRS, in order.</p>
-							<span>Read the guide <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-						</a>
-						<a href="https://t.me/ProsperityPath_bot?start=menu" target="_blank" rel="noopener noreferrer" class="tool-card">
-							<i class="fab fa-telegram" aria-hidden="true"></i>
-							<h3>Telegram Bot</h3>
-							<p>Every calculator in Telegram, plus live COE prices.</p>
-							<span>Open in Telegram <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-						</a>
+						<a href="Pages/money-quiz.html" class="tool-card"><i class="fas fa-theater-masks" aria-hidden="true"></i><h3>Money Persona Quiz</h3><p>15 taps to your money personality.</p><span>Take the quiz <i class="fas fa-arrow-right" aria-hidden="true"></i></span></a>
+						<a href="Pages/financial-advisory.html#afford" class="tool-card"><i class="fas fa-wallet" aria-hidden="true"></i><h3>What Can I Afford?</h3><p>The home, car or bike you can buy.</p><span>Open <i class="fas fa-arrow-right" aria-hidden="true"></i></span></a>
+						<a href="Pages/financial-advisory.html#earn" class="tool-card"><i class="fas fa-coins" aria-hidden="true"></i><h3>How Much Do I Need to Earn?</h3><p>The pay behind the home you want.</p><span>Open <i class="fas fa-arrow-right" aria-hidden="true"></i></span></a>
+						<a href="Pages/financial-advisory.html#hdb" class="tool-card"><i class="fas fa-house" aria-hidden="true"></i><h3>HDB Loan</h3><p>Downpayment, CPF and monthly instalment.</p><span>Open <i class="fas fa-arrow-right" aria-hidden="true"></i></span></a>
+						<a href="Pages/financial-advisory.html#sell-flat" class="tool-card"><i class="fas fa-key" aria-hidden="true"></i><h3>Selling My Flat</h3><p>What goes back to CPF, and your cash.</p><span>Open <i class="fas fa-arrow-right" aria-hidden="true"></i></span></a>
+						<a href="Pages/financial-advisory.html#insurance" class="tool-card"><i class="fas fa-umbrella" aria-hidden="true"></i><h3>Insurance</h3><p>The cover you need, and what it costs.</p><span>Open <i class="fas fa-arrow-right" aria-hidden="true"></i></span></a>
+						<a href="Pages/financial-advisory.html#tax" class="tool-card"><i class="fas fa-receipt" aria-hidden="true"></i><h3>Tax Relief</h3><p>What you can still save by 31 Dec.</p><span>Open <i class="fas fa-arrow-right" aria-hidden="true"></i></span></a>
+						<a href="Pages/financial-advisory.html#srs" class="tool-card"><i class="fas fa-hourglass-half" aria-hidden="true"></i><h3>Is SRS Worth It?</h3><p>Tax saved now vs tax paid later.</p><span>Open <i class="fas fa-arrow-right" aria-hidden="true"></i></span></a>
+						<a href="Pages/financial-advisory.html#cpf" class="tool-card"><i class="fas fa-piggy-bank" aria-hidden="true"></i><h3>CPF Growth</h3><p>Your CPF, projected to retirement.</p><span>Open <i class="fas fa-arrow-right" aria-hidden="true"></i></span></a>
+						<a href="Pages/financial-advisory.html#cards" class="tool-card"><i class="fas fa-credit-card" aria-hidden="true"></i><h3>Which Credit Card?</h3><p>The card that fits how you spend.</p><span>Open <i class="fas fa-arrow-right" aria-hidden="true"></i></span></a>
+						<a href="Pages/financial-advisory.html#vehicle" class="tool-card"><i class="fas fa-car" aria-hidden="true"></i><h3>Car &amp; Bike Loan</h3><p>Instalment, MAS limits and the real rate.</p><span>Open <i class="fas fa-arrow-right" aria-hidden="true"></i></span></a>
+						<a href="Pages/financial-advisory.html#compound" class="tool-card"><i class="fas fa-chart-line" aria-hidden="true"></i><h3>Compound Interest</h3><p>What your savings grow to.</p><span>Open <i class="fas fa-arrow-right" aria-hidden="true"></i></span></a>
 					</div>
+					<p class="tools-more">
+						<a href="Pages/sg-money-guide.html"><i class="fas fa-book-open" aria-hidden="true"></i> Money Guide</a>
+						<a href="Pages/market-update.html"><i class="fas fa-chart-column" aria-hidden="true"></i> Market Update</a>
+						<a href="https://t.me/ProsperityPath_bot?start=menu" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram" aria-hidden="true"></i> Telegram Bot</a>
+					</p>
 				</div>
 			</section>
 
-			<!-- WHAT I DO -->
-			<div class="home-profile-grid">
-			<section id="work">
-				<div class="container">
-					<span class="section-label">What I Do</span>
-					<h2 class="section-title">At a Glance</h2>
-					<div class="section-line"></div>
-					<div class="pillars-grid">
-						<a href="Pages/software-development.html" class="pillar-card-link">
-							<div class="pillar-card">
-								<div class="pillar-icon"><i class="fas fa-code"></i></div>
-								<h3 class="pillar-title">Software Development</h3>
-								<p class="pillar-text">
-									Practical web and app products, built cleanly and shipped with intent.
-								</p>
-								<span class="pillar-link"
-									>View Details <i class="fas fa-arrow-right"></i
-								></span>
-							</div>
-						</a>
-
-						<a href="Pages/financial-advisory.html" class="pillar-card-link">
-							<div class="pillar-card">
-								<div class="pillar-icon"><i class="fas fa-chart-line"></i></div>
-								<h3 class="pillar-title">Financial Advisory</h3>
-								<p class="pillar-text">
-									Clear protection and investment plans built around real goals.
-								</p>
-								<span class="pillar-link"
-									>View Details <i class="fas fa-arrow-right"></i
-								></span>
-							</div>
-						</a>
-
-						<a href="Pages/fitness-sports.html" class="pillar-card-link">
-							<div class="pillar-card">
-								<div class="pillar-icon"><i class="fas fa-dumbbell"></i></div>
-								<h3 class="pillar-title">Fitness &amp; Sport</h3>
-								<p class="pillar-text">
-									HYROX, basketball, swimming, golf and five training days a week.
-								</p>
-								<span class="pillar-link"
-									>View Details <i class="fas fa-arrow-right"></i
-								></span>
-							</div>
-						</a>
-					</div>
-				</div>
-			</section>
-
-			<!-- EDUCATION & EXPERIENCE -->
-			<section id="credentials">
-				<div class="container">
-					<span class="section-label">Background</span>
-					<h2 class="section-title">Education &amp; Experience</h2>
-					<div class="section-line"></div>
-					<div class="timeline">
-						<div class="timeline-entry">
-							<p class="tl-date">2026 &ndash; Present</p>
-							<p class="tl-school">Financial Adviser</p>
-							<p class="tl-degree">AIA Singapore</p>
-						</div>
-						<div class="timeline-entry">
-							<p class="tl-date">2023 &ndash; 2026</p>
-							<p class="tl-school">University of London, SIM</p>
-							<p class="tl-degree">Computer Science</p>
-						</div>
-						<div class="timeline-entry timeline-entry-photo">
-							<img width="240" height="336" loading="lazy" decoding="async"
-								src="assets/commando-portrait.webp"
-								alt="Shaun Sevilla in Singapore Armed Forces Commando ceremonial uniform"
-								class="timeline-photo"
-							/>
-							<div>
-								<p class="tl-date">2021 &ndash; 2022</p>
-								<p class="tl-school">Singapore Armed Forces, Commandos</p>
-								<p class="tl-degree">National Service &middot; Leadership &amp; Operations</p>
-							</div>
-						</div>
-						<div class="timeline-entry">
-							<p class="tl-date">2018 &ndash; 2021</p>
-							<p class="tl-school">Temasek Polytechnic</p>
-							<p class="tl-degree">Business, HR &amp; Tourism</p>
-						</div>
-					</div>
-				</div>
-			</section>
-			</div>
-
-			<div class="home-overview">
 			<section class="consultation-cta">
 				<div class="container consultation-cta-inner">
 					<div>
 						<span class="section-label">Consultation Hours</span>
 						<h2>Let&rsquo;s make a clear plan.</h2>
-						<p>Focused two-hour sessions. Singapore Time.</p>
+						<p>Two-hour sessions or a quick 15-minute chat. Weekdays, Singapore time.</p>
 						<p class="consultation-perks">Clients also get will writing, estate planning, a medical concierge and care at home through my partners. <a href="Pages/financial-advisory.html#client-services">See client services</a></p>
 					</div>
 					<div class="consultation-actions">
-						<div class="consultation-hours" aria-label="Typical consultation hours">
+						<div class="consultation-hours" aria-label="Consultation hours">
 							<span>8&ndash;10am</span><span>12&ndash;2pm</span><span>2&ndash;4pm</span><span>8&ndash;10pm</span>
 						</div>
-						<a href="Pages/booking.html" class="bot-cta-link bot-cta-primary">View Live Availability <i class="fas fa-arrow-right"></i></a>
+						<a href="Pages/booking.html" class="bot-cta-link bot-cta-primary">See open times <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
 					</div>
 				</div>
 			</section>
 
-			<!-- LEADERSHIP -->
-			<section id="leadership">
-				<div class="container">
-					<span class="section-label">Leadership</span>
-					<h2 class="section-title">Roles</h2>
-					<div class="section-line"></div>
-					<div class="leadership-grid">
-						<div class="leadership-item">
-							<p class="leadership-role">
-								Captain, Temasek Polytechnic Wakeboard Team
-							</p>
-							<p class="leadership-date">2019 &ndash; 2020</p>
+			<section class="home-about" id="about">
+				<div class="container home-about-grid">
+					<div id="work">
+						<span class="section-label">What I Do</span>
+						<h2 class="section-title">At a Glance</h2>
+						<div class="section-line"></div>
+						<div class="pillars-grid">
+							<a href="Pages/financial-advisory.html" class="pillar-card-link"><div class="pillar-card"><div class="pillar-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></div><h3 class="pillar-title">Financial Advisory</h3><p class="pillar-text">Protection and investing plans built around your goals.</p><span class="pillar-link">View details <i class="fas fa-arrow-right" aria-hidden="true"></i></span></div></a>
+							<a href="Pages/software-development.html" class="pillar-card-link"><div class="pillar-card"><div class="pillar-icon"><i class="fas fa-code" aria-hidden="true"></i></div><h3 class="pillar-title">Software Development</h3><p class="pillar-text">Practical web apps and bots, built cleanly.</p><span class="pillar-link">View details <i class="fas fa-arrow-right" aria-hidden="true"></i></span></div></a>
+							<a href="Pages/fitness-sports.html" class="pillar-card-link"><div class="pillar-card"><div class="pillar-icon"><i class="fas fa-dumbbell" aria-hidden="true"></i></div><h3 class="pillar-title">Fitness &amp; Sport</h3><p class="pillar-text">HYROX, basketball, swimming and golf.</p><span class="pillar-link">View details <i class="fas fa-arrow-right" aria-hidden="true"></i></span></div></a>
 						</div>
-						<div class="leadership-item">
-							<p class="leadership-role">
-								Captain, Greenview Secondary 2nd Basketball Team
-							</p>
-							<p class="leadership-date">2016 &ndash; 2017</p>
+					</div>
+					<div id="credentials">
+						<span class="section-label">Background</span>
+						<h2 class="section-title">Experience</h2>
+						<div class="section-line"></div>
+						<div class="timeline">
+							<div class="timeline-entry"><p class="tl-date">2026 &ndash; Present</p><p class="tl-school">Financial Adviser</p><p class="tl-degree">AIA Singapore</p></div>
+							<div class="timeline-entry"><p class="tl-date">2023 &ndash; 2026</p><p class="tl-school">University of London, SIM</p><p class="tl-degree">Computer Science</p></div>
+							<div class="timeline-entry timeline-entry-photo">
+								<img width="240" height="336" loading="lazy" decoding="async" src="assets/commando-portrait.webp" alt="Shaun Sevilla in Commando ceremonial uniform" class="timeline-photo" />
+								<div><p class="tl-date">2021 &ndash; 2022</p><p class="tl-school">Singapore Armed Forces, Commandos</p><p class="tl-degree">National Service</p></div>
+							</div>
+							<div class="timeline-entry"><p class="tl-date">2018 &ndash; 2021</p><p class="tl-school">Temasek Polytechnic</p><p class="tl-degree">Business, HR &amp; Tourism</p></div>
 						</div>
+						<h3 class="home-sub">Leadership</h3>
+						<ul class="role-list">
+							<li><span>Captain, Temasek Polytechnic Wakeboard Team</span><small>2019 &ndash; 2020</small></li>
+							<li><span>Captain, Greenview Secondary Basketball Team</span><small>2016 &ndash; 2017</small></li>
+						</ul>
 					</div>
 				</div>
 			</section>
-			</div>
-
 		</main>
 
 		<footer id="site-footer" class="site-footer"></footer>

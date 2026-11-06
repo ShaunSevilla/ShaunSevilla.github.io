@@ -1,0 +1,41 @@
+/* Font Awesome Free 6.7.2 by @fontawesome (fontawesome.com), CC BY 4.0 / SIL OFL 1.1. Cut down to the icons this site uses. */
+@font-face{font-family:"FA";font-style:normal;font-weight:900;font-display:block;src:url(fa-solid.woff2) format("woff2")}
+@font-face{font-family:"FAB";font-style:normal;font-weight:400;font-display:block;src:url(fa-brands.woff2) format("woff2")}
+.fas,.fab{display:inline-block;font-style:normal;font-variant:normal;line-height:1;text-rendering:auto;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.fas{font-family:"FA";font-weight:900}.fab{font-family:"FAB";font-weight:400}
+.fas::before,.fab::before{content:var(--fa)}
+.fa-arrow-down{--fa:"\f063"}
+.fa-arrow-left{--fa:"\f060"}
+.fa-arrow-right{--fa:"\f061"}
+.fa-arrow-up-right-from-square{--fa:"\f08e"}
+.fa-book-open{--fa:"\f518"}
+.fa-car{--fa:"\f1b9"}
+.fa-chart-column{--fa:"\e0e3"}
+.fa-chart-line{--fa:"\f201"}
+.fa-chevron-down{--fa:"\f078"}
+.fa-code{--fa:"\f121"}
+.fa-coins{--fa:"\f51e"}
+.fa-credit-card{--fa:"\f09d"}
+.fa-download{--fa:"\f019"}
+.fa-dumbbell{--fa:"\f44b"}
+.fa-envelope{--fa:"\f0e0"}
+.fa-file-signature{--fa:"\f573"}
+.fa-github{--fa:"\f09b"}
+.fa-hospital-user{--fa:"\f80d"}
+.fa-hourglass-half{--fa:"\f252"}
+.fa-house{--fa:"\f015"}
+.fa-house-medical{--fa:"\e3b2"}
+.fa-instagram{--fa:"\f16d"}
+.fa-key{--fa:"\f084"}
+.fa-landmark{--fa:"\f66f"}
+.fa-lightbulb{--fa:"\f0eb"}
+.fa-linkedin{--fa:"\f08c"}
+.fa-piggy-bank{--fa:"\f4d3"}
+.fa-receipt{--fa:"\f543"}
+.fa-rotate-left{--fa:"\f2ea"}
+.fa-share{--fa:"\f064"}
+.fa-telegram{--fa:"\f2c6"}
+.fa-theater-masks{--fa:"\f630"}
+.fa-tiktok{--fa:"\e07b"}
+.fa-umbrella{--fa:"\f0e9"}
+.fa-wallet{--fa:"\f555"}
