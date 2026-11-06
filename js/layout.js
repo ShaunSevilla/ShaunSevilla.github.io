@@ -58,27 +58,31 @@
 		`;
 	}
 
+	const SOCIAL = [
+		["mailto:shaun.sevilla@aiafa.com.sg", "fas fa-envelope", "Email"],
+		["https://www.linkedin.com/in/shaunsevilla/", "fab fa-linkedin", "LinkedIn"],
+		["https://github.com/ShaunSevilla", "fab fa-github", "GitHub"],
+		["https://www.instagram.com/se.villa/", "fab fa-instagram", "Instagram"],
+		["https://t.me/ShaunSevilla", "fab fa-telegram", "Telegram"],
+		["https://www.tiktok.com/@shaunsevilla?lang=en", "fab fa-tiktok", "TikTok"],
+	];
+
 	function buildFooter(root) {
+		const ext = 'target="_blank" rel="noopener noreferrer"';
+		const social = SOCIAL.map(([href, icon, name]) => `<a href="${href}" ${href.startsWith("http") ? ext : ""} aria-label="${name}"><i class="${icon}" aria-hidden="true"></i><b>${name}</b></a>`).join("");
 		return `
 			<div class="container">
-				<p class="footer-tools">
-					<span>Free tools:</span>
+				<div class="footer-tools">
+					<span>Free tools</span>
 					<a href="${root}/Pages/financial-advisory.html#calculators">Calculators</a>
 					<a href="${root}/Pages/money-quiz.html">Money Quiz</a>
 					<a href="${root}/Pages/sg-money-guide.html">Money Guide</a>
 					<a href="${root}/Pages/market-update.html">Market Update</a>
-					<a href="https://t.me/ProsperityPath_bot?start=menu" target="_blank" rel="noopener noreferrer">Telegram Bot</a>
+					<a href="https://t.me/ProsperityPath_bot?start=menu" ${ext}>Telegram Bot</a>
 					<a href="${root}/Pages/booking.html">Book a Chat</a>
-				</p>
-				<div class="footer-contact-links">
-					<a href="mailto:shaun.sevilla@aiafa.com.sg"><i class="fas fa-envelope"></i>Email</a>
-					<a href="https://www.linkedin.com/in/shaunsevilla/" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin"></i>LinkedIn</a>
-					<a href="https://github.com/ShaunSevilla" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i>GitHub</a>
-					<a href="https://www.instagram.com/se.villa/" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i>Instagram</a>
-					<a href="https://t.me/ShaunSevilla" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram"></i>Telegram</a>
-					<a href="https://www.tiktok.com/@shaunsevilla?lang=en" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i>TikTok</a>
 				</div>
-				<p>&copy; 2026 <span>Shaun Sevilla</span>. Relentlessly building.</p>
+				<div class="footer-contact-links">${social}</div>
+				<p class="footer-copy">&copy; 2026 <span>Shaun Sevilla</span>. Relentlessly building.</p>
 			</div>
 		`;
 	}

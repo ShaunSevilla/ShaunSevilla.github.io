@@ -169,7 +169,7 @@
 
 	// A link shared from a result (?r=monk) shows who sent it.
 	const shared = new URLSearchParams(window.location.search).get("r");
-	if (shared && Quiz.PERSONAS[shared]) {
+	if (shared && Object.prototype.hasOwnProperty.call(Quiz.PERSONAS, shared)) {
 		const persona = Quiz.PERSONAS[shared];
 		const friend = $("quiz-friend");
 		friend.innerHTML = "";

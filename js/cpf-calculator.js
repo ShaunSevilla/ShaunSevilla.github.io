@@ -54,60 +54,17 @@
 		return html;
 	}
 
-	let cpfChartInstance = null;
-
-	function renderChart(yearly) {
-		const canvas = document.getElementById("cpf-chart-canvas");
-		if (!canvas || typeof Chart === "undefined") return;
-
-		const labels = yearly.map((y) => Math.round(y.age));
-		const oaData = yearly.map((y) => Math.round(y.oa));
-		const saRaData = yearly.map((y) => Math.round(y.sa + y.ra));
-		const maData = yearly.map((y) => Math.round(y.ma));
-
-		if (cpfChartInstance) {
-			cpfChartInstance.destroy();
-		}
-
-		cpfChartInstance = new Chart(canvas.getContext("2d"), {
-			type: "line",
-			data: {
-				labels,
-				datasets: [
-					{ label: "OA", data: oaData, borderColor: "#c9a84c", backgroundColor: "rgba(201, 168, 76, 0.16)", fill: true, tension: 0.25, pointRadius: 0, borderWidth: 2 },
-					{ label: "SA / RA", data: saRaData, borderColor: "#6fae9c", backgroundColor: "rgba(111, 174, 156, 0.16)", fill: true, tension: 0.25, pointRadius: 0, borderWidth: 2 },
-					{ label: "MediSave", data: maData, borderColor: "#b0764c", backgroundColor: "rgba(176, 118, 76, 0.16)", fill: true, tension: 0.25, pointRadius: 0, borderWidth: 2 },
-				],
-			},
-			options: {
-				responsive: true,
-				maintainAspectRatio: false,
-				interaction: { mode: "index", intersect: false },
-				plugins: {
-					legend: { labels: { color: "#c9c4b4", boxWidth: 12, font: { family: "inherit" } } },
-					tooltip: {
-						callbacks: {
-							title: (items) => `Age ${items[0].label}`,
-							label: (item) => `${item.dataset.label}: ${formatCurrency(item.parsed.y)}`,
-						},
-					},
-				},
-				scales: {
-					x: {
-						title: { display: true, text: "Age", color: "#888888" },
-						ticks: { color: "#888888" },
-						grid: { color: "rgba(255, 255, 255, 0.06)" },
-					},
-					y: {
-						ticks: {
-							color: "#888888",
-							callback: (v) => (v >= 1000 ? `$${Math.round(v / 1000)}k` : `$${v}`),
-						},
-						grid: { color: "rgba(255, 255, 255, 0.06)" },
-					},
-				},
-			},
-		});
+	function chartHtml(yearly) {
+		if (typeof CalcViz === "undefined") return "";
+		return CalcViz.layers(
+			"How your CPF builds up, by age",
+			yearly.map((y) => `Age ${Math.round(y.age)}`),
+			[
+				{ label: "OA", values: yearly.map((y) => y.oa) },
+				{ label: "SA / RA", values: yearly.map((y) => y.sa + y.ra) },
+				{ label: "MediSave", values: yearly.map((y) => y.ma) },
+			],
+		);
 	}
 
 	function initCpfCalculator() {
@@ -172,7 +129,7 @@
 
 			resultBox.innerHTML =
 				`<div class="calculator-result-headline"><span>At age ${targetAge}</span><strong>${formatCurrency(final.total)}</strong></div>` +
-				`<div class="cpf-chart-wrap"><canvas id="cpf-chart-canvas" height="240"></canvas></div>` +
+				chartHtml(yearly) +
 				`<div class="calculator-result-row"><span>OA · SA/RA · MediSave</span><strong>${formatCurrency(final.oa)} · ${formatCurrency(final.sa + final.ra)} · ${formatCurrency(final.ma)}</strong></div>` +
 				`<div class="calculator-result-row"><span>In today's money (2% inflation)</span><strong>about ${formatCurrency(projection.todayDollars)}</strong></div>` +
 				`<p class="calculator-note">Most of this isn't cash you can take out: the RA pays you monthly for life through CPF LIFE from 65, and MediSave is for healthcare.</p>` +
@@ -191,7 +148,6 @@
 				`<p class="calculator-note">Educational estimate only, not financial advice.</p>`;
 
 			resultBox.hidden = false;
-			renderChart(yearly);
 		});
 	}
 

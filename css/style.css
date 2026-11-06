@@ -41,7 +41,7 @@ body {
 	font-size: 16px;
 	line-height: 1.7;
 	-webkit-font-smoothing: antialiased;
-	overflow-x: hidden;
+	overflow-x: clip;
 }
 
 h1,
@@ -1338,6 +1338,20 @@ section {
 	border-top: 1px solid var(--border);
 }
 
+.calc-group {
+	margin: 2.75rem 0 0.9rem;
+	font-family: "Inter", sans-serif;
+	font-size: 0.68rem;
+	font-weight: 500;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: var(--gold);
+}
+
+.calc-group + .calculator-dropdown {
+	border-top: 1px solid var(--border);
+}
+
 .calculator-dropdown summary {
 	display: flex;
 	align-items: center;
@@ -1392,7 +1406,8 @@ section {
 	padding-bottom: 2.5rem;
 }
 
-.calculator-dropdown .calculator-card {
+.calculator-dropdown .calculator-card,
+.fitness-strength-grid .calculator-card {
 	border: none;
 	padding: 0;
 }
@@ -1631,12 +1646,6 @@ section {
 	border-top: 1px solid var(--gold-dim);
 }
 
-.cpf-chart-wrap {
-	position: relative;
-	height: 240px;
-	margin-bottom: 1rem;
-}
-
 .calculator-result-row {
 	display: flex;
 	justify-content: space-between;
@@ -1753,56 +1762,120 @@ section {
 /* FOOTER */
 footer {
 	border-top: 1px solid var(--border);
-	padding: 2.5rem 0;
+	padding: 2.5rem 0 calc(2rem + env(safe-area-inset-bottom, 0px));
 	text-align: center;
 }
 
 .site-footer .container {
+	display: grid;
+	justify-items: center;
+	gap: 1.25rem;
+}
+
+.footer-tools {
 	display: flex;
-	flex-direction: column;
-	gap: 1.2rem;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0 1.1rem;
+	font-size: 0.7rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+.footer-tools a,
+.footer-tools > span {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 44px;
+	color: var(--text-muted);
+}
+
+.footer-tools a {
+	color: var(--gold);
+}
+
+.footer-tools a:hover {
+	text-decoration: underline;
 }
 
 .footer-contact-links {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
-	gap: 0.5rem 0.8rem;
+	gap: 0.5rem;
 }
 
 .footer-contact-links a {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.4rem;
+	justify-content: center;
+	gap: 0.45rem;
+	min-height: 44px;
+	padding: 0 0.9rem;
+	border: 1px solid var(--soft-border);
+	border-radius: 999px;
 	font-size: 0.64rem;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
-	padding: 0.35rem 0.6rem;
-	border: 1px solid var(--border);
 	color: var(--text-muted);
 	transition:
 		color var(--transition),
-		border-color var(--transition),
-		background var(--transition);
+		border-color var(--transition);
 }
 
-.footer-contact-links a:hover {
+.footer-contact-links a:hover,
+.footer-contact-links a:focus-visible {
 	color: var(--gold);
 	border-color: var(--gold-dim);
-	background: rgba(201, 168, 76, 0.05);
 }
 
-.footer-contact-links i {
-	font-size: 0.66rem;
+.footer-contact-links b {
+	font-weight: inherit;
 }
 
-footer p {
+.footer-copy {
 	font-size: 0.72rem;
 	letter-spacing: 0.1em;
 	color: var(--text-muted);
 }
-footer span {
+
+.footer-copy span {
 	color: var(--gold);
+}
+
+/* Phones: tools in a 2-column grid, contact links as one row of icons. */
+@media (max-width: 560px) {
+	.footer-tools {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		width: 100%;
+		max-width: 22rem;
+	}
+
+	.footer-tools > span {
+		grid-column: 1 / -1;
+		min-height: 2rem;
+	}
+
+	.footer-contact-links {
+		display: grid;
+		grid-template-columns: repeat(6, 44px);
+	}
+
+	.footer-contact-links a {
+		width: 44px;
+		padding: 0;
+	}
+
+	.footer-contact-links b {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
+		white-space: nowrap;
+	}
 }
 
 @media (max-width: 1200px) {
@@ -1852,9 +1925,6 @@ footer span {
 
 	.consultation-hours {
 		grid-template-columns: repeat(2, 1fr);
-	}
-	.footer-contact-links {
-		gap: 0.45rem 0.55rem;
 	}
 
 	.github-preview-head {
@@ -2157,15 +2227,6 @@ footer span {
 		font-size: 0.84rem;
 	}
 
-	.footer-contact-links {
-		justify-content: center;
-	}
-
-	.footer-contact-links a {
-		font-size: 0.58rem;
-		letter-spacing: 0.1em;
-	}
-
 	.bot-cta-link {
 		width: 100%;
 		justify-content: center;
@@ -2397,30 +2458,11 @@ footer span {
 	}
 }
 
-/* Footer "free tools" row */
-.footer-tools {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	gap: 0.4rem 1.2rem;
-	font-size: 0.72rem;
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	color: var(--text-muted);
-}
-
-.footer-tools a {
-	color: var(--gold);
-}
-
-.footer-tools a:hover {
-	text-decoration: underline;
-}
-
 /* Calculator result actions (added by calculator-ux.js) */
 .calculator-actions {
 	display: flex;
 	flex-wrap: wrap;
+	align-items: center;
 	gap: 0.75rem;
 	margin-top: 1.4rem;
 	padding-top: 1.2rem;
@@ -2498,7 +2540,7 @@ footer span {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.75rem;
-	margin: -1.5rem 0 2rem;
+	margin: 0 0 2rem;
 }
 
 /* Money guide: "use the tool for this" links under topic headings */
@@ -3055,6 +3097,7 @@ footer span {
 
 /* "Ask Shaun about..." topic buttons under calculator and quiz results. */
 .topic-chips {
+	flex-basis: 100%;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
@@ -3284,8 +3327,8 @@ footer span {
 		content: "";
 		position: absolute;
 		inset: auto 0 0 0;
-		height: 60%;
-		background: linear-gradient(to bottom, transparent, rgba(10, 10, 10, 0.85) 55%, #0a0a0a);
+		height: 66%;
+		background: linear-gradient(to bottom, transparent, rgba(10, 10, 10, 0.88) 30%, #0a0a0a 80%);
 		z-index: 1;
 		pointer-events: none;
 	}
@@ -3804,10 +3847,6 @@ footer span {
 }
 
 /* Cleanup pass (Oct 2026): tighter phone layouts */
-.footer-tools > span {
-	color: var(--text-muted);
-}
-
 @media (max-width: 560px) {
 	/* Tools: compact two-up tiles, title only */
 	.tools-grid {
@@ -4538,7 +4577,6 @@ input[type="range"] {
 .share-friend-btn,
 .share-friend-links a,
 .share-friend-links button,
-.footer-contact-links a,
 .money-guide-jump a,
 .github-preview-meta a,
 .github-preview-meta span,
@@ -4547,37 +4585,13 @@ input[type="range"] {
 	border-radius: 999px;
 }
 
-.footer-contact-links a,
 .money-guide-jump a {
 	border-color: var(--soft-border);
 }
 
-/* Tap targets: at least ~40px tall on phones */
-.footer-contact-links a {
-	min-height: 36px;
-	padding: 0.45rem 0.85rem;
-}
-
-.footer-tools a {
-	display: inline-block;
-	padding: 0.4rem 0;
-}
-
-@media (max-width: 560px) {
-	.footer-contact-links a {
-		min-height: 40px;
-	}
-}
 
 /* Sections that run edge to edge on phones keep square corners. */
 
-.footer-tools {
-	align-items: center;
-}
-
-.footer-tools > span {
-	padding: 0.4rem 0;
-}
 
 /* Mini app: quiz banner like the website's, and an odd last tile spans both columns */
 .mini-app-quiz {
@@ -4761,6 +4775,10 @@ input[type="range"] {
 }
 
 .viz-area-total { fill: rgba(201, 168, 76, 0.22); }
+.tone-fill-0 { fill: var(--gold); }
+.tone-fill-1 { fill: #8a7334; }
+.tone-fill-2 { fill: #5c5c5c; }
+.viz-layer { stroke: var(--bg, #0a0a0a); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .viz-area-base { fill: rgba(255, 255, 255, 0.1); }
 .viz-line-total { fill: none; stroke: var(--gold); stroke-width: 2; vector-effect: non-scaling-stroke; }
 
@@ -4978,9 +4996,6 @@ form.is-quick .calc-detail {
 
 /* Tap targets: 44px minimum (VectorLab viewports / WCAG 2.5.8) */
 .nav-logo { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }
-.footer-tools a,
-.footer-tools > span { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.15rem; }
-.footer-contact-links a { min-height: 44px; display: inline-flex; align-items: center; }
 .calc-mode button { min-height: 44px; padding: 0 1.2rem; }
 .booking-retry { min-height: 44px; padding: 0 1rem; margin: 0.35rem 0.25rem; }
 .money-guide-jump a { min-height: 44px; display: inline-flex; align-items: center; }
@@ -5141,3 +5156,64 @@ a, button, summary, label, select, input, .topic-chip, .calc-mode button {
 
 /* Textarea matches the other fields. */
 .booking-form textarea { min-height: 7rem; line-height: 1.5; }
+
+/* Phones: hero photos would sit behind the copy, so the copy gets the full width. */
+@media (max-width: 560px) {
+	.page-hero-photo,
+	.money-guide-hero-photo,
+	.fitness-hero-photo {
+		display: none;
+	}
+
+	.page-hero-grid {
+		min-height: 0;
+	}
+
+	.page-hero-grid > :first-child,
+	.money-guide-hero .container > :not(.money-guide-hero-photo) {
+		max-width: none;
+	}
+}
+
+/* Motion, all CSS, zero JavaScript, off for reduced-motion users:
+   1. Page-to-page cross-fade (cross-document View Transitions); the nav stays put.
+   2. Cards ease in as they scroll into view (scroll-driven animations).
+   Browsers without support simply show the page as normal. */
+@media (prefers-reduced-motion: no-preference) {
+	@view-transition {
+		navigation: auto;
+	}
+
+	#site-nav {
+		view-transition-name: site-nav;
+	}
+
+	::view-transition-old(root),
+	::view-transition-new(root) {
+		animation-duration: 0.3s;
+		animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+	}
+
+	@supports (animation-timeline: view()) {
+		.tool-card,
+		.pillar-card,
+		.timeline-entry,
+		.role-list li,
+		.fitness-tile,
+		.client-services-grid > *,
+		.money-principles-grid > *,
+		.software-grid > *,
+		.booking-step {
+			animation: reveal-up linear both;
+			animation-timeline: view();
+			animation-range: entry 0% entry 40%;
+		}
+	}
+}
+
+@keyframes reveal-up {
+	from {
+		opacity: 0;
+		translate: 0 1.25rem;
+	}
+}

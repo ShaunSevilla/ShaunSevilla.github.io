@@ -25,7 +25,12 @@
 	}
 
 	function openFromHash() {
-		const id = decodeURIComponent(window.location.hash.replace("#", ""));
+		let id = "";
+		try {
+			id = decodeURIComponent(window.location.hash.slice(1));
+		} catch {
+			return;
+		}
 		if (!id) return;
 		const target = document.getElementById(id);
 		if (!target || !target.classList.contains("calculator-dropdown")) return;

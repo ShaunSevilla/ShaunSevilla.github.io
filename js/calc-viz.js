@@ -56,5 +56,23 @@
 			<div class="viz-legend"><span><i class="tone-gold"></i>${labels[0]} <b>${short(last.total)}</b></span><span><i class="tone-grey"></i>${labels[1]} <b>${short(last.base)}</b></span></div></figure>`;
 	}
 
-	root.CalcViz = { bars, stack, growth, money, short };
+	// series: [{ label, values }] stacked bottom-up over the same x labels
+	function layers(title, xLabels, series) {
+		const n = xLabels.length;
+		if (n < 2 || !series.length) return "";
+		const W = 320;
+		const H = 140;
+		const sums = series.map((_, k) => xLabels.map((__, i) => series.slice(0, k + 1).reduce((t, s) => t + (Number(s.values[i]) || 0), 0)));
+		const max = Math.max(...sums[sums.length - 1], 1);
+		const xs = (i) => ((i / (n - 1)) * W).toFixed(1);
+		const ys = (v) => (H - (v / max) * (H - 4)).toFixed(1);
+		const area = (row) => `M0,${H} ${row.map((v, i) => `L${xs(i)},${ys(v)}`).join(" ")} L${W},${H} Z`;
+		const paths = sums.map((row, k) => `<path class="viz-layer tone-fill-${k}" d="${area(row)}"/>`).reverse().join("");
+		const last = n - 1;
+		return `<figure class="viz"><figcaption>${title}</figcaption><svg class="viz-growth" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${title}">${paths}</svg>
+			<div class="viz-axis"><span>${xLabels[0]}</span><span>${xLabels[last]}</span></div>
+			<div class="viz-legend">${series.map((s, k) => `<span><i class="tone-${TONES[k % TONES.length]}"></i>${s.label} <b>${short(s.values[last])}</b></span>`).join("")}</div></figure>`;
+	}
+
+	root.CalcViz = { bars, stack, growth, layers, money, short };
 })(typeof self !== "undefined" ? self : this);

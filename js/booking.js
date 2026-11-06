@@ -214,8 +214,8 @@ function renderDateButtons() {
 	container.innerHTML = dates
 		.map(
 			(date) => `
-				<button type="button" class="booking-date ${date === bookingState.selectedDate ? "selected" : ""}" data-date="${date}">
-					${formatDisplayDate(date)}
+				<button type="button" class="booking-date ${date === bookingState.selectedDate ? "selected" : ""}" data-date="${escapeHtml(date)}">
+					${escapeHtml(formatDisplayDate(date))}
 				</button>
 			`,
 		)
@@ -245,10 +245,10 @@ function renderTimeSlots() {
 				<button
 					type="button"
 					class="booking-time ${slot.slot_key === bookingState.selectedSlot ? "selected" : ""}"
-					data-slot="${slot.slot_key}"
+					data-slot="${escapeHtml(slot.slot_key)}"
 					${slot.is_available ? "" : "disabled"}
 				>
-					<span>${formatTime(slot.start_time)} &ndash; ${formatTime(displayEnd(slot))}</span>
+					<span>${escapeHtml(formatTime(slot.start_time))} &ndash; ${escapeHtml(formatTime(displayEnd(slot)))}</span>
 					<small>${slot.is_available ? "Available" : "Booked"}</small>
 				</button>
 			`,
