@@ -338,6 +338,45 @@
 						</div>
 					</details>
 
+					<details class="calculator-dropdown" id="srs" data-calculator="SRS">
+						<summary>
+							<div>
+								<h3><i class="fas fa-piggy-bank" aria-hidden="true"></i> Is SRS Worth It for Me?</h3>
+								<p>Tax saved now, tax paid later, and SRS vs investing it yourself.</p>
+							</div>
+							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
+						</summary>
+						<div class="calculator-dropdown-body">
+							<article class="calculator-card">
+								<p class="calculator-card-note">Every dollar you put into SRS comes off your taxable income this year. You pay some back later, because half of each withdrawal is taxed. It's worth it when the tax you save going in beats the tax you pay coming out, and you won't need the money before retirement age.</p>
+								<form class="booking-form calculator-form" id="srs-form">
+									<label><span>Monthly salary before CPF ($)</span><input type="number" inputmode="numeric" id="srs-pay" min="1" step="1" placeholder="6000" required /></label>
+									<label><span>Yearly bonus ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="srs-bonus" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label><span>Age</span><input type="number" inputmode="numeric" id="srs-age" min="18" max="70" step="1" placeholder="30" required /></label>
+									<label><span>You are a</span>
+										<select id="srs-residency">
+											<option value="local">Singapore citizen or PR</option>
+											<option value="foreigner">Foreigner working here</option>
+										</select>
+									</label>
+									<label><span>Put into SRS each year ($) <em id="srs-amount-cap">up to $15,300</em></span><input type="number" inputmode="numeric" id="srs-amount" min="0" max="15300" step="100" placeholder="Blank = the most that still cuts your tax" /></label>
+									<label id="srs-return-field"><span>Yearly return on the money (%) <em>Optional</em></span><input type="number" inputmode="decimal" id="srs-return" min="0" max="12" step="0.5" placeholder="Blank = 4%" /></label>
+									<label id="srs-withdraw-field"><span>Withdrawal age</span>
+										<select id="srs-withdraw">
+											<option value="64">64 (first SRS top-up from July 2026)</option>
+											<option value="63">63 (first top-up before July 2026)</option>
+										</select>
+									</label>
+									<label id="srs-other-field"><span>Other taxable income a year when you withdraw ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="srs-other" min="0" step="1" placeholder="Blank = $0 (CPF LIFE payouts aren't taxed)" /></label>
+									<label id="srs-years-field"><span>Years before you'd withdraw (at least 10)</span><input type="number" inputmode="numeric" id="srs-years" min="10" max="40" step="1" placeholder="10" /></label>
+									<button type="submit" class="booking-submit">Calculate</button>
+									<p class="booking-status" id="srs-status" role="status"></p>
+								</form>
+								<div class="calculator-result" id="srs-result" hidden></div>
+							</article>
+						</div>
+					</details>
+
 					<details class="calculator-dropdown" id="hdb" data-calculator="HDB loan" data-bot-start="hdbloan">
 						<summary>
 							<div>
@@ -611,6 +650,8 @@
 		<script src="../js/compound-calculator.js?v=20261025"></script>
 		<script src="../js/card-finder.js?v=20261002"></script>
 		<script src="../js/shared/taxRelief.js"></script>
+		<script src="../js/shared/srsPlan.js?v=20261107"></script>
+		<script src="../js/srs.js?v=20261107"></script>
 		<script src="../js/shared/btoSale.js?v=20261107"></script>
 		<script src="../js/bto-sale.js?v=20261107"></script>
 		<script src="../js/shared/affordability.js?v=20261106"></script>
@@ -618,7 +659,7 @@
 		<script src="../js/share.js?v=20261003"></script>
 		<script src="../js/calc-viz.js?v=20261025"></script>
 		<script src="../js/calculator-ux.js?v=20261025"></script>
-		<script src="../js/calc-live.js?v=20261107"></script>
+		<script src="../js/calc-live.js?v=20261107b"></script>
 		<script src="../js/telegram-app.js?v=20261023"></script>
 	</body>
 </html>

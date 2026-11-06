@@ -20,6 +20,9 @@
 		"compound-addition": M(0, 100000, 500, 0),
 		"compound-years": M(1, 50, 1, 20),
 		"compound-rate": M(0, 12, 0.5, 4),
+		"srs-pay": M(1000, 40000, 250, 6000),
+		"srs-amount": (input) => (Number(input.max) > 15300 ? M(0, 35700, 100, 35700) : M(0, 15300, 100, 15300)),
+		"srs-age": M(18, 62, 1, 30),
 		"bto-sale-cpf": M(0, 600000, 5000, 150000),
 		"bto-sale-grants": M(0, 230000, 5000, 0),
 		"bto-sale-age": M(1, 40, 1, 8),
@@ -36,11 +39,12 @@
 		"hdb-loan-form": ["#hdb-pay-field", "#hdb-pay-hint", "#hdb-staggered-field", "#hdb-staggered-hint", "#hdb-grants", "#hdb-grants-hint", "#hdb-years", "#hdb-bank-rate"],
 		"cpf-form": ["#cpf-oa", "#cpf-sa", "#cpf-ma", "#cpf-growth", "#cpf-house-monthly", "#cpf-house-lump", "#cpf-house-more", ":scope > p.calculator-field-hint"],
 		"vehicle-loan-form": ["#vehicle-years", "#vehicle-rate"],
+		"srs-form": ["#srs-return-field", "#srs-withdraw-field", "#srs-other-field"],
 		"bto-sale-form": ["#bto-sale-interest-field", "#bto-sale-upfront-field", "#bto-sale-scheme-field", "#bto-sale-clawback-field", "#bto-sale-agent-field", "#bto-sale-next-field", "#bto-sale-singles-field"],
 	};
 
 	function rangeFor(input) {
-		const r = RANGES[input.id];
+		const r = typeof RANGES[input.id] === "function" ? RANGES[input.id](input) : RANGES[input.id];
 		if (r && r.min === undefined) {
 			const item = document.getElementById("earn-item");
 			return r[(item && item.value) || "bto"];
