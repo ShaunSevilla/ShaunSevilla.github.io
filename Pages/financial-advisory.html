@@ -18,7 +18,7 @@
 		<meta name="twitter:card" content="summary_large_image" />
 		<link rel="icon" type="image/png" sizes="64x64" href="../assets/favicon-64.png" />
 		<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
-		<link rel="stylesheet" href="../css/style.css?v=20261103c" />
+		<link rel="stylesheet" href="../css/style.css?v=20261106" />
 		<link
 			rel="stylesheet"
 			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -376,6 +376,54 @@
 						</div>
 					</details>
 
+					<details class="calculator-dropdown" id="sell-flat" data-calculator="Selling my flat">
+						<summary>
+							<div>
+								<h3><i class="fas fa-key" aria-hidden="true"></i> Selling My Flat: What Do I Get Back?</h3>
+								<p>Loan, CPF refund with accrued interest, grants and the cash left.</p>
+							</div>
+							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
+						</summary>
+						<div class="calculator-dropdown-body">
+							<article class="calculator-card">
+								<p class="calculator-card-note">When you sell, the outstanding loan is paid first. Then every CPF dollar you used, grants included, goes back into your CPF OA with the 2.5% interest it would have earned. Only what's left is cash.</p>
+								<form class="booking-form calculator-form" id="bto-sale-form">
+									<label><span>Price you paid for the flat ($)</span><input type="number" id="bto-sale-price" min="1" step="1" placeholder="400000" required /></label>
+									<label><span>Price you expect to sell at ($)</span><input type="number" id="bto-sale-sell" min="1" step="1" placeholder="650000" required /></label>
+									<label><span>Years living in it before you sell</span><input type="number" id="bto-sale-years" min="1" max="99" step="1" placeholder="10" required /></label>
+									<label><span>Housing grants you got ($) <em>Optional</em></span><input type="number" id="bto-sale-grants" min="0" step="1" placeholder="EHG, CPF Housing Grant, PHG. Blank = none" /></label>
+									<label id="bto-sale-scheme-field"><span>Type of flat</span>
+										<select id="bto-sale-scheme">
+											<option value="standard">Standard (or bought before Oct 2024)</option>
+											<option value="plus">Plus</option>
+											<option value="prime">Prime</option>
+										</select>
+									</label>
+									<label id="bto-sale-clawback-field"><span>Subsidy clawback (% of the sale price) <em>From your sales brochure</em></span><input type="number" id="bto-sale-clawback" min="0" max="20" step="0.5" placeholder="6 to 9" /></label>
+									<label><span>CPF used for the downpayment and stamp duty ($) <em>Optional</em></span><input type="number" id="bto-sale-cpf-upfront" min="0" step="1" placeholder="Blank = all of it from CPF" /></label>
+									<label><span>HDB loan taken ($) <em>Optional</em></span><input type="number" id="bto-sale-loan" min="0" step="1" placeholder="Blank = 75% of the price, less grants" /></label>
+									<label><span>Share of each instalment paid by CPF (%) <em>Optional</em></span><input type="number" id="bto-sale-share" min="0" max="100" step="1" placeholder="Blank = 100%" /></label>
+									<label><span>Years from signing to key collection <em>Optional</em></span><input type="number" id="bto-sale-wait" min="0" max="10" step="0.5" placeholder="Blank = 3. Resale = 0" /></label>
+									<label><span>Agent fee (% of the sale price, before GST) <em>Optional</em></span><input type="number" id="bto-sale-agent" min="0" max="5" step="0.1" placeholder="Blank = 2%. Selling yourself = 0" /></label>
+									<label id="bto-sale-next-field"><span>Next home also subsidised? (BTO, EC, or resale with grants)</span>
+										<select id="bto-sale-next">
+											<option value="none">No, or not sure</option>
+											<option value="2-room">Yes, and I'm selling a 2-room</option>
+											<option value="3-room">Yes, and I'm selling a 3-room</option>
+											<option value="4-room">Yes, and I'm selling a 4-room</option>
+											<option value="5-room">Yes, and I'm selling a 5-room</option>
+											<option value="executive">Yes, and I'm selling an Executive flat</option>
+										</select>
+									</label>
+									<label class="check-row" id="bto-sale-singles-field"><input type="checkbox" id="bto-sale-singles" /><span>I bought it as a single (the resale levy is halved)</span></label>
+									<button type="submit" class="booking-submit">Calculate</button>
+									<p class="booking-status" id="bto-sale-status" role="status"></p>
+								</form>
+								<div class="calculator-result" id="bto-sale-result" hidden></div>
+							</article>
+						</div>
+					</details>
+
 					<details class="calculator-dropdown" id="cpf" data-calculator="CPF growth" data-bot-start="cpf">
 						<summary>
 							<div>
@@ -563,12 +611,14 @@
 		<script src="../js/compound-calculator.js?v=20261025"></script>
 		<script src="../js/card-finder.js?v=20261002"></script>
 		<script src="../js/shared/taxRelief.js"></script>
-		<script src="../js/shared/affordability.js?v=20261103"></script>
-		<script src="../js/tools.js?v=20261025"></script>
+		<script src="../js/shared/btoSale.js?v=20261106"></script>
+		<script src="../js/bto-sale.js?v=20261106"></script>
+		<script src="../js/shared/affordability.js?v=20261106"></script>
+		<script src="../js/tools.js?v=20261106"></script>
 		<script src="../js/share.js?v=20261003"></script>
 		<script src="../js/calc-viz.js?v=20261025"></script>
 		<script src="../js/calculator-ux.js?v=20261025"></script>
-		<script src="../js/calc-live.js?v=20261103"></script>
+		<script src="../js/calc-live.js?v=20261106"></script>
 		<script src="../js/telegram-app.js?v=20261023"></script>
 	</body>
 </html>

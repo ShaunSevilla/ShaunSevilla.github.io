@@ -219,7 +219,8 @@ section {
 
 /* HERO */
 .hero {
-	min-height: calc(100svh - var(--nav-height));
+	/* Capped so a tall iPad screen gets the same composition as a laptop. */
+	min-height: min(calc(100svh - var(--nav-height)), 56rem);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -261,15 +262,15 @@ section {
 }
 
 .hero-portrait-casual {
-	left: calc(50% - 30rem);
-	height: min(72vh, 690px);
+	left: calc(50% - min(30rem, 33vw));
+	height: min(72vh, 690px, 48vw);
 	transform: translateX(-50%);
 }
 
 .hero-portrait-professional {
-	left: calc(50% + 30rem);
+	left: calc(50% + min(30rem, 33vw));
 	right: auto;
-	height: min(79vh, 760px);
+	height: min(79vh, 760px, 53vw);
 	transform: translateX(-50%);
 }
 
@@ -735,6 +736,10 @@ section {
 	position: relative;
 	z-index: 2;
 	max-width: 620px;
+}
+
+.software-hero .page-hero-grid > :first-child {
+	max-width: 780px;
 }
 
 /* Width is intentionally left auto: the box only sets a height, so the
@@ -1382,7 +1387,7 @@ section {
 }
 
 .software-hero h1 {
-	font-size: clamp(3.8rem, 9vw, 8rem);
+	font-size: clamp(3.8rem, 9vw, 6.5rem);
 	line-height: 0.9;
 	max-width: 900px;
 	margin-bottom: 1.5rem;
@@ -1640,7 +1645,7 @@ section {
 }
 
 .money-guide-hero {
-	min-height: 72vh;
+	min-height: min(72vh, 40rem);
 	display: flex;
 	align-items: center;
 	background: radial-gradient(ellipse 60% 52% at 65% 62%, rgba(201, 168, 76, 0.1), transparent 70%);
@@ -1676,7 +1681,7 @@ section {
 }
 
 .money-guide-hero h1 {
-	font-size: clamp(4rem, 10vw, 8.5rem);
+	font-size: clamp(4rem, 10vw, 7rem);
 	line-height: 0.88;
 	max-width: 950px;
 	margin-bottom: 1.5rem;
@@ -2428,7 +2433,7 @@ footer span {
 	}
 
 	.money-guide-hero {
-		min-height: 64vh;
+		min-height: min(64vh, 36rem);
 	}
 
 	.money-guide-hero h1 {

@@ -283,9 +283,9 @@
 			});
 
 			const bufferBasis = {
-				pay: "pay, since people depend on you",
 				expenses: `your ${formatCurrency(r.expenses)} monthly spending`,
-				estimated: `spending, estimated at ${formatCurrency(r.expenses)}/month. Enter your real spending for a sharper number`,
+				estimated: `spending, estimated at ${formatCurrency(r.expenses)}/month. Enter your real spending in Detailed for a sharper number`,
+				estimatedDependants: `spending, estimated at ${formatCurrency(r.expenses)}/month with people depending on you. Enter your real spending in Detailed for a sharper number`,
 			}[r.bufferBasis];
 			let html = note(`Kept aside first: <strong>${formatCurrency(r.buffer)}</strong> emergency buffer (6 months of ${bufferBasis}). Everything below leaves it untouched.`);
 
@@ -412,7 +412,7 @@
 			if (s.stretch && !window.CalcViz) html += `<div class="earn-stretch">${headline(s.stretchLabel, s.stretch, s.stretchSub)}</div>`;
 			s.rows.forEach(function (row) { html += resultRow(row[0], row[1]); });
 			s.notes.forEach(function (text, index) { html += note(text, index === 0 ? "calculator-note-callout" : ""); });
-			html += note("Comfortable means the emergency buffer (6 months of spending, or of pay if people depend on you) stays untouched. Estimates only, not personalised advice.");
+			html += note("Comfortable means the emergency buffer (6 months of spending: yours if you enter it, otherwise an estimate) stays untouched. Estimates only, not personalised advice.");
 			resultBox.innerHTML = html;
 			resultBox.hidden = false;
 		});

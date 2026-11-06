@@ -20,8 +20,9 @@
 //     the part of the instalment CPF doesn't cover
 //   • long-run planning rates: 2.6% (HDB loan), 3% (bank; today's ~1.6%
 //     packages only last 2 to 3 years)
-//   • an emergency buffer left untouched in the bank: 6 months of expenses,
-//     or 6 months of pay if people depend on you
+//   • an emergency buffer left untouched in the bank: 6 months of spending
+//     (yours if given, else a fixed estimate: $2,000 alone, $3,500 as a
+//     couple, +$1,500 with dependants), so more pay never shrinks the result
 // BTO vs resale: BTO is the default. Ticking a resale grant (CPF Housing
 // Grant / Proximity Housing Grant) switches the answer to resale. For BTO,
 // most of the downpayment is due at key collection (taken as 3 years away),
@@ -56,7 +57,12 @@
 	const COMFORT_SHARE = 0.3;
 	const MIN_SAVINGS_RATE = 0.2;
 	const TAKE_HOME_SHARE = 0.8; // after 20% employee CPF
-	const DEFAULT_SPEND_SHARE = 0.5; // of take-home, when spending isn't given
+	// Emergency buffer when spending isn't entered: a fixed monthly estimate, so
+	// earning more never shrinks what you can buy with the same savings.
+	const DEFAULT_SPEND = { alone: 2000, couple: 3500, dependants: 1500 };
+	function estimatedSpend(alone, hasDependants) {
+		return (alone ? DEFAULT_SPEND.alone : DEFAULT_SPEND.couple) + (hasDependants ? DEFAULT_SPEND.dependants : 0);
+	}
 	const HDB_STRESS_RATE = 0.03;
 	const BANK_STRESS_RATE = 0.04;
 	const HDB_RATE = 0.026;
@@ -316,6 +322,7 @@
 			// What they asked for in the dropdown, so a switch to resale is said out loud.
 			wanted: input.resale ? "resale" : "bto",
 			income,
+			alone,
 			price: best.price,
 			maxPrice: Math.max(...options.map((option) => option.maxPrice)),
 			best,
@@ -482,8 +489,10 @@
 		const cpf = Math.max(0, Number(input.cpfOa) || 0);
 		const otherDebt = Math.max(0, Number(input.otherDebt) || 0);
 		const expensesKnown = Number(input.monthlyExpenses) > 0;
-		const expenses = expensesKnown ? Number(input.monthlyExpenses) : income * TAKE_HOME_SHARE * DEFAULT_SPEND_SHARE;
-		const buffer = Math.round(input.hasDependants ? income * 6 : expenses * 6);
+		const expenses = expensesKnown ? Number(input.monthlyExpenses) : estimatedSpend(alone, input.hasDependants);
+		// Six months of spending. With people depending on you, the estimate is
+		// higher; your own figure, when given, is used as is.
+		const buffer = Math.round(expenses * 6);
 		const spare = Math.max(0, savings - buffer);
 		const legacy = { house: ["home"], car: ["car"], both: ["home", "car"], bike: ["bike"] };
 		let plan = Array.isArray(input.plan) ? input.plan : legacy[input.want] || ["home", "car"];
@@ -495,7 +504,7 @@
 			age,
 			income,
 			buffer,
-			bufferBasis: input.hasDependants ? "pay" : expensesKnown ? "expenses" : "estimated",
+			bufferBasis: expensesKnown ? "expenses" : input.hasDependants ? "estimatedDependants" : "estimated",
 			expenses: Math.round(expenses),
 			spare,
 			want,
@@ -590,7 +599,15 @@
 				]);
 			}
 			if (home.grants.items.length) {
-				home.grants.items.forEach((item) => summary.rows.push([item.label, item.amount > 0 ? money(item.amount) : "$0 at your income"]));
+				home.grants.items.forEach((item) => {
+					let shown = item.amount > 0 ? money(item.amount) : "$0 at your income";
+					// The grant cutoff is lower than the BTO income ceiling: losing the
+					// grant doesn't mean losing the BTO.
+					if (item.key === "ehg" && item.amount <= 0 && home.hdbEligible) {
+						shown = `$0 above ${money(home.alone ? 4500 : 9000)} (a BTO is still open up to ${money(home.ceiling)})`;
+					}
+					summary.rows.push([item.label, shown]);
+				});
 			}
 			if (home.type === "bto") {
 				summary.rows.push(["Your CPF OA by key collection (~3 years)", `about ${money(home.cpfAtKeys)}`]);
@@ -750,8 +767,8 @@
 			const income = up(Math.max(inst / VEHICLE_COMFORT_SHARE / TAKE_HOME_SHARE, byTdsr));
 			const stretchIncome = up(Math.max(inst / VEHICLE_STRETCH_SHARE / TAKE_HOME_SHARE, byTdsr));
 			const downpayment = Math.round(o.price * (1 - tier.ltv));
-			const expenses = o.monthlyExpenses > 0 ? o.monthlyExpenses : income * TAKE_HOME_SHARE * DEFAULT_SPEND_SHARE;
-			const buffer = Math.round(o.hasDependants ? income * 6 : expenses * 6);
+			const expenses = o.monthlyExpenses > 0 ? o.monthlyExpenses : estimatedSpend(o.alone !== false, o.hasDependants);
+			const buffer = Math.round(expenses * 6);
 			const spare = Math.max(0, o.savings - buffer);
 			return {
 				key: tier.key,

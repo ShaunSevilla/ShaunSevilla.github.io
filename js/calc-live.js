@@ -20,6 +20,9 @@
 		"compound-addition": M(0, 100000, 500, 0),
 		"compound-years": M(1, 50, 1, 20),
 		"compound-rate": M(0, 12, 0.5, 4),
+		"bto-sale-sell": M(200000, 2000000, 5000, 650000),
+		"bto-sale-years": M(1, 30, 1, 10),
+		"bto-sale-grants": M(0, 230000, 5000, 0),
 	};
 
 	// Quick / Detailed: Quick shows only these forms' essentials; everything
@@ -32,6 +35,7 @@
 		"hdb-loan-form": ["#hdb-pay-field", "#hdb-pay-hint", "#hdb-staggered-field", "#hdb-staggered-hint", "#hdb-grants", "#hdb-grants-hint", "#hdb-years", "#hdb-bank-rate"],
 		"cpf-form": ["#cpf-oa", "#cpf-sa", "#cpf-ma", "#cpf-growth", "#cpf-house-monthly", "#cpf-house-lump", "#cpf-house-more", ":scope > p.calculator-field-hint"],
 		"vehicle-loan-form": ["#vehicle-years", "#vehicle-rate"],
+		"bto-sale-form": ["#bto-sale-scheme-field", "#bto-sale-clawback-field", "#bto-sale-cpf-upfront", "#bto-sale-loan", "#bto-sale-share", "#bto-sale-wait", "#bto-sale-agent", "#bto-sale-next-field", "#bto-sale-singles-field"],
 	};
 
 	function rangeFor(input) {
