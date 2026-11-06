@@ -5328,3 +5328,111 @@ form.is-quick .calc-detail {
 	background-position: right 1rem center;
 	background-size: 12px 8px;
 }
+
+/* ---------------------------------------------------------------------------
+   Same look on Mac, iPad and iPhone (Nov 2026)
+   --------------------------------------------------------------------------- */
+/* iPad / iPhone Safari zooms the page when a field's text is under 16px. */
+@media (pointer: coarse) {
+	.booking-form input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+	.booking-form select,
+	.booking-form textarea,
+	.ins-slider select {
+		font-size: 16px;
+	}
+}
+
+/* No grey flash on tap (iOS); focus rings still show for keyboards. */
+a, button, summary, label, select, input, .topic-chip, .calc-mode button {
+	-webkit-tap-highlight-color: transparent;
+}
+
+/* Checkboxes and radios: drawn by the site, not the browser, so they match
+   the dark theme everywhere (Safari's unticked box is bright white). */
+.booking-form input[type="checkbox"],
+.booking-form input[type="radio"],
+.booking-type-option input[type="radio"],
+#calculators input[type="checkbox"],
+#calculators input[type="radio"] {
+	-webkit-appearance: none;
+	appearance: none;
+	flex: none;
+	width: 20px;
+	height: 20px;
+	margin: 0.1rem 0 0;
+	border: 1.5px solid rgba(255, 255, 255, 0.28) !important;
+	border-radius: 6px !important;
+	background: #0d0d0d !important;
+	display: inline-grid;
+	place-content: center;
+	cursor: pointer;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.booking-form input[type="radio"],
+.booking-type-option input[type="radio"],
+#calculators input[type="radio"] {
+	border-radius: 50% !important;
+}
+.booking-form input[type="checkbox"]::after,
+#calculators input[type="checkbox"]::after {
+	content: "";
+	width: 10px;
+	height: 6px;
+	border-left: 2px solid #0a0a0a;
+	border-bottom: 2px solid #0a0a0a;
+	transform: translateY(-1px) rotate(-45deg) scale(0);
+	transition: transform 0.15s ease;
+}
+.booking-form input[type="radio"]::after,
+.booking-type-option input[type="radio"]::after,
+#calculators input[type="radio"]::after {
+	content: "";
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #0a0a0a;
+	transform: scale(0);
+	transition: transform 0.15s ease;
+}
+.booking-form input[type="checkbox"]:checked,
+.booking-form input[type="radio"]:checked,
+.booking-type-option input[type="radio"]:checked,
+#calculators input[type="checkbox"]:checked,
+#calculators input[type="radio"]:checked {
+	background: var(--gold) !important;
+	border-color: var(--gold) !important;
+}
+.booking-form input[type="checkbox"]:checked::after,
+#calculators input[type="checkbox"]:checked::after {
+	transform: translateY(-1px) rotate(-45deg) scale(1);
+}
+.booking-form input[type="radio"]:checked::after,
+.booking-type-option input[type="radio"]:checked::after,
+#calculators input[type="radio"]:checked::after {
+	transform: scale(1);
+}
+.booking-form input[type="checkbox"]:focus-visible,
+.booking-form input[type="radio"]:focus-visible,
+.booking-type-option input[type="radio"]:focus-visible,
+#calculators input[type="checkbox"]:focus-visible,
+#calculators input[type="radio"]:focus-visible {
+	outline: 2px solid var(--gold);
+	outline-offset: 3px;
+}
+
+/* Insurance "what if" sliders share the calculator slider. */
+.ins-slider .calc-range { margin: 0.5rem 0 0.25rem; height: 28px; }
+
+/* Autofill keeps the dark field instead of Safari/Chrome's yellow or blue. */
+.booking-form input:-webkit-autofill,
+.booking-form input:-webkit-autofill:hover,
+.booking-form input:-webkit-autofill:focus,
+.booking-form textarea:-webkit-autofill {
+	-webkit-text-fill-color: var(--text);
+	-webkit-box-shadow: 0 0 0 1000px #0d0d0d inset;
+	caret-color: var(--text);
+	transition: background-color 9999s ease-out 0s;
+}
+
+/* Textarea matches the other fields. */
+.booking-form textarea { min-height: 7rem; line-height: 1.5; }

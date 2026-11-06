@@ -20,9 +20,10 @@
 		"compound-addition": M(0, 100000, 500, 0),
 		"compound-years": M(1, 50, 1, 20),
 		"compound-rate": M(0, 12, 0.5, 4),
-		"bto-sale-sell": M(200000, 2000000, 5000, 650000),
-		"bto-sale-years": M(1, 30, 1, 10),
+		"bto-sale-cpf": M(0, 600000, 5000, 150000),
 		"bto-sale-grants": M(0, 230000, 5000, 0),
+		"bto-sale-age": M(1, 40, 1, 8),
+		"bto-sale-sell": M(200000, 1500000, 10000, 600000),
 	};
 
 	// Quick / Detailed: Quick shows only these forms' essentials; everything
@@ -35,7 +36,7 @@
 		"hdb-loan-form": ["#hdb-pay-field", "#hdb-pay-hint", "#hdb-staggered-field", "#hdb-staggered-hint", "#hdb-grants", "#hdb-grants-hint", "#hdb-years", "#hdb-bank-rate"],
 		"cpf-form": ["#cpf-oa", "#cpf-sa", "#cpf-ma", "#cpf-growth", "#cpf-house-monthly", "#cpf-house-lump", "#cpf-house-more", ":scope > p.calculator-field-hint"],
 		"vehicle-loan-form": ["#vehicle-years", "#vehicle-rate"],
-		"bto-sale-form": ["#bto-sale-scheme-field", "#bto-sale-clawback-field", "#bto-sale-cpf-upfront", "#bto-sale-loan", "#bto-sale-share", "#bto-sale-wait", "#bto-sale-agent", "#bto-sale-next-field", "#bto-sale-singles-field"],
+		"bto-sale-form": ["#bto-sale-interest-field", "#bto-sale-upfront-field", "#bto-sale-scheme-field", "#bto-sale-clawback-field", "#bto-sale-agent-field", "#bto-sale-next-field", "#bto-sale-singles-field"],
 	};
 
 	function rangeFor(input) {
@@ -55,7 +56,7 @@
 	function show(input, value) {
 		if (!Number.isFinite(value)) return "—";
 		if (/rate/.test(input.id)) return `${value}%`;
-		if (/years/.test(input.id)) return `${value} ${value === 1 ? "year" : "years"}`;
+		if (/years|-age$/.test(input.id)) return `${value} ${value === 1 ? "year" : "years"}`;
 		return `$${Math.round(value).toLocaleString("en-SG")}`;
 	}
 

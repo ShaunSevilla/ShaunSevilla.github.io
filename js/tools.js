@@ -446,7 +446,7 @@
 					<label><span>Ward</span><select data-k="ward"><option value="private">Private / A</option><option value="b1">B1</option><option value="b2">B2</option><option value="c">C</option></select></label>
 					<label><span>Your hospital cover</span><select data-k="cover"><option value="none">Shield plan, no rider</option><option value="old">Shield + rider before Apr 2026</option><option value="new">Shield + rider from Apr 2026</option></select></label>
 				</div>`}
-				<label class="ins-slider"><span>Hospital bill <strong data-o="bill"></strong></span><input type="range" data-k="bill" min="2000" max="150000" step="1000" value="20000" /></label>
+				<label class="ins-slider"><span>Hospital bill <strong data-o="bill"></strong></span><input type="range" class="calc-range" data-k="bill" min="2000" max="150000" step="1000" value="20000" /></label>
 				<div class="ins-out"><span>You pay</span><strong data-o="you"></strong><em data-o="youSub"></em></div>
 				<div class="ins-bar" aria-hidden="true"><i class="ins-bar-you" data-o="barYou"></i><i class="ins-bar-ins" data-o="barIns"></i></div>
 				<div class="ins-legend"><span><i class="ins-dot-you"></i>You</span><span><i class="ins-dot-ins"></i>Insurer</span></div>
@@ -457,7 +457,7 @@
 			</div>
 
 			<div class="ins-pane" data-pane="ci" hidden>
-				<label class="ins-slider"><span>Critical illness payout <strong data-o="ciAmt"></strong></span><input type="range" data-k="ci" min="0" max="${ciMax}" step="${step(ciMax)}" value="${ciStart}" /></label>
+				<label class="ins-slider"><span>Critical illness payout <strong data-o="ciAmt"></strong></span><input type="range" class="calc-range" data-k="ci" min="0" max="${ciMax}" step="${step(ciMax)}" value="${ciStart}" /></label>
 				<div class="ins-out"><span>Time off you can afford</span><strong data-o="ciRun"></strong><em>Your pay replaced while you get treated and recover, without touching savings.</em></div>
 				<div class="ins-meter" aria-hidden="true"><i data-o="ciFill"></i><b style="left:50%"></b></div>
 				<div class="ins-legend"><span>0</span><span>Benchmark: 5 years</span><span>10 years</span></div>
@@ -465,7 +465,7 @@
 			</div>
 
 			<div class="ins-pane" data-pane="life" hidden>
-				<label class="ins-slider"><span>Death &amp; TPD payout <strong data-o="lifeAmt"></strong></span><input type="range" data-k="life" min="0" max="${lifeMax}" step="${step(lifeMax)}" value="${lifeStart}" /></label>
+				<label class="ins-slider"><span>Death &amp; TPD payout <strong data-o="lifeAmt"></strong></span><input type="range" class="calc-range" data-k="life" min="0" max="${lifeMax}" step="${step(lifeMax)}" value="${lifeStart}" /></label>
 				<div class="ins-out"><span>Your family gets</span><strong data-o="lifeRun"></strong><em>Of your income, if you pass away or can never work again.</em></div>
 				<div class="ins-meter" aria-hidden="true"><i data-o="lifeFill"></i><b style="left:50%"></b></div>
 				<div class="ins-legend"><span>0</span><span>Benchmark: 10 years</span><span>20 years</span></div>
@@ -548,7 +548,19 @@
 				sim.querySelectorAll("[data-pane]").forEach((p) => { p.hidden = p.dataset.pane !== tab.dataset.tab; });
 			});
 		});
-		sim.querySelectorAll("[data-k]").forEach((el) => el.addEventListener("input", update));
+		// Gold fill up to the thumb, like the calculator sliders.
+		const fillRange = (el) => {
+			if (el.type !== "range") return;
+			const pct = ((Number(el.value) - Number(el.min)) / (Number(el.max) - Number(el.min))) * 100;
+			el.style.setProperty("--fill", `${Math.max(0, Math.min(100, pct))}%`);
+		};
+		sim.querySelectorAll("[data-k]").forEach((el) => {
+			fillRange(el);
+			el.addEventListener("input", function () {
+				fillRange(el);
+				update();
+			});
+		});
 		update();
 	}
 

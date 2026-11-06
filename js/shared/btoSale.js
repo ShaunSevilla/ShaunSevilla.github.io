@@ -1,21 +1,22 @@
-// Selling your HDB flat: where the sale price goes, and what you actually get back.
+// Selling your HDB flat: how much goes back into CPF, and the cash you keep.
 // Kept free of the page so the Telegram bot can reuse it.
 //
 // Rules (CPF Board / HDB, Nov 2026):
 //   • Sale price pays, in order: the outstanding housing loan, then a refund of
 //     the CPF you used (principal + accrued interest) into your own CPF OA.
 //     What's left is cash.
-//   • Housing grants (EHG, CPF Housing Grant, PHG…) are paid into your CPF OA
+//   • Housing grants (EHG, CPF Housing Grant, PHG…) were paid into your CPF OA
 //     and spent on the flat, so they're refunded with accrued interest too.
-//   • Accrued interest: what the CPF you withdrew would have earned in the OA,
-//     2.5% a year, compounded, from the month each dollar left the OA.
-//   • Sold at market value: if the sale proceeds can't cover the full refund,
-//     CPF doesn't ask you to top up the rest in cash.
+//   • Accrued interest: what that CPF would have earned in the OA, 2.5% a year,
+//     compounded, from the month each dollar left the OA. The CPF app shows the
+//     exact figure under Home Ownership.
+//   • Sold at market value: if the sale can't cover the full refund, CPF doesn't
+//     ask you to top up the rest in cash.
 //   • Minimum Occupation Period: 5 years from key collection (10 for Plus and
 //     Prime flats). Plus/Prime also pay back a subsidy clawback of 6–9% of the
 //     resale price, as stated in the sales brochure.
-//   • Resale levy: only if your next flat is also subsidised (BTO, EC, or a
-//     resale flat with grants); paid from cash or the sale proceeds.
+//   • Resale levy: only if your next flat is also subsidised; paid in cash or
+//     from the sale proceeds.
 (function (root, factory) {
 	if (typeof module === "object" && module.exports) {
 		module.exports = factory();
@@ -24,137 +25,82 @@
 	}
 })(typeof self !== "undefined" ? self : this, function () {
 	const OA_RATE = 0.025;
-	const HDB_RATE = 0.026;
-	const HDB_LTV = 0.75;
-	const BTO_SIGNING_SHARE = 0.1; // of the price, at the Agreement for Lease
+	const UPFRONT_SHARE = 1 / 3; // of CPF used, assumed paid upfront when not given
 	const MOP_YEARS = { standard: 5, plus: 10, prime: 10 };
 	const RESALE_LEVY = { none: 0, "2-room": 15000, "3-room": 30000, "4-room": 40000, "5-room": 45000, executive: 50000 };
 
-	function money(value) {
-		const v = Math.round(Number(value) || 0);
-		return `${v < 0 ? "-" : ""}$${Math.abs(v).toLocaleString("en-SG")}`;
-	}
-
-	// Buyer's stamp duty (residential, Feb 2023 rates).
-	function bsd(price) {
-		const bands = [[180000, 0.01], [180000, 0.02], [640000, 0.03], [500000, 0.04], [1500000, 0.05], [Infinity, 0.06]];
-		let left = price;
-		let duty = 0;
-		for (const [size, rate] of bands) {
-			const part = Math.min(left, size);
-			duty += part * rate;
-			left -= part;
-			if (left <= 0) break;
-		}
-		return duty;
-	}
-
-	function instalment(loan, rate, years) {
-		const n = years * 12;
-		const i = rate / 12;
-		if (loan <= 0 || n <= 0) return 0;
-		return i === 0 ? loan / n : (loan * i) / (1 - Math.pow(1 + i, -n));
-	}
-
-	function balanceAfter(loan, rate, years, monthsPaid) {
-		const i = rate / 12;
-		const pay = instalment(loan, rate, years);
-		const k = Math.min(monthsPaid, years * 12);
-		if (loan <= 0) return 0;
-		if (i === 0) return Math.max(0, loan - pay * k);
-		return Math.max(0, loan * Math.pow(1 + i, k) - pay * ((Math.pow(1 + i, k) - 1) / i));
-	}
-
 	// Interest a dollar would have earned in the OA over m months.
-	const grow = (months) => Math.pow(1 + OA_RATE, months / 12) - 1;
+	const grow = (months) => Math.pow(1 + OA_RATE, Math.max(0, months) / 12) - 1;
+	const num = (v) => (v === undefined || v === null || v === "" ? null : Math.max(0, Number(v) || 0));
 
-	// input: { price, salePrice, yearsLived, grants, cpfUpfront?, loan?, loanYears?,
-	//          loanRate?, cpfShare? (0–1 of each instalment from CPF), waitYears?,
-	//          clawbackPercent?, agentPercent?, legalFees?, nextFlat? (levy key),
-	//          singles? (levy at half), scheme? (standard|plus|prime) }
+	// input: { cpfUsed, grants, flatAge (years since keys), upfront?, interestKnown?,
+	//          salePrice?, loanLeft?, scheme?, clawbackPercent?, agentPercent?,
+	//          legalFees?, nextFlat?, singles? }
 	function calculate(input) {
-		const price = Math.max(0, Number(input.price) || 0);
-		const salePrice = Math.max(0, Number(input.salePrice) || 0);
-		const yearsLived = Math.max(0, Number(input.yearsLived) || 0);
-		const waitYears = Math.max(0, input.waitYears === undefined || input.waitYears === "" ? 3 : Number(input.waitYears) || 0);
-		const grants = Math.max(0, Number(input.grants) || 0);
-		const stampDuty = bsd(price);
-		const loanRate = input.loanRate > 0 ? Number(input.loanRate) / 100 : HDB_RATE;
-		const loanYears = Math.max(1, Math.min(35, Number(input.loanYears) || 25));
-		const cpfShare = input.cpfShare === undefined || input.cpfShare === "" ? 1 : Math.max(0, Math.min(1, Number(input.cpfShare)));
+		const cpfUsed = num(input.cpfUsed) || 0;
+		const grants = num(input.grants) || 0;
+		const flatAge = num(input.flatAge) || 0;
+		const months = Math.round(flatAge * 12);
 
-		// Downpayment: 25% of the price plus stamp duty, less the grants that
-		// land at key collection. Unless told otherwise, all from CPF OA.
-		const downpayment = price * (1 - HDB_LTV);
-		const grantsOnDown = Math.min(grants, downpayment);
-		const grantsOnLoan = grants - grantsOnDown;
-		const cpfUpfront = input.cpfUpfront === undefined || input.cpfUpfront === "" ? Math.max(0, downpayment - grantsOnDown) + stampDuty : Math.max(0, Number(input.cpfUpfront));
-		const loan = input.loan === undefined || input.loan === "" ? Math.max(0, price * HDB_LTV - grantsOnLoan) : Math.max(0, Number(input.loan));
-
-		const months = Math.round(yearsLived * 12);
-		const monthly = instalment(loan, loanRate, loanYears);
-		const monthsPaid = Math.min(months, loanYears * 12);
-		const loanLeft = balanceAfter(loan, loanRate, loanYears, monthsPaid);
-		const cpfMonthly = monthly * cpfShare;
-
-		// When each CPF dollar left the OA. Signing part (10% + stamp duty) goes
-		// while you wait for the flat; the rest at key collection.
-		const signingPart = Math.min(cpfUpfront, price * BTO_SIGNING_SHARE + stampDuty);
-		const keysPart = cpfUpfront - signingPart;
-		const monthsSinceSigning = months + Math.round(waitYears * 12);
-		let interest = signingPart * grow(monthsSinceSigning) + keysPart * grow(months) + grants * grow(months);
-		let instalmentsFromCpf = 0;
-		for (let m = 1; m <= monthsPaid; m++) {
-			instalmentsFromCpf += cpfMonthly;
-			interest += cpfMonthly * grow(months - m);
+		// Accrued interest: the figure from the CPF app if given, else an estimate.
+		// Upfront CPF (downpayment, stamp duty) has been out since key collection;
+		// the rest went out bit by bit with each monthly instalment.
+		const upfrontGiven = num(input.upfront);
+		const upfront = Math.min(cpfUsed, upfrontGiven === null ? cpfUsed * UPFRONT_SHARE : upfrontGiven);
+		const monthlyPart = cpfUsed - upfront;
+		let estimate = upfront * grow(months) + grants * grow(months);
+		if (months > 0) {
+			const perMonth = monthlyPart / months;
+			for (let m = 1; m <= months; m++) estimate += perMonth * grow(months - m);
 		}
-		const principal = cpfUpfront + grants + instalmentsFromCpf;
-		const cpfDue = principal + interest;
+		const interestKnown = num(input.interestKnown);
+		const interest = interestKnown === null ? estimate : interestKnown;
+		const refund = cpfUsed + grants + interest;
 
-		const scheme = MOP_YEARS[input.scheme] ? input.scheme : "standard";
-		const clawback = salePrice * Math.max(0, Number(input.clawbackPercent) || 0) / 100;
-		const agentFee = salePrice * (input.agentPercent === undefined || input.agentPercent === "" ? 2 : Math.max(0, Number(input.agentPercent))) / 100 * 1.09; // + 9% GST
-		const legalFees = input.legalFees === undefined || input.legalFees === "" ? 2000 : Math.max(0, Number(input.legalFees));
-		const afterLoan = salePrice - loanLeft - clawback - agentFee - legalFees;
-		const loanShortfall = Math.max(0, -afterLoan);
-		const proceeds = Math.max(0, afterLoan);
-		// Market-value sale: CPF takes back what's there and writes off the rest.
-		const cpfBack = Math.min(cpfDue, proceeds);
-		const cpfWrittenOff = cpfDue - cpfBack;
-		const cash = proceeds - cpfBack;
-		const levyBase = RESALE_LEVY[input.nextFlat] || 0;
-		const levy = input.singles ? levyBase / 2 : levyBase;
-
-		return {
-			price,
-			salePrice,
-			yearsLived,
-			waitYears,
-			stampDuty,
-			loan,
-			monthly,
-			cpfMonthly,
-			loanLeft,
+		const out = {
+			cpfUsed,
 			grants,
-			cpfUpfront,
-			instalmentsFromCpf,
-			principal,
+			flatAge,
+			upfront,
+			upfrontAssumed: upfrontGiven === null,
 			interest,
-			cpfDue,
-			cpfBack,
-			cpfWrittenOff,
-			clawback,
-			agentFee,
-			legalFees,
-			loanShortfall,
-			cash,
-			levy,
-			cashAfterLevy: cash - levy,
-			mop: MOP_YEARS[scheme],
-			beforeMop: yearsLived < MOP_YEARS[scheme],
-			gain: salePrice - price,
+			interestEstimated: interestKnown === null,
+			refund,
+			mop: MOP_YEARS[input.scheme] || 5,
+			beforeMop: flatAge < (MOP_YEARS[input.scheme] || 5),
+			sale: null,
 		};
+
+		const salePrice = num(input.salePrice);
+		if (salePrice) {
+			const loanLeft = num(input.loanLeft) || 0;
+			const clawback = (salePrice * (num(input.clawbackPercent) || 0)) / 100;
+			const agentPct = num(input.agentPercent);
+			const agentFee = (salePrice * (agentPct === null ? 2 : agentPct)) / 100 * 1.09; // + 9% GST
+			const legalFees = num(input.legalFees) === null ? 2000 : num(input.legalFees);
+			const afterLoan = salePrice - loanLeft - clawback - agentFee - legalFees;
+			const proceeds = Math.max(0, afterLoan);
+			const cpfBack = Math.min(refund, proceeds);
+			const levyBase = RESALE_LEVY[input.nextFlat] || 0;
+			const levy = input.singles ? levyBase / 2 : levyBase;
+			const cash = proceeds - cpfBack;
+			out.sale = {
+				salePrice,
+				loanLeft,
+				clawback,
+				agentFee,
+				legalFees,
+				fees: agentFee + legalFees,
+				loanShortfall: Math.max(0, -afterLoan),
+				cpfBack,
+				cpfWrittenOff: refund - cpfBack,
+				cash,
+				levy,
+				cashAfterLevy: cash - levy,
+			};
+		}
+		return out;
 	}
 
-	return { calculate, bsd, instalment, balanceAfter, money, RESALE_LEVY, MOP_YEARS, OA_RATE, HDB_RATE };
+	return { calculate, RESALE_LEVY, MOP_YEARS, OA_RATE, UPFRONT_SHARE };
 });

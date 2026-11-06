@@ -18,7 +18,7 @@
 		<meta name="twitter:card" content="summary_large_image" />
 		<link rel="icon" type="image/png" sizes="64x64" href="../assets/favicon-64.png" />
 		<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
-		<link rel="stylesheet" href="../css/style.css?v=20261106b" />
+		<link rel="stylesheet" href="../css/style.css?v=20261107" />
 		<link
 			rel="stylesheet"
 			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -103,16 +103,16 @@
 										<label class="check-row"><input type="checkbox" id="afford-plan-car" value="car" checked /><span>🚗 A car</span></label>
 										<label class="check-row"><input type="checkbox" id="afford-plan-bike" value="bike" /><span>🏍️ A motorbike</span></label>
 									</fieldset>
-									<label><span>Age</span><input type="number" id="afford-age" min="18" max="100" step="1" placeholder="28" required /></label>
+									<label><span>Age</span><input type="number" inputmode="numeric" id="afford-age" min="18" max="100" step="1" placeholder="28" required /></label>
 									<label class="afford-home-fields"><span>Buying with</span>
 										<select id="afford-with">
 											<option value="alone">Just me</option>
 											<option value="partner">My partner</option>
 										</select>
 									</label>
-									<label><span id="afford-pay-label">Monthly salary before CPF ($)</span><input type="number" id="afford-pay" min="0" step="1" placeholder="5000" required /></label>
-									<label><span>Cash in the bank ($)</span><input type="number" id="afford-savings" min="0" step="1" placeholder="40000" required /></label>
-									<label class="afford-home-fields"><span>CPF Ordinary Account balance ($) <em>Optional</em></span><input type="number" id="afford-cpf" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label><span id="afford-pay-label">Monthly salary before CPF ($)</span><input type="number" inputmode="numeric" id="afford-pay" min="0" step="1" placeholder="5000" required /></label>
+									<label><span>Cash in the bank ($)</span><input type="number" inputmode="numeric" id="afford-savings" min="0" step="1" placeholder="40000" required /></label>
+									<label class="afford-home-fields"><span>CPF Ordinary Account balance ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="afford-cpf" min="0" step="1" placeholder="Blank = $0" /></label>
 									<div class="afford-home-fields">
 										<label><span>New or resale flat?</span>
 											<select id="afford-flat">
@@ -141,8 +141,8 @@
 											<option value="yes">Yes (kids, parents)</option>
 										</select>
 									</label>
-									<label id="afford-expenses-field"><span>Monthly spending, all in ($) <em>Optional</em></span><input type="number" id="afford-expenses" min="0" step="1" placeholder="Blank = estimate ($2,000 alone, $3,500 as a couple)" /></label>
-									<label><span>Other loan repayments a month ($) <em>Optional</em></span><input type="number" id="afford-debt" min="0" step="1" placeholder="Car, study loan, instalments. Blank = none" /></label>
+									<label id="afford-expenses-field"><span>Monthly spending, all in ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="afford-expenses" min="0" step="1" placeholder="Blank = estimate ($2,000 alone, $3,500 as a couple)" /></label>
+									<label><span>Other loan repayments a month ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="afford-debt" min="0" step="1" placeholder="Car, study loan, instalments. Blank = none" /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="afford-status" role="status"></p>
 								</form>
@@ -171,7 +171,7 @@
 											<option value="bike">🏍️ A motorbike</option>
 										</select>
 									</label>
-									<label><span>Price ($)</span><input type="number" id="earn-price" min="1" step="1" placeholder="500000" required /></label>
+									<label><span>Price ($)</span><input type="number" inputmode="numeric" id="earn-price" min="1" step="1" placeholder="500000" required /></label>
 									<label class="earn-car-field"><span>Car's OMV</span>
 										<select id="earn-omv">
 											<option value="unknown">Not sure (show both)</option>
@@ -180,7 +180,7 @@
 										</select>
 									</label>
 									<div class="earn-home-field">
-										<label><span>Age</span><input type="number" id="earn-age" min="18" max="100" step="1" placeholder="28" /></label>
+										<label><span>Age</span><input type="number" inputmode="numeric" id="earn-age" min="18" max="100" step="1" placeholder="28" /></label>
 										<label><span>Buying with</span>
 											<select id="earn-with">
 												<option value="alone">Just me</option>
@@ -200,17 +200,17 @@
 												<option value="near">Within 4 km of parents</option>
 											</select>
 										</label>
-										<label><span>CPF Ordinary Account balance ($) <em>Optional</em></span><input type="number" id="earn-cpf" min="0" step="1" placeholder="Combined if buying together. Blank = $0" /></label>
+										<label><span>CPF Ordinary Account balance ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="earn-cpf" min="0" step="1" placeholder="Combined if buying together. Blank = $0" /></label>
 									</div>
-									<label><span>Cash in the bank ($)</span><input type="number" id="earn-savings" min="0" step="1" placeholder="40000" required /></label>
+									<label><span>Cash in the bank ($)</span><input type="number" inputmode="numeric" id="earn-savings" min="0" step="1" placeholder="40000" required /></label>
 									<label><span>Does anyone depend on you financially?</span>
 										<select id="earn-dependants">
 											<option value="no">No</option>
 											<option value="yes">Yes (kids, parents)</option>
 										</select>
 									</label>
-									<label id="earn-expenses-field"><span>Monthly spending, all in ($) <em>Optional</em></span><input type="number" id="earn-expenses" min="0" step="1" placeholder="Blank = estimate ($2,000 alone, $3,500 as a couple)" /></label>
-									<label><span>Other loan repayments a month ($) <em>Optional</em></span><input type="number" id="earn-debt" min="0" step="1" placeholder="Blank = none" /></label>
+									<label id="earn-expenses-field"><span>Monthly spending, all in ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="earn-expenses" min="0" step="1" placeholder="Blank = estimate ($2,000 alone, $3,500 as a couple)" /></label>
+									<label><span>Other loan repayments a month ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="earn-debt" min="0" step="1" placeholder="Blank = none" /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="earn-status" role="status"></p>
 								</form>
@@ -235,15 +235,15 @@
 								</div>
 								<p class="calculator-card-note" id="insurance-mode-note">Two answers in 10 seconds: how much cover you need, and what it should cost.</p>
 								<form class="booking-form calculator-form" id="insurance-form" data-mode="quick">
-									<label><span>Monthly income ($)</span><input type="number" id="insurance-income" min="0" step="1" placeholder="4000" required /></label>
+									<label><span>Monthly income ($)</span><input type="number" inputmode="numeric" id="insurance-income" min="0" step="1" placeholder="4000" required /></label>
 									<label><span>You are</span>
 										<select id="insurance-residency">
 											<option value="local">A Singapore citizen or PR</option>
 											<option value="foreigner">A foreigner working here (EP, S Pass, WP)</option>
 										</select>
 									</label>
-									<label class="ins-detail-only"><span>Death &amp; TPD cover you already have ($) <em>Optional</em></span><input type="number" id="insurance-have-life" min="0" step="1" placeholder="Blank = skip" /></label>
-									<label class="ins-detail-only"><span>Critical illness cover you already have ($) <em>Optional</em></span><input type="number" id="insurance-have-ci" min="0" step="1" placeholder="Blank = skip" /></label>
+									<label class="ins-detail-only"><span>Death &amp; TPD cover you already have ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="insurance-have-life" min="0" step="1" placeholder="Blank = skip" /></label>
+									<label class="ins-detail-only"><span>Critical illness cover you already have ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="insurance-have-ci" min="0" step="1" placeholder="Blank = skip" /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="insurance-status" role="status"></p>
 								</form>
@@ -264,9 +264,9 @@
 							<article class="calculator-card">
 								<p class="calculator-card-note">For employees on a salary, using the rules for income earned this year. Assumes you claim the full child relief (you can split it with your spouse). Disability reliefs and special cases aren't included.</p>
 								<form class="booking-form calculator-form" id="tax-form">
-									<label><span>Monthly salary before CPF ($)</span><input type="number" id="tax-pay" min="0" step="1" placeholder="5000" required /></label>
-									<label><span>Bonus this year, incl. AWS ($) <em>Optional</em></span><input type="number" id="tax-bonus" min="0" step="1" placeholder="Blank = none" /></label>
-									<label><span>Age this year</span><input type="number" id="tax-age" min="16" max="100" step="1" placeholder="29" required /></label>
+									<label><span>Monthly salary before CPF ($)</span><input type="number" inputmode="numeric" id="tax-pay" min="0" step="1" placeholder="5000" required /></label>
+									<label><span>Bonus this year, incl. AWS ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="tax-bonus" min="0" step="1" placeholder="Blank = none" /></label>
+									<label><span>Age this year</span><input type="number" inputmode="numeric" id="tax-age" min="16" max="100" step="1" placeholder="29" required /></label>
 									<label><span>Residency</span>
 										<select id="tax-residency">
 											<option value="local">Singapore Citizen, or PR for 2+ years</option>
@@ -283,7 +283,7 @@
 											<option value="married">Married, spouse earns more</option>
 										</select>
 									</label>
-									<label class="tax-relief-field"><span>Children under 16, or studying full-time <em>Optional</em></span><input type="number" id="tax-children" min="0" max="20" step="1" placeholder="Blank = none" /></label>
+									<label class="tax-relief-field"><span>Children under 16, or studying full-time <em>Optional</em></span><input type="number" inputmode="numeric" id="tax-children" min="0" max="20" step="1" placeholder="Blank = none" /></label>
 									<div class="tax-mother-fields" id="tax-mother-fields" hidden>
 										<label><span>Are you their mother, and working?</span>
 											<select id="tax-working-mother">
@@ -292,7 +292,7 @@
 											</select>
 										</label>
 										<div id="tax-mother-extra" hidden>
-											<label><span>How many were born in 2024 or later?</span><input type="number" id="tax-children-2024" min="0" max="20" step="1" placeholder="0" /></label>
+											<label><span>How many were born in 2024 or later?</span><input type="number" inputmode="numeric" id="tax-children-2024" min="0" max="20" step="1" placeholder="0" /></label>
 											<label><span>Does a grandparent look after a child aged 12 or under?</span>
 												<select id="tax-grandparent">
 													<option value="no">No</option>
@@ -302,7 +302,7 @@
 										</div>
 									</div>
 									<div class="form-group-contents" id="tax-ptr-field" hidden>
-										<label><span>Parenthood Tax Rebate you still have ($) <em>Optional</em></span><input type="number" id="tax-ptr" min="0" step="1" placeholder="Blank = none" /></label>
+										<label><span>Parenthood Tax Rebate you still have ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="tax-ptr" min="0" step="1" placeholder="Blank = none" /></label>
 										<p class="calculator-field-hint">$5,000 for your 1st child, $10,000 for the 2nd, $20,000 for each after. Unused rebate carries forward; myTax Portal shows what's left.</p>
 									</div>
 									<label class="tax-relief-field"><span>Parents or grandparents you support (55+, earn under $8,000 this year)</span>
@@ -326,10 +326,10 @@
 										</select>
 									</label>
 									<p class="calculator-field-hint tax-group-hint tax-relief-field">Already done this year? Leave blank if not.</p>
-									<label class="tax-relief-field"><span>SRS contributions so far ($) <em>Optional</em></span><input type="number" id="tax-srs" min="0" step="1" placeholder="Blank = $0" /></label>
-									<label class="tax-relief-field"><span>CPF cash top-ups to yourself so far ($) <em>Optional</em></span><input type="number" id="tax-topup-self" min="0" step="1" placeholder="Blank = $0" /></label>
-									<label class="tax-relief-field"><span>CPF cash top-ups to family so far ($) <em>Optional</em></span><input type="number" id="tax-topup-family" min="0" step="1" placeholder="Blank = $0" /></label>
-									<label id="tax-life-field" hidden><span>Life insurance premiums a year ($) <em>Optional</em></span><input type="number" id="tax-life" min="0" step="1" placeholder="Only counts when your CPF is under $5,000 a year" /></label>
+									<label class="tax-relief-field"><span>SRS contributions so far ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="tax-srs" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label class="tax-relief-field"><span>CPF cash top-ups to yourself so far ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="tax-topup-self" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label class="tax-relief-field"><span>CPF cash top-ups to family so far ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="tax-topup-family" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label id="tax-life-field" hidden><span>Life insurance premiums a year ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="tax-life" min="0" step="1" placeholder="Only counts when your CPF is under $5,000 a year" /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="tax-status" role="status"></p>
 								</form>
@@ -356,18 +356,18 @@
 											<option value="bto">BTO</option>
 										</select>
 									</label>
-									<label><span>Flat purchase price ($)</span><input type="number" id="hdb-price" min="0" step="1" placeholder="500000" required /></label>
+									<label><span>Flat purchase price ($)</span><input type="number" inputmode="numeric" id="hdb-price" min="0" step="1" placeholder="500000" required /></label>
 									<p class="calculator-field-hint" id="hdb-price-hint"></p>
-									<label><span>CPF Ordinary Account today ($) <em>Optional</em></span><input type="number" id="hdb-cpf" min="0" step="1" placeholder="Blank = show where CPF OA can pay" /></label>
+									<label><span>CPF Ordinary Account today ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="hdb-cpf" min="0" step="1" placeholder="Blank = show where CPF OA can pay" /></label>
 									<p class="calculator-field-hint" id="hdb-cpf-hint"></p>
-									<label id="hdb-pay-field"><span>Monthly salary before CPF ($) <em>Optional, BTO</em></span><input type="number" id="hdb-pay" min="0" step="1" placeholder="Combined if buying together. Blank = skip" /></label>
+									<label id="hdb-pay-field"><span>Monthly salary before CPF ($) <em>Optional, BTO</em></span><input type="number" inputmode="numeric" id="hdb-pay" min="0" step="1" placeholder="Combined if buying together. Blank = skip" /></label>
 									<p class="calculator-field-hint" id="hdb-pay-hint">Counts the CPF OA you'll build up in the ~3 years before key collection, so more of the downpayment comes from CPF instead of cash.</p>
 									<label class="check-row" id="hdb-staggered-field"><input type="checkbox" id="hdb-staggered" /><span>Staggered Downpayment Scheme: pay 5% at signing, the rest at keys</span></label>
 									<p class="calculator-field-hint" id="hdb-staggered-hint">For first-timer couples where the younger one got the HFE letter before turning 30, buying a 5-room or smaller BTO. HDB tells you if you qualify when you book.</p>
-									<label><span>Grants you expect (EHG, CPF Housing Grant, PHG, etc.) ($) <em>Optional</em></span><input type="number" id="hdb-grants" min="0" step="1" placeholder="Blank = none" /></label>
+									<label><span>Grants you expect (EHG, CPF Housing Grant, PHG, etc.) ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="hdb-grants" min="0" step="1" placeholder="Blank = none" /></label>
 									<p class="calculator-field-hint" id="hdb-grants-hint">Paid into your CPF OA at key collection (BTO) or completion (resale). Leave blank if none.</p>
-									<label><span>Loan tenure (years, max 25) <em>Optional</em></span><input type="number" id="hdb-years" min="1" max="25" step="1" placeholder="Blank = 25" /></label>
-									<label><span>Bank loan rate (% p.a.) <em>Optional</em></span><input type="number" id="hdb-bank-rate" min="0" max="15" step="0.01" placeholder="Don't know? Blank = typical 1.6%" /></label>
+									<label><span>Loan tenure (years, max 25) <em>Optional</em></span><input type="number" inputmode="numeric" id="hdb-years" min="1" max="25" step="1" placeholder="Blank = 25" /></label>
+									<label><span>Bank loan rate (% p.a.) <em>Optional</em></span><input type="number" inputmode="decimal" id="hdb-bank-rate" min="0" max="15" step="0.01" placeholder="Don't know? Blank = typical 1.6%" /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="hdb-status" role="status"></p>
 								</form>
@@ -379,19 +379,23 @@
 					<details class="calculator-dropdown" id="sell-flat" data-calculator="Selling my flat">
 						<summary>
 							<div>
-								<h3><i class="fas fa-key" aria-hidden="true"></i> Selling My Flat: What Do I Get Back?</h3>
-								<p>Loan, CPF refund with accrued interest, grants and the cash left.</p>
+								<h3><i class="fas fa-key" aria-hidden="true"></i> Selling My Flat: What Goes Back to CPF?</h3>
+								<p>The CPF and grants you used, the interest on top, and the cash you keep.</p>
 							</div>
 							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
 						</summary>
 						<div class="calculator-dropdown-body">
 							<article class="calculator-card">
-								<p class="calculator-card-note">When you sell, the outstanding loan is paid first. Then every CPF dollar you used, grants included, goes back into your CPF OA with the 2.5% interest it would have earned. Only what's left is cash.</p>
+								<p class="calculator-card-note">When you sell, any HDB loan left is paid first. Then every CPF dollar you used, grants included, goes back into your own CPF OA with the 2.5% a year it would have earned. Only what's left is cash.</p>
 								<form class="booking-form calculator-form" id="bto-sale-form">
-									<label><span>Price you paid for the flat ($)</span><input type="number" id="bto-sale-price" min="1" step="1" placeholder="400000" required /></label>
-									<label><span>Price you expect to sell at ($)</span><input type="number" id="bto-sale-sell" min="1" step="1" placeholder="650000" required /></label>
-									<label><span>Years living in it before you sell</span><input type="number" id="bto-sale-years" min="1" max="99" step="1" placeholder="10" required /></label>
-									<label><span>Housing grants you got ($) <em>Optional</em></span><input type="number" id="bto-sale-grants" min="0" step="1" placeholder="EHG, CPF Housing Grant, PHG. Blank = none" /></label>
+									<label><span>CPF you've used on the flat so far ($)</span><input type="number" inputmode="numeric" id="bto-sale-cpf" min="1" step="1" placeholder="150000" required /></label>
+									<p class="calculator-field-hint">Downpayment, stamp duty and monthly instalments from CPF. The CPF app shows it under Home Ownership.</p>
+									<label><span>Housing grants used ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="bto-sale-grants" min="0" step="1" placeholder="EHG, CPF Housing Grant, PHG. Blank = none" /></label>
+									<label><span>How old is the flat? (years since you got the keys)</span><input type="number" inputmode="numeric" id="bto-sale-age" min="1" max="99" step="1" placeholder="8" required /></label>
+									<label><span>Price you'd sell at ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="bto-sale-sell" min="0" step="1" placeholder="Blank = just show the CPF refund" /></label>
+									<label><span>HDB loan still owed ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="bto-sale-loan" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label id="bto-sale-interest-field"><span>Accrued interest so far, from the CPF app ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="bto-sale-interest" min="0" step="1" placeholder="Blank = estimate it" /></label>
+									<label id="bto-sale-upfront-field"><span>Of your CPF, how much went into the downpayment ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="bto-sale-upfront" min="0" step="1" placeholder="Blank = about a third" /></label>
 									<label id="bto-sale-scheme-field"><span>Type of flat</span>
 										<select id="bto-sale-scheme">
 											<option value="standard">Standard (or bought before Oct 2024)</option>
@@ -399,12 +403,8 @@
 											<option value="prime">Prime</option>
 										</select>
 									</label>
-									<label id="bto-sale-clawback-field"><span>Subsidy clawback (% of the sale price) <em>From your sales brochure</em></span><input type="number" id="bto-sale-clawback" min="0" max="20" step="0.5" placeholder="6 to 9" /></label>
-									<label><span>CPF used for the downpayment and stamp duty ($) <em>Optional</em></span><input type="number" id="bto-sale-cpf-upfront" min="0" step="1" placeholder="Blank = all of it from CPF" /></label>
-									<label><span>HDB loan taken ($) <em>Optional</em></span><input type="number" id="bto-sale-loan" min="0" step="1" placeholder="Blank = 75% of the price, less grants" /></label>
-									<label><span>Share of each instalment paid by CPF (%) <em>Optional</em></span><input type="number" id="bto-sale-share" min="0" max="100" step="1" placeholder="Blank = 100%" /></label>
-									<label><span>Years from signing to key collection <em>Optional</em></span><input type="number" id="bto-sale-wait" min="0" max="10" step="0.5" placeholder="Blank = 3. Resale = 0" /></label>
-									<label><span>Agent fee (% of the sale price, before GST) <em>Optional</em></span><input type="number" id="bto-sale-agent" min="0" max="5" step="0.1" placeholder="Blank = 2%. Selling yourself = 0" /></label>
+									<label id="bto-sale-clawback-field"><span>Subsidy clawback (% of the sale price) <em>From your sales brochure</em></span><input type="number" inputmode="decimal" id="bto-sale-clawback" min="0" max="20" step="0.5" placeholder="6 to 9" /></label>
+									<label id="bto-sale-agent-field"><span>Agent fee (% of the sale price, before GST) <em>Optional</em></span><input type="number" inputmode="decimal" id="bto-sale-agent" min="0" max="5" step="0.1" placeholder="Blank = 2%. Selling yourself = 0" /></label>
 									<label id="bto-sale-next-field"><span>Next home also subsidised? (BTO, EC, or resale with grants)</span>
 										<select id="bto-sale-next">
 											<option value="none">No, or not sure</option>
@@ -436,19 +436,19 @@
 							<article class="calculator-card">
 								<p class="calculator-card-note">Uses today's CPF contribution, allocation and interest rules, on your monthly wage only (bonus and AWS not included). At 55, your SA moves into your Retirement Account (SA first, then OA) up to the Full Retirement Sum, and MediSave is capped at the Basic Healthcare Sum. Both sums are projected to the year you turn 55.</p>
 								<form class="booking-form calculator-form" id="cpf-form">
-									<label><span>Current age</span><input type="number" id="cpf-age" min="16" max="90" step="1" placeholder="30" required /></label>
-									<label><span>Monthly income before CPF deductions ($)</span><input type="number" id="cpf-wage" min="0" step="1" placeholder="5000" required /></label>
-									<label><span>Current CPF Ordinary Account (OA) balance ($) <em>Optional</em></span><input type="number" id="cpf-oa" min="0" step="1" placeholder="Blank = $0" /></label>
-									<label><span id="cpf-sa-label">Current CPF Special Account (SA) balance ($) <em>Optional</em></span><input type="number" id="cpf-sa" min="0" step="1" placeholder="Blank = $0" /></label>
-									<label><span>Current MediSave Account (MA) balance ($) <em>Optional</em></span><input type="number" id="cpf-ma" min="0" step="1" placeholder="Blank = $0" /></label>
-									<label><span>Pay rise per year (%) <em>Optional</em></span><input type="number" id="cpf-growth" min="0" max="15" step="0.1" placeholder="Blank = pay stays flat. Try 3" /></label>
+									<label><span>Current age</span><input type="number" inputmode="numeric" id="cpf-age" min="16" max="90" step="1" placeholder="30" required /></label>
+									<label><span>Monthly income before CPF deductions ($)</span><input type="number" inputmode="numeric" id="cpf-wage" min="0" step="1" placeholder="5000" required /></label>
+									<label><span>Current CPF Ordinary Account (OA) balance ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="cpf-oa" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label><span id="cpf-sa-label">Current CPF Special Account (SA) balance ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="cpf-sa" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label><span>Current MediSave Account (MA) balance ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="cpf-ma" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label><span>Pay rise per year (%) <em>Optional</em></span><input type="number" inputmode="decimal" id="cpf-growth" min="0" max="15" step="0.1" placeholder="Blank = pay stays flat. Try 3" /></label>
 									<p class="calculator-field-hint">Leave SA/MA blank (treated as $0) if you just want to project OA. CPF doesn't let you top up OA on its own, only SA/RA (via RSTU) or MediSave individually, or all three together.</p>
 									<p class="calculator-field-hint tax-group-hint">Paying for a home with CPF? Leave blank if not.</p>
-									<label><span>Home loan paid from OA each month ($) <em>Optional</em></span><input type="number" id="cpf-house-monthly" min="0" step="1" placeholder="Blank = none" /></label>
-									<label><span>OA for the downpayment ($) <em>Optional</em></span><input type="number" id="cpf-house-lump" min="0" step="1" placeholder="Only if you haven't bought yet" /></label>
+									<label><span>Home loan paid from OA each month ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="cpf-house-monthly" min="0" step="1" placeholder="Blank = none" /></label>
+									<label><span>OA for the downpayment ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="cpf-house-lump" min="0" step="1" placeholder="Only if you haven't bought yet" /></label>
 									<div class="form-group-contents" id="cpf-house-more" hidden>
-										<label><span>Starting at age <em>Optional</em></span><input type="number" id="cpf-house-from" min="16" max="90" step="1" placeholder="Blank = now" /></label>
-										<label><span>Loan years left <em>Optional</em></span><input type="number" id="cpf-house-years" min="1" max="35" step="1" placeholder="Blank = 25" /></label>
+										<label><span>Starting at age <em>Optional</em></span><input type="number" inputmode="numeric" id="cpf-house-from" min="16" max="90" step="1" placeholder="Blank = now" /></label>
+										<label><span>Loan years left <em>Optional</em></span><input type="number" inputmode="numeric" id="cpf-house-years" min="1" max="35" step="1" placeholder="Blank = 25" /></label>
 									</div>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="cpf-status" role="status"></p>
@@ -544,12 +544,12 @@
 											<option value="commercial">Commercial or private-hire (PHV)</option>
 										</select>
 									</label>
-									<label><span>Purchase price ($)</span><input type="number" id="vehicle-price" min="0" step="1" placeholder="120000" required /></label>
-									<label id="vehicle-omv-field"><span>Open Market Value / OMV ($) <em>Optional</em></span><input type="number" id="vehicle-omv" min="0" step="1" placeholder="Blank = check against both MAS limits" /></label>
+									<label><span>Purchase price ($)</span><input type="number" inputmode="numeric" id="vehicle-price" min="0" step="1" placeholder="120000" required /></label>
+									<label id="vehicle-omv-field"><span>Open Market Value / OMV ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="vehicle-omv" min="0" step="1" placeholder="Blank = check against both MAS limits" /></label>
 									<p class="calculator-field-hint" id="vehicle-omv-hint"></p>
-									<label><span>Downpayment ($)</span><input type="number" id="vehicle-downpayment" min="0" step="1" placeholder="55000" required /></label>
-									<label><span id="vehicle-years-label">Loan tenure (years, max 7) <em>Optional</em></span><input type="number" id="vehicle-years" min="1" max="10" step="1" placeholder="Blank = 7" /></label>
-									<label><span>Quoted interest rate (% p.a., flat) <em>Optional</em></span><input type="number" id="vehicle-rate" min="0" max="15" step="0.01" placeholder="Don't know? Blank = typical 2.48%" /></label>
+									<label><span>Downpayment ($)</span><input type="number" inputmode="numeric" id="vehicle-downpayment" min="0" step="1" placeholder="55000" required /></label>
+									<label><span id="vehicle-years-label">Loan tenure (years, max 7) <em>Optional</em></span><input type="number" inputmode="numeric" id="vehicle-years" min="1" max="10" step="1" placeholder="Blank = 7" /></label>
+									<label><span>Quoted interest rate (% p.a., flat) <em>Optional</em></span><input type="number" inputmode="decimal" id="vehicle-rate" min="0" max="15" step="0.01" placeholder="Don't know? Blank = typical 2.48%" /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="vehicle-status" role="status"></p>
 								</form>
@@ -569,10 +569,10 @@
 						<div class="calculator-dropdown-body">
 							<article class="calculator-card">
 								<form class="booking-form calculator-form" id="compound-form">
-									<label><span>Starting amount ($)</span><input type="number" id="compound-principal" min="0" step="1" placeholder="10000" required /></label>
-									<label><span>Amount added each year ($) <em>Optional</em></span><input type="number" id="compound-addition" min="0" step="1" placeholder="Blank = $0" /></label>
-									<label><span>Number of years</span><input type="number" id="compound-years" min="1" max="60" step="1" placeholder="20" required /></label>
-									<label><span>Assumed annual return (%)</span><input type="number" id="compound-rate" min="0" max="12" step="0.1" placeholder="e.g. 4" required /></label>
+									<label><span>Starting amount ($)</span><input type="number" inputmode="numeric" id="compound-principal" min="0" step="1" placeholder="10000" required /></label>
+									<label><span>Amount added each year ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="compound-addition" min="0" step="1" placeholder="Blank = $0" /></label>
+									<label><span>Number of years</span><input type="number" inputmode="numeric" id="compound-years" min="1" max="60" step="1" placeholder="20" required /></label>
+									<label><span>Assumed annual return (%)</span><input type="number" inputmode="decimal" id="compound-rate" min="0" max="12" step="0.1" placeholder="e.g. 4" required /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="compound-status" role="status"></p>
 								</form>
@@ -611,14 +611,14 @@
 		<script src="../js/compound-calculator.js?v=20261025"></script>
 		<script src="../js/card-finder.js?v=20261002"></script>
 		<script src="../js/shared/taxRelief.js"></script>
-		<script src="../js/shared/btoSale.js?v=20261106"></script>
-		<script src="../js/bto-sale.js?v=20261106"></script>
+		<script src="../js/shared/btoSale.js?v=20261107"></script>
+		<script src="../js/bto-sale.js?v=20261107"></script>
 		<script src="../js/shared/affordability.js?v=20261106"></script>
-		<script src="../js/tools.js?v=20261106"></script>
+		<script src="../js/tools.js?v=20261107"></script>
 		<script src="../js/share.js?v=20261003"></script>
 		<script src="../js/calc-viz.js?v=20261025"></script>
 		<script src="../js/calculator-ux.js?v=20261025"></script>
-		<script src="../js/calc-live.js?v=20261106"></script>
+		<script src="../js/calc-live.js?v=20261107"></script>
 		<script src="../js/telegram-app.js?v=20261023"></script>
 	</body>
 </html>
