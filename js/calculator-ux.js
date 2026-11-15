@@ -99,6 +99,7 @@
 		cpf: ["CPF optimisation", "Reaching my retirement sum", "CPF top-ups"],
 		vehicle: ["Loan offsetting", "Cash vs car loan", "Can I afford this car?"],
 		insurance: ["Reviewing my policies", "Is my rider old or new?", "Closing my protection gap"],
+		"loan-odds": ["Improving my credit score", "Paying down my debts first", "How much should I borrow?"],
 		compound: ["Where to invest", "A regular investing plan", "Investing my SRS"],
 	};
 

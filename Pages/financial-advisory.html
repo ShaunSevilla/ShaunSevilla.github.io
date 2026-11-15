@@ -22,9 +22,9 @@
 		<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
 		<link rel="preload" href="../assets/vendor/cormorant-garamond-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin />
 		<link rel="preload" href="../assets/vendor/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
-		<link rel="stylesheet" href="../assets/vendor/fonts.css?v=20261116a" />
-		<link rel="stylesheet" href="../assets/vendor/icons.css?v=20261116a" />
-		<link rel="stylesheet" href="../css/style.css?v=20261116a" />
+		<link rel="stylesheet" href="../assets/vendor/fonts.css?v=20261116d" />
+		<link rel="stylesheet" href="../assets/vendor/icons.css?v=20261116d" />
+		<link rel="stylesheet" href="../css/style.css?v=20261116d" />
 	</head>
 	<body data-root=".." data-page="financial">
 		<nav id="site-nav"></nav>
@@ -608,6 +608,54 @@
 						</div>
 					</details>
 
+					<details class="calculator-dropdown" id="loan-odds" data-calculator="Loan approval">
+						<summary>
+							<div>
+								<h3><i class="fas fa-landmark" aria-hidden="true"></i> Will My Loan Be Approved?</h3>
+								<p>Your odds, and what's helping or hurting them.</p>
+							</div>
+							<span class="calculator-dropdown-icon" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
+						</summary>
+						<div class="calculator-dropdown-body">
+							<article class="calculator-card">
+								<p class="calculator-card-note">Banks and HDB check the same few things: your credit grade, how much of your pay goes to loans (MAS caps all repayments at 55% of pay, and a flat's at 30%), and the legal loan limits. This runs those checks, using the stress-test rates banks use. It's an estimate, not a lender's decision. Your score is on your Credit Bureau Singapore report, free once a year through your bank or Singpass.</p>
+								<form class="booking-form calculator-form" id="loan-odds-form">
+									<label><span>What's the loan for?</span>
+										<select id="loan-type">
+											<option value="hdb">HDB flat, HDB loan</option>
+											<option value="bankHdb">HDB flat or EC, bank loan</option>
+											<option value="private">Private property, bank loan</option>
+											<option value="car">Car</option>
+											<option value="personal">Personal loan</option>
+										</select>
+									</label>
+									<label><span>Credit score <em>1000 to 2000, optional</em></span><input type="number" inputmode="numeric" id="loan-score" min="1000" max="2000" step="1" placeholder="Blank = don't know (taken as average)" /></label>
+									<label><span>How much you want to borrow ($)</span><input type="number" inputmode="numeric" id="loan-amount" min="1" step="1" placeholder="300000" required /></label>
+									<label><span id="loan-income-label">Monthly income before CPF ($)</span><input type="number" inputmode="numeric" id="loan-income" min="1" step="1" placeholder="6000" required /></label>
+									<label><span>Loans you already repay, a month ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="loan-debt" min="0" step="1" placeholder="Car, study loan, card instalments. Blank = none" /></label>
+									<label id="loan-with-field"><span>Buying with</span>
+										<select id="loan-with">
+											<option value="couple">Partner or family</option>
+											<option value="alone">Just me (single)</option>
+										</select>
+									</label>
+									<label id="loan-years-field"><span>Loan length (years) <em id="loan-years-max">up to 25</em></span><input type="number" inputmode="numeric" id="loan-years" min="1" max="30" step="1" placeholder="Blank = the longest allowed" /></label>
+									<label id="loan-price-field"><span>Price of the home or car ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="loan-price" min="0" step="1" placeholder="Blank = skip the loan-limit check" /></label>
+									<label id="loan-omv-field"><span>Car's OMV</span>
+										<select id="loan-omv">
+											<option value="">Not sure</option>
+											<option value="low">$20,000 or less (borrow up to 70%)</option>
+											<option value="high">Above $20,000 (borrow up to 60%)</option>
+										</select>
+									</label>
+									<label id="loan-unsecured-field"><span>Card balances and personal loans you owe now ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="loan-unsecured" min="0" step="1" placeholder="Interest-bearing only. Blank = none" /></label>
+									<button type="submit" class="booking-submit">Check my odds</button>
+									<p class="booking-status" id="loan-odds-status" role="status"></p>
+								</form>
+								<div class="calculator-result" id="loan-odds-result" hidden></div>
+							</article>
+						</div>
+					</details>
 					<details class="calculator-dropdown" id="compound" data-calculator="Compound interest" data-bot-start="compound">
 						<summary>
 							<div>
@@ -664,12 +712,14 @@
 		<script src="../js/srs.js?v=20261116c"></script>
 		<script src="../js/shared/btoSale.js?v=20261107"></script>
 		<script src="../js/bto-sale.js?v=20261107"></script>
+		<script src="../js/shared/loanOdds.js?v=20261116d"></script>
+		<script src="../js/loan-odds.js?v=20261116d"></script>
 		<script src="../js/shared/affordability.js?v=20261116b"></script>
 		<script src="../js/tools.js?v=20261116c"></script>
 		<script src="../js/share.js?v=20261003"></script>
 		<script src="../js/calc-viz.js?v=20261107d"></script>
-		<script src="../js/calculator-ux.js?v=20261116c"></script>
-		<script src="../js/calc-live.js?v=20261116b"></script>
+		<script src="../js/calculator-ux.js?v=20261116d"></script>
+		<script src="../js/calc-live.js?v=20261116d"></script>
 		<script src="../js/telegram-app.js?v=20261023"></script>
 	</body>
 </html>

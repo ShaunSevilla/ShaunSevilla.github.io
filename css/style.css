@@ -5220,3 +5220,63 @@ a, button, summary, label, select, input, .topic-chip, .calc-mode button {
 		translate: 0 1.25rem;
 	}
 }
+
+/* Will My Loan Be Approved? */
+.odds-meter {
+	height: 8px;
+	margin: 0.25rem 0 1.25rem;
+	border-radius: 999px;
+	background: var(--soft-border);
+	overflow: hidden;
+}
+
+.odds-meter span {
+	display: block;
+	height: 100%;
+	border-radius: inherit;
+	background: var(--gold);
+}
+
+.odds-low span { background: #b5523c; }
+.odds-ok span { background: #8a7334; }
+
+.loan-why {
+	display: grid;
+	gap: 0.6rem;
+	margin: 0 0 1rem;
+	list-style: none;
+}
+
+.loan-why li {
+	display: grid;
+	grid-template-columns: 1.6rem 1fr;
+	gap: 0.6rem;
+	align-items: start;
+}
+
+.loan-why b {
+	display: grid;
+	place-items: center;
+	width: 1.6rem;
+	height: 1.6rem;
+	border-radius: 50%;
+	font-size: 0.8rem;
+	border: 1px solid currentColor;
+}
+
+.loan-why .is-pass b { color: var(--gold); }
+.loan-why .is-tight b { color: #c9a84c99; }
+.loan-why .is-fail b { color: #d06a52; }
+
+.loan-why strong {
+	display: block;
+	font-size: 0.86rem;
+	font-weight: 500;
+	color: var(--text);
+}
+
+.loan-why span {
+	display: block;
+	font-size: 0.8rem;
+	color: var(--text-muted);
+}
