@@ -39,7 +39,7 @@
 		// Share of pay for the loan, 0-100%, starting at comfortable: 30% of
 		// gross pay for a home, 10% of take-home for a car or bike.
 		"loan-score": M(1000, 2000, 1, 1818),
-		"loan-amount": (input) => ({ hdb: M(10000, 1000000, 5000, 350000), bankHdb: M(10000, 1500000, 5000, 400000), private: M(50000, 5000000, 10000, 1000000), car: M(5000, 300000, 1000, 80000), personal: M(1000, 200000, 500, 20000) })[(document.getElementById("loan-type") || {}).value || "hdb"],
+		"loan-amount": M(1000, 1500000, 1000, 300000),
 		"loan-income": M(1000, 40000, 100, 6000),
 		"loan-debt": M(0, 10000, 50, 0),
 		"afford-home-share": H(0, 30, 1, 30), // 30% of pay is HDB's and the banks' cap
@@ -92,7 +92,7 @@
 		"cpf-form": ["#cpf-oa", "#cpf-sa", "#cpf-ma", "#cpf-growth", "#cpf-house-monthly", "#cpf-house-lump", "#cpf-house-more", ":scope > p.calculator-field-hint"],
 		"vehicle-loan-form": ["#vehicle-years", "#vehicle-rate"],
 		"srs-form": ["#srs-return-field", "#srs-withdraw-field", "#srs-other-field"],
-		"loan-odds-form": ["#loan-years", "#loan-price", "#loan-omv", "#loan-unsecured", "#loan-with"],
+		"loan-odds-form": ["#loan-years"],
 		"bto-sale-form": ["#bto-sale-interest-field", "#bto-sale-upfront-field", "#bto-sale-scheme-field", "#bto-sale-clawback-field", "#bto-sale-agent-field", "#bto-sale-next-field", "#bto-sale-singles-field"],
 	};
 

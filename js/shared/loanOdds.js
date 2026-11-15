@@ -38,7 +38,12 @@
 		private: { name: "Bank loan for private property", rate: 0.04, flat: false, msr: false, maxYears: 30, ltv: 0.75 },
 		car: { name: "Car loan", rate: 0.0248, flat: true, msr: false, maxYears: 7 },
 		personal: { name: "Personal loan", rate: 0.035, flat: true, msr: false, maxYears: 5 },
+		// No type given (the website): a big loan is planned like a home loan,
+		// a smaller one like a car or personal loan.
+		big: { name: "Loan", rate: 0.04, flat: false, msr: false, maxYears: 30, defaultYears: 25 },
+		small: { name: "Loan", rate: 0.03, flat: true, msr: false, maxYears: 10 },
 	};
+	const BIG_LOAN = 150000;
 
 	function gradeFor(score) {
 		const s = Math.max(1000, Math.min(2000, Number(score) || 0));
@@ -63,14 +68,16 @@
 	// repayments now), years?, price?, omv?: "low"|"high", alone?, unsecured?
 	// (interest-bearing unsecured debt owed now) }
 	function assess(input) {
-		const type = TYPES[input.type] ? input.type : "personal";
+		const given = TYPES[input.type] && input.type !== "big" && input.type !== "small";
+		const type = given ? input.type : Number(input.amount) >= BIG_LOAN ? "big" : "small";
 		const t = TYPES[type];
 		const g = gradeFor(input.score);
 		const amount = Math.max(0, Number(input.amount) || 0);
 		const income = Math.max(0, Number(input.income) || 0);
 		const otherDebt = Math.max(0, Number(input.otherDebt) || 0);
 		const unsecured = Math.max(0, Number(input.unsecured) || 0);
-		const years = Math.max(1, Math.min(t.maxYears, Number(input.years) || t.maxYears));
+		const fallbackYears = t.defaultYears || (type === "small" ? (amount >= 30000 ? 7 : 5) : t.maxYears);
+		const years = Math.max(1, Math.min(t.maxYears, Number(input.years) || fallbackYears));
 		const price = Math.max(0, Number(input.price) || 0);
 		const pay = monthly(type, amount, years);
 		const checks = [];
@@ -83,8 +90,9 @@
 		const tdsr = income > 0 ? (pay + otherDebt) / income : Infinity;
 		const tdsrCap = income * TDSR - otherDebt;
 		caps.push(amountFor(type, tdsrCap, years));
-		const tdsrName = type === "car" || type === "personal" ? "All your repayments (banks keep this under 55% of pay)" : "All your repayments (TDSR, max 55% of pay)";
-		add(tdsr <= TDSR * 0.85 ? true : tdsr <= TDSR ? "tight" : false, tdsrName, `${share(tdsr)} of your pay: ${money(pay)} for this loan${otherDebt ? ` + ${money(otherDebt)} you already pay` : ""}.`, type !== "car" && type !== "personal");
+		const soft = type === "car" || type === "personal" || type === "small";
+		const tdsrName = soft ? "All your repayments (banks keep this under 55% of pay)" : "All your repayments (max 55% of pay)";
+		add(tdsr <= TDSR * 0.85 ? true : tdsr <= TDSR ? "tight" : false, tdsrName, `${share(tdsr)} of your pay: ${money(pay)} for this loan${otherDebt ? ` + ${money(otherDebt)} you already pay` : ""}.`, !soft);
 
 		if (t.msr) {
 			const msr = income > 0 ? pay / income : Infinity;
@@ -138,7 +146,12 @@
 		odds = Math.max(0.01, Math.min(0.97, odds));
 
 		const verdict = odds >= 0.75 ? "Likely" : odds >= 0.5 ? "Possible" : odds >= 0.25 ? "Unlikely" : "Very unlikely";
-		const maxLoan = Math.max(0, Math.floor(Math.min(...caps) / 1000) * 1000);
+		let best = Math.min(...caps);
+		// Without a type, a big loan is planned over 25 years, a small one over
+		// 5 to 7, so the most you could borrow is worked out on whichever fits.
+		if (type === "small" && best >= BIG_LOAN) best = Math.max(BIG_LOAN, amountFor("big", tdsrCap, TYPES.big.defaultYears));
+		if (type === "big" && best < BIG_LOAN) best = Math.min(BIG_LOAN - 1000, amountFor("small", tdsrCap, 7));
+		const maxLoan = Math.max(0, Math.floor(best / 1000) * 1000);
 		// What would turn the red checks green, most useful first.
 		const tips = [];
 		if (failed.length && maxLoan > 0 && maxLoan < amount) tips.push(`Borrow ${money(maxLoan)} or less and every check passes.`);
