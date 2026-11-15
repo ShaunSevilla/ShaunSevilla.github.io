@@ -3,6 +3,11 @@
 // away. calculator-ux.js sees window.__calcLive and skips its scroll.
 (function () {
 	const M = (min, max, step, def) => ({ min, max, step, def });
+	// A legal or physical limit: the slider never stretches past it, even if
+	// a bigger number is typed into the box.
+	const H = (min, max, step, def) => ({ min, max, step, def, hard: true });
+	// Banks keep all loan repayments within 55% of gross pay: about 69% of take-home.
+	const VEHICLE_MAX = 69;
 	// Sliders only on the numbers people actually play with.
 	const RANGES = {
 		"afford-pay": M(1000, 30000, 100, 5000),
@@ -11,17 +16,21 @@
 		"earn-savings": M(0, 500000, 1000, 40000),
 		"insurance-income": M(1000, 30000, 100, 4000),
 		"tax-pay": M(1000, 50000, 100, 5000),
-		"tax-srs": M(0, 35700, 100, 0),
+		"tax-srs": () => (/foreigner|nonresident/.test((document.getElementById("tax-residency") || {}).value) ? H(0, 35700, 100, 0) : H(0, 15300, 100, 0)),
 		"hdb-price": M(100000, 1500000, 5000, 500000),
 		"cpf-wage": M(1000, 30000, 100, 5000),
 		"vehicle-price": M(5000, 400000, 1000, 120000),
-		"vehicle-downpayment": M(0, 300000, 1000, 55000),
+		// Can't put down more than the car costs.
+		"vehicle-downpayment": () => {
+			const price = Number((document.getElementById("vehicle-price") || {}).value) || 120000;
+			return H(0, price, 1000, Math.min(price, Math.round((price * 0.45) / 1000) * 1000));
+		},
 		"compound-principal": M(0, 500000, 500, 10000),
 		"compound-addition": M(0, 100000, 500, 0),
 		"compound-years": M(1, 50, 1, 20),
 		"compound-rate": M(0, 12, 0.5, 4),
 		"srs-pay": M(1000, 40000, 250, 6000),
-		"srs-amount": (input) => (Number(input.max) > 15300 ? M(0, 35700, 100, 35700) : M(0, 15300, 100, 15300)),
+		"srs-amount": (input) => (Number(input.max) > 15300 ? H(0, 35700, 100, 35700) : H(0, 15300, 100, 15300)),
 		"srs-age": M(18, 62, 1, 30),
 		"bto-sale-cpf": M(0, 600000, 5000, 150000),
 		"bto-sale-grants": M(0, 230000, 5000, 0),
@@ -33,9 +42,9 @@
 		"loan-amount": (input) => ({ hdb: M(10000, 1000000, 5000, 350000), bankHdb: M(10000, 1500000, 5000, 400000), private: M(50000, 5000000, 10000, 1000000), car: M(5000, 300000, 1000, 80000), personal: M(1000, 200000, 500, 20000) })[(document.getElementById("loan-type") || {}).value || "hdb"],
 		"loan-income": M(1000, 40000, 100, 6000),
 		"loan-debt": M(0, 10000, 50, 0),
-		"afford-home-share": M(0, 30, 1, 30), // 30% of pay is HDB's and the banks' cap
-		"afford-vehicle-share": M(0, 100, 1, 10),
-		"earn-share": { bto: M(1, 30, 1, 30), resale: M(1, 30, 1, 30), car: M(1, 100, 1, 10), bike: M(1, 100, 1, 10) },
+		"afford-home-share": H(0, 30, 1, 30), // 30% of pay is HDB's and the banks' cap
+		"afford-vehicle-share": H(0, VEHICLE_MAX, 1, 10),
+		"earn-share": { bto: H(1, 30, 1, 30), resale: H(1, 30, 1, 30), car: H(1, VEHICLE_MAX, 1, 10), bike: H(1, VEHICLE_MAX, 1, 10) },
 	};
 
 	function homeShareNote(v) {
@@ -43,7 +52,7 @@
 	}
 	function vehicleShareNote(v) {
 		// TDSR: all loans within 55% of gross pay, about 69% of take-home.
-		if (v > 69) return "Banks cap all loan repayments at 55% of gross pay (about 69% of take-home), so it stops growing there.";
+		if (v >= VEHICLE_MAX) return "The banks' limit: all loan repayments within 55% of gross pay (about 69% of take-home).";
 		if (v > 15) return "Past 15% of take-home is a stretch: little room left for savings.";
 		return v === 10 ? "Comfortable: 10% of take-home pay, for a car or a bike." : "";
 	}
@@ -169,7 +178,7 @@
 				const v = input.value === "" ? r.def : Number(input.value);
 				slider.min = r.min;
 				slider.step = r.step;
-				slider.max = Math.max(r.max, Number.isFinite(v) ? v : 0);
+				slider.max = r.hard ? r.max : Math.max(r.max, Number.isFinite(v) ? v : 0);
 				slider.value = Number.isFinite(v) ? v : r.def;
 				val.textContent = show(input, Number(slider.value));
 				slider.setAttribute("aria-valuetext", val.textContent);
@@ -298,6 +307,14 @@
 			setupModes(form);
 			tweakPanel(form);
 			live(form);
+		});
+		// Ranges that follow another field: SRS cap by residency, downpayment by price.
+		[["tax-residency", "tax-srs"], ["vehicle-price", "vehicle-downpayment"]].forEach(function (pair) {
+			const from = document.getElementById(pair[0]);
+			const to = document.getElementById(pair[1]);
+			if (from && to) from.addEventListener(from.tagName === "SELECT" ? "change" : "input", function () {
+				if (to._syncSlider) to._syncSlider();
+			});
 		});
 		// The price slider's range follows what they're buying.
 		const item = document.getElementById("earn-item");
