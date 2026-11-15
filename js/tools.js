@@ -30,7 +30,7 @@
 	}
 
 	// A 0-100 percentage box as a 0-1 share; blank stays blank (comfortable default).
-	function percent(id) {
+	function shareInput(id) {
 		const v = numberValue(id);
 		return v === null || Number.isNaN(v) ? null : v / 100;
 	}
@@ -286,8 +286,8 @@
 				familyGrant: wantsHome && first && resale,
 				proximity: wantsHome && resale ? value("afford-proximity") : "none",
 				resale: wantsHome && resale,
-				homeShare: percent("afford-home-share"),
-				vehicleShare: percent("afford-vehicle-share"),
+				homeShare: shareInput("afford-home-share"),
+				vehicleShare: shareInput("afford-vehicle-share"),
 			});
 
 			const bufferBasis = {
@@ -311,8 +311,9 @@
 				summary.rows.forEach(function (row) {
 					html += resultRow(row[0], row[1]);
 				});
+				// Only the income-ceiling warning stays in view; the rest is detail.
 				summary.notes.forEach(function (text) {
-					html += note(text, "calculator-note-callout");
+					html += note(text, /ceiling/.test(text) ? "calculator-note-callout" : "");
 				});
 			}
 
@@ -402,7 +403,7 @@
 				monthlyExpenses: numberValue("earn-expenses") || 0,
 				otherDebt: numberValue("earn-debt") || 0,
 				omv: value("earn-omv"),
-				share: percent("earn-share"),
+				share: shareInput("earn-share"),
 			});
 			const s = window.Affordability.needSummary(n);
 			let html = headline(s.headlineLabel, s.headline, s.sub);

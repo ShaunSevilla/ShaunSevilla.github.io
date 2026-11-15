@@ -87,7 +87,7 @@
 				`${money(r.exitTax)} (${pct(r.exitRate)})`,
 			);
 			html += row(`Without SRS: investing ${money(r.perYear - r.saving)} a year yourself`, money(r.outside));
-			html += row(r.advantage >= 0 ? "SRS comes out ahead by" : "Investing yourself comes out ahead by", money(Math.abs(r.advantage)));
+			html += row(r.advantage >= 0 ? "SRS comes out ahead by" : "Investing yourself comes out ahead by", money(Math.abs(r.advantage))).replace('result-row"', 'result-row calc-keep"');
 
 			const notes = [];
 			const lock = r.isLocal ? `you won't need this money before ${r.withdrawAge}` : `you'll keep the account for at least 10 years`;

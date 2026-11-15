@@ -137,21 +137,40 @@
 		return '<div class="topic-chips"><span>Ask Shaun about</span>' + chips.join("") + "</div>";
 	}
 
-	// Small print folds away: the answer stays on screen, the assumptions sit
-	// behind one "Details & assumptions" tap (kept open across live updates).
-	function foldNotes(resultBox) {
-		if (resultBox.querySelector(":scope > .calc-info")) return;
-		const notes = Array.from(resultBox.children).filter(function (el) {
-			return (el.matches("p.calculator-note") && !el.classList.contains("calculator-note-callout")) || el.matches("ul.calculator-note-list");
+	// Every result reads the same way: the answer, its chart, the first two
+	// rows and any callout stay on screen; the rest of the breakdown, the
+	// notes and the small print sit behind one "More details" tap per block
+	// (kept open across live updates). Car/bike blocks fold on their own.
+	const KEEP_ROWS = 2;
+	const EXTRA_BLOCKS = ".pay-plan, .bank-compare, .loan-offset";
+	function foldBlock(container, resultBox, key) {
+		if (container.querySelector(":scope > .calc-info")) return;
+		const kids = Array.from(container.children);
+		const rows = kids.filter(function (el) { return el.matches(".calculator-result-row:not(.calc-keep)"); });
+		const extras = kids.filter(function (el) {
+			return rows.indexOf(el) >= KEEP_ROWS
+				|| el.matches(EXTRA_BLOCKS)
+				|| el.matches("ul.calculator-note-list")
+				|| (el.matches("p.calculator-note") && !el.matches(".calculator-note-callout, .calc-keep"));
 		});
-		if (!notes.length) return;
+		// A short result stays as it is; small print always folds.
+		const hasNotes = extras.some(function (el) { return el.matches(".calculator-note, .calculator-note-list"); });
+		if (!extras.length || (!hasNotes && extras.length < 3)) return;
 		const fold = document.createElement("details");
 		fold.className = "calc-info";
-		fold.open = resultBox.dataset.infoOpen === "1";
-		fold.innerHTML = "<summary>Details &amp; assumptions</summary>";
-		notes.forEach(function (el) { fold.appendChild(el); });
-		fold.addEventListener("toggle", function () { resultBox.dataset.infoOpen = fold.open ? "1" : ""; });
-		resultBox.appendChild(fold);
+		fold.open = resultBox.dataset["open" + key] === "1";
+		fold.innerHTML = "<summary>More details</summary>";
+		// Sits at the end of its own section: before a car/bike block or the
+		// actions, never under someone else's answer.
+		const end = container.querySelector(":scope > .afford-car, :scope > .calculator-actions");
+		extras.forEach(function (el) { fold.appendChild(el); });
+		if (end) end.before(fold);
+		else container.appendChild(fold);
+		fold.addEventListener("toggle", function () { resultBox.dataset["open" + key] = fold.open ? "1" : ""; });
+	}
+	function foldNotes(resultBox) {
+		resultBox.querySelectorAll(":scope > .afford-car").forEach(function (block, i) { foldBlock(block, resultBox, "Sub" + i); });
+		foldBlock(resultBox, resultBox, "Main");
 	}
 
 	function addResultActions(details, form, resultBox) {
