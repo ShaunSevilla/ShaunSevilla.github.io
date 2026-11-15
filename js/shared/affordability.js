@@ -108,6 +108,14 @@
 	// take-home pay (15% is a stretch).
 	const VEHICLE_COMFORT_SHARE = 0.1; // of take-home
 	const VEHICLE_STRETCH_SHARE = 0.15; // of take-home
+	const STRETCH_FACTOR = VEHICLE_STRETCH_SHARE / VEHICLE_COMFORT_SHARE;
+	// The share of pay someone chooses to put towards the loan (the website's
+	// slider). Home: of gross pay, never above MSR. Vehicle: of take-home.
+	function shareOf(value, fallback, max) {
+		const n = Number(value);
+		return n > 0 ? Math.min(max, Math.max(0.01, n)) : fallback;
+	}
+	const pct = (share) => `${Math.round(share * 100)}%`;
 	const CAR_COMFORT_SHARE = VEHICLE_COMFORT_SHARE;
 	const CAR_ALL_IN_LOW = 1.3;
 	const CAR_ALL_IN_HIGH = 1.5;
@@ -218,7 +226,7 @@
 		const maxLoanAllowed = presentValue(stressCap, bank ? BANK_STRESS_RATE : HDB_STRESS_RATE, years);
 		const planningRate = bank ? BANK_PLANNING_RATE : HDB_RATE;
 
-		let comfortMonthly = Math.min(stressCap, o.income * COMFORT_SHARE);
+		let comfortMonthly = Math.min(stressCap, o.income * o.share);
 		if (o.expensesKnown) {
 			// Keep saving at least 20% of take-home after the part of the
 			// instalment that CPF OA contributions don't cover.
@@ -309,6 +317,7 @@
 			grants: grants.total,
 			cashComfort: cash,
 			cashAll,
+			share: shareOf(input.share, COMFORT_SHARE, MSR),
 		};
 		const options = [];
 		if (hdbEligible) options.push(homeOption({ ...base, loan: "hdb" }));
@@ -334,6 +343,7 @@
 			keyYears: BTO_KEY_YEARS,
 			hdbEligible,
 			ceiling,
+			share: base.share,
 			singleUnder35: alone && age < SINGLES_MIN_AGE,
 			savingsRateAfter,
 		};
@@ -341,13 +351,13 @@
 
 	// One vehicle loan setup: the most you can pay at the comfortable and
 	// stretch instalment, capped by cash for the downpayment and by TDSR.
-	function vehicleTier({ takeHome, income, cash, otherDebt, ltv, rate, years }) {
+	function vehicleTier({ takeHome, income, cash, otherDebt, ltv, rate, years, share }) {
 		const k = perDollar(ltv, rate, years);
 		const byIncome = (share) => Math.max(0, (takeHome * share) / k);
 		const byCash = cash / (1 - ltv);
 		const byTdsr = Math.max(0, (income * TDSR - otherDebt) / k);
-		const comfortable = roundDown(Math.min(byIncome(VEHICLE_COMFORT_SHARE), byCash, byTdsr), 1000);
-		const stretch = roundDown(Math.min(byIncome(VEHICLE_STRETCH_SHARE), byCash, byTdsr), 1000);
+		const comfortable = roundDown(Math.min(byIncome(share), byCash, byTdsr), 1000);
+		const stretch = roundDown(Math.min(byIncome(share * STRETCH_FACTOR), byCash, byTdsr), 1000);
 		return {
 			ltv,
 			price: comfortable,
@@ -356,21 +366,21 @@
 			stretchDownpayment: Math.round(stretch * (1 - ltv)),
 			instalment: Math.round(comfortable * k),
 			stretchInstalment: Math.round(stretch * k),
-			limitedBy: byCash < byIncome(VEHICLE_COMFORT_SHARE) ? "savings" : "income",
+			limitedBy: byCash < byIncome(share) ? "savings" : "income",
 		};
 	}
 
 	// Gross pay whose take-home keeps an instalment under the comfortable share.
-	function payFor(monthly) {
-		return Math.ceil(monthly / VEHICLE_COMFORT_SHARE / TAKE_HOME_SHARE / 100) * 100;
+	function payFor(monthly, share) {
+		return Math.ceil(monthly / share / TAKE_HOME_SHARE / 100) * 100;
 	}
 
-	function car({ income, cash, otherDebt }) {
+	function car({ income, cash, otherDebt, share }) {
 		const takeHome = income * TAKE_HOME_SHARE;
 		const tiers = CAR_TIERS.map((tier) => ({
 			key: tier.key,
 			label: tier.label,
-			...vehicleTier({ takeHome, income, cash, otherDebt, ltv: tier.ltv, rate: CAR_FLAT_RATE, years: CAR_LOAN_YEARS }),
+			...vehicleTier({ takeHome, income, cash, otherDebt, share, ltv: tier.ltv, rate: CAR_FLAT_RATE, years: CAR_LOAN_YEARS }),
 		}));
 		// Headline on the lower of the two, so it holds whatever the OMV.
 		const base = tiers.reduce((a, b) => (b.price < a.price ? b : a));
@@ -382,7 +392,9 @@
 			instalment: base.instalment,
 			realistic: tiers.some((tier) => tier.price >= CAR_MIN_REALISTIC),
 			limitedBy: tiers.every((tier) => tier.limitedBy === "savings") ? "savings" : "income",
-			instalmentCap: Math.round(takeHome * VEHICLE_COMFORT_SHARE),
+			share,
+			takeHome,
+			instalmentCap: Math.round(takeHome * share),
 			allInLow: Math.round(base.instalment * CAR_ALL_IN_LOW),
 			allInHigh: Math.round(base.instalment * CAR_ALL_IN_HIGH),
 			monthlyAllIn: Math.round(base.instalment * (CAR_ALL_IN_LOW + CAR_ALL_IN_HIGH) / 2),
@@ -390,25 +402,27 @@
 			examples: CAR_TIERS.map((tier) => ({
 				label: tier.label,
 				downpayment: Math.round(CAR_EXAMPLE_PRICE * (1 - tier.ltv)),
-				pay: payFor(CAR_EXAMPLE_PRICE * perDollar(tier.ltv, CAR_FLAT_RATE, CAR_LOAN_YEARS)),
+				pay: payFor(CAR_EXAMPLE_PRICE * perDollar(tier.ltv, CAR_FLAT_RATE, CAR_LOAN_YEARS), share),
 			})),
 		};
 	}
 
-	function bike({ income, cash, otherDebt }) {
+	function bike({ income, cash, otherDebt, share }) {
 		const takeHome = income * TAKE_HOME_SHARE;
-		const t = vehicleTier({ takeHome, income, cash, otherDebt, ltv: BIKE_LTV, rate: BIKE_FLAT_RATE, years: BIKE_LOAN_YEARS });
+		const t = vehicleTier({ takeHome, income, cash, otherDebt, share, ltv: BIKE_LTV, rate: BIKE_FLAT_RATE, years: BIKE_LOAN_YEARS });
 		return {
 			kind: "bike",
 			...t,
 			realistic: t.price >= BIKE_MIN_REALISTIC,
-			instalmentCap: Math.round(takeHome * VEHICLE_COMFORT_SHARE),
+			share,
+			takeHome,
+			instalmentCap: Math.round(takeHome * share),
 			allInLow: t.instalment + BIKE_RUNNING_LOW,
 			allInHigh: t.instalment + BIKE_RUNNING_HIGH,
 			monthlyAllIn: t.instalment + (BIKE_RUNNING_LOW + BIKE_RUNNING_HIGH) / 2,
 			examplePrice: BIKE_EXAMPLE_PRICE,
 			exampleDownpayment: Math.round(BIKE_EXAMPLE_PRICE * (1 - BIKE_LTV)),
-			examplePay: payFor(BIKE_EXAMPLE_PRICE * perDollar(BIKE_LTV, BIKE_FLAT_RATE, BIKE_LOAN_YEARS)),
+			examplePay: payFor(BIKE_EXAMPLE_PRICE * perDollar(BIKE_LTV, BIKE_FLAT_RATE, BIKE_LOAN_YEARS), share),
 		};
 	}
 
@@ -416,11 +430,11 @@
 	function carSummary(result) {
 		const c = result.car;
 		const money = (value) => `$${Math.round(value).toLocaleString("en-SG")}`;
-		const pct = (ltv) => `${Math.round((1 - ltv) * 100)}% down`;
+		const down = (ltv) => `${Math.round((1 - ltv) * 100)}% down`;
 		if (c.realistic) {
 			const rows = [];
 			c.tiers.forEach((tier) => {
-				rows.push([`${tier.label} (${pct(tier.ltv)}): comfortable`, `${money(tier.price)} · ${money(tier.downpayment)} down · ${money(tier.instalment)}/month`]);
+				rows.push([`${tier.label} (${down(tier.ltv)}): comfortable`, `${money(tier.price)} · ${money(tier.downpayment)} down · ${money(tier.instalment)}/month`]);
 				rows.push([`${tier.label}: stretch`, `${money(tier.stretchPrice)} · ${money(tier.stretchDownpayment)} down · ${money(tier.stretchInstalment)}/month`]);
 			});
 			rows.push(["All-in monthly cost (comfortable)", `${money(c.allInLow)} to ${money(c.allInHigh)} (1.3 to 1.5x the instalment)`]);
@@ -429,7 +443,7 @@
 				ok: true,
 				headlineLabel: high > c.price ? "Car: comfortable, depending on the OMV" : "Car: comfortable up to",
 				headline: high > c.price ? `${money(c.price)} to ${money(high)}` : money(c.price),
-				sub: `Instalment about ${money(c.instalment)}/month, under 10% of your take-home pay. How much you can borrow depends on the car's OMV, so both are shown.`,
+				sub: `Instalment about ${money(c.instalment)}/month, ${pct(c.instalment / c.takeHome)} of your take-home pay. How much you can borrow depends on the car's OMV, so both are shown.`,
 				rows,
 				notes: [],
 			};
@@ -440,9 +454,9 @@
 			headline: "Not comfortably yet",
 			sub: c.limitedBy === "savings"
 				? "After your emergency buffer, there isn't enough for the downpayment (30% to 40% of the price, in cash)."
-				: `Keeping the instalment under 10% of take-home means about ${money(c.instalmentCap)}/month for you, which covers a car of about ${money(c.price)}.`,
+				: `Keeping the instalment to ${pct(c.share)} of take-home means about ${money(c.instalmentCap)}/month for you, which covers a car of about ${money(c.price)}.`,
 			rows: [],
-			notes: [`A ${money(c.examplePrice)} car needs ${c.examples.map((e) => `${money(e.downpayment)} down and pay of about ${money(e.pay)}/month (${e.label.replace("OMV", "OMV")})`).join(", or ")} to keep its instalment under 10% of take-home.`],
+			notes: [`A ${money(c.examplePrice)} car needs ${c.examples.map((e) => `${money(e.downpayment)} down and pay of about ${money(e.pay)}/month (${e.label.replace("OMV", "OMV")})`).join(", or ")} to keep its instalment to ${pct(c.share)} of take-home.`],
 		};
 	}
 
@@ -454,10 +468,10 @@
 				ok: true,
 				headlineLabel: "Motorbike: comfortable up to",
 				headline: money(b.price),
-				sub: `Instalment about ${money(b.instalment)}/month, under 10% of your take-home pay.`,
+				sub: `Instalment about ${money(b.instalment)}/month, ${pct(b.instalment / b.takeHome)} of your take-home pay.`,
 				rows: [
 					["Downpayment (20%)", money(b.downpayment)],
-					["Stretch (instalment at 15% of take-home)", `${money(b.stretchPrice)} · ${money(b.stretchDownpayment)} down · ${money(b.stretchInstalment)}/month`],
+					[`Stretch (instalment at ${pct(b.share * STRETCH_FACTOR)} of take-home)`, `${money(b.stretchPrice)} · ${money(b.stretchDownpayment)} down · ${money(b.stretchInstalment)}/month`],
 					["All-in monthly cost (comfortable)", `${money(b.allInLow)} to ${money(b.allInHigh)} (instalment plus insurance, road tax, petrol, parking)`],
 				],
 				notes: [],
@@ -469,9 +483,9 @@
 			headline: "Not comfortably yet",
 			sub: b.limitedBy === "savings"
 				? "After your emergency buffer, there isn't enough for the 20% downpayment."
-				: `Keeping the instalment under 10% of take-home means about ${money(b.instalmentCap)}/month for you, which covers a bike of about ${money(b.price)}.`,
+				: `Keeping the instalment to ${pct(b.share)} of take-home means about ${money(b.instalmentCap)}/month for you, which covers a bike of about ${money(b.price)}.`,
 			rows: [],
-			notes: [`A ${money(b.examplePrice)} bike needs about ${money(b.exampleDownpayment)} down, and pay of about ${money(b.examplePay)}/month to keep its instalment under 10% of take-home.`],
+			notes: [`A ${money(b.examplePrice)} bike needs about ${money(b.exampleDownpayment)} down, and pay of about ${money(b.examplePay)}/month to keep its instalment to ${pct(b.share)} of take-home.`],
 		};
 	}
 
@@ -488,6 +502,7 @@
 		const savings = Math.max(0, Number(input.savings) || 0);
 		const cpf = Math.max(0, Number(input.cpfOa) || 0);
 		const otherDebt = Math.max(0, Number(input.otherDebt) || 0);
+		const vehicleShare = shareOf(input.vehicleShare, VEHICLE_COMFORT_SHARE, TDSR);
 		const expensesKnown = Number(input.monthlyExpenses) > 0;
 		const expenses = expensesKnown ? Number(input.monthlyExpenses) : estimatedSpend(alone, input.hasDependants);
 		// Six months of spending. With people depending on you, the estimate is
@@ -513,11 +528,11 @@
 
 		const vehicles = [];
 		if (plan.includes("car")) {
-			result.car = car({ income, cash: spare, otherDebt });
+			result.car = car({ income, cash: spare, otherDebt, share: vehicleShare });
 			vehicles.push(result.car);
 		}
 		if (plan.includes("bike")) {
-			result.bike = bike({ income, cash: spare, otherDebt });
+			result.bike = bike({ income, cash: spare, otherDebt, share: vehicleShare });
 			vehicles.push(result.bike);
 		}
 		const owned = vehicles.filter((v) => v.realistic);
@@ -541,6 +556,7 @@
 				familyGrant: Boolean(input.familyGrant),
 				proximity: input.proximity || "none",
 				resale: Boolean(input.resale),
+				share: input.homeShare,
 			};
 			const withoutVehicles = home(homeInput);
 			result.home = withoutVehicles;
@@ -590,7 +606,7 @@
 			const cpfLine = best.cpfCovers >= best.monthly
 				? `your CPF OA (about ${money(home.oaInflow)}/month) covers all of it`
 				: `your CPF OA covers about ${money(best.cpfCovers)}, cash ${money(best.monthly - best.cpfCovers)}`;
-			summary.sub = `${loanName} over ${best.years} years: about ${money(best.monthly)}/month at ${best.ratePercent}%, and ${cpfLine}.`;
+			summary.sub = `${loanName} over ${best.years} years: about ${money(best.monthly)}/month at ${best.ratePercent}% (${pct(best.monthly / home.income)} of your pay), and ${cpfLine}.`;
 			const other = home.options.find((option) => option !== best);
 			if (other) {
 				summary.rows.push([
@@ -614,7 +630,7 @@
 			}
 			summary.rows.push([
 				"What's holding you back",
-				best.limitedBy === "savings" ? "Savings for the downpayment" : `Your income (instalment kept within 30% of pay, ${money(best.comfortMonthly)}/month)`,
+				best.limitedBy === "savings" ? "Savings for the downpayment" : `Your income (instalment kept within ${pct(home.share)} of pay, ${money(best.comfortMonthly)}/month)`,
 			]);
 			if (home.maxPrice > home.price) {
 				summary.rows.push(["Stretch (the most the loan rules allow, using every dollar)", money(home.maxPrice)]);
@@ -654,7 +670,7 @@
 	function footnote(result) {
 		const parts = [];
 		if (result.home) {
-			parts.push("Comfortable keeps the home loan instalment within 30% of gross pay, the limit HDB itself uses. Loans are stress-tested at 3% (HDB) or 4% (bank), and bank loans are planned at 3% since today's ~1.6% packages only last 2 to 3 years.");
+			parts.push(`Comfortable keeps the home loan instalment within ${pct(result.home.share)} of gross pay (HDB and banks cap it at 30%). Loans are stress-tested at 3% (HDB) or 4% (bank), and bank loans are planned at 3% since today's ~1.6% packages only last 2 to 3 years.`);
 		}
 		if (result.car) {
 			parts.push("Car loans: 7 years at 2.48% flat; MAS lets you borrow 70% of the price if the OMV is $20,000 or less, 60% if above. All-in costs cover insurance, road tax, petrol, parking and servicing.");
@@ -696,6 +712,7 @@
 			familyGrant: o.firstTimer && o.resale,
 			proximity: o.resale ? o.proximity : "none",
 			resale: o.resale,
+			homeShare: o.homeShare,
 		});
 	}
 
@@ -724,6 +741,7 @@
 			signing: Math.round(o.price * BTO_SIGNING_SHARE.hdb + bsd(o.price)),
 			ceiling: o.alone ? HDB_INCOME_CEILING_SINGLE : HDB_INCOME_CEILING_FAMILY,
 			singleUnder35: o.alone && o.age < SINGLES_MIN_AGE,
+			share: o.homeShare,
 			stretchIncome: stretch ? stretch.income : null,
 		};
 		if (!comfortable) {
@@ -764,8 +782,8 @@
 		const rows = tiers.map((tier) => {
 			const inst = o.price * perDollar(tier.ltv, rate, years);
 			const byTdsr = (inst + o.otherDebt) / TDSR;
-			const income = up(Math.max(inst / VEHICLE_COMFORT_SHARE / TAKE_HOME_SHARE, byTdsr));
-			const stretchIncome = up(Math.max(inst / VEHICLE_STRETCH_SHARE / TAKE_HOME_SHARE, byTdsr));
+			const income = up(Math.max(inst / o.vehicleShare / TAKE_HOME_SHARE, byTdsr));
+			const stretchIncome = up(Math.max(inst / (o.vehicleShare * STRETCH_FACTOR) / TAKE_HOME_SHARE, byTdsr));
 			const downpayment = Math.round(o.price * (1 - tier.ltv));
 			const expenses = o.monthlyExpenses > 0 ? o.monthlyExpenses : estimatedSpend(o.alone !== false, o.hasDependants);
 			const buffer = Math.round(expenses * 6);
@@ -782,10 +800,10 @@
 				cashShort: Math.max(0, downpayment - spare),
 				allInLow: Math.round(car ? inst * CAR_ALL_IN_LOW : inst + BIKE_RUNNING_LOW),
 				allInHigh: Math.round(car ? inst * CAR_ALL_IN_HIGH : inst + BIKE_RUNNING_HIGH),
-				tdsrBound: byTdsr > inst / VEHICLE_COMFORT_SHARE / TAKE_HOME_SHARE,
+				tdsrBound: byTdsr > inst / o.vehicleShare / TAKE_HOME_SHARE,
 			};
 		});
-		return { kind, price: o.price, years, ratePercent: rate * 100, tiers: rows };
+		return { kind, price: o.price, years, ratePercent: rate * 100, tiers: rows, share: o.vehicleShare };
 	}
 
 	// input: { item: "bto"|"resale"|"car"|"bike", price, age, alone, savings,
@@ -805,6 +823,8 @@
 			otherDebt: Math.max(0, Number(input.otherDebt) || 0),
 			omv: input.omv || "unknown",
 			resale: input.item === "resale",
+			homeShare: shareOf(input.share, COMFORT_SHARE, MSR),
+			vehicleShare: shareOf(input.share, VEHICLE_COMFORT_SHARE, TDSR),
 		};
 		if (input.item === "car") return vehicleNeed(o, "car");
 		if (input.item === "bike") return vehicleNeed(o, "bike");
@@ -844,7 +864,7 @@
 				ok: true,
 				headlineLabel: `To comfortably buy a ${flat} at ${money(n.price)}, you need about`,
 				headline: pay(n.income),
-				sub: `Gross pay before CPF${who}. The instalment stays within 30% of it.`,
+				sub: `Gross pay before CPF${who}. The instalment stays within ${pct(n.share)} of it.`,
 				stretchLabel: "Stretch (the least the loan rules allow)",
 				stretch: hasStretch ? pay(n.stretchIncome) : null,
 				stretchSub: hasStretch ? "Passes HDB's and the banks' checks, but uses every dollar of savings and leaves little room each month." : "",
@@ -878,8 +898,8 @@
 			ok: true,
 			headlineLabel: `To comfortably own a ${name} at ${money(n.price)}, you need about`,
 			headline: low !== high ? `${money(low)} to ${pay(high)}` : pay(high),
-			sub: `Gross pay before CPF. Keeps the loan instalment under 10% of your take-home pay.${twoTiers ? " It depends on the car's OMV, so both are shown." : ""}`,
-			stretchLabel: "Stretch (instalment at 15% of take-home)",
+			sub: `Gross pay before CPF. Keeps the loan instalment to ${pct(n.share)} of your take-home pay.${twoTiers ? " It depends on the car's OMV, so both are shown." : ""}`,
+			stretchLabel: `Stretch (instalment at ${pct(n.share * STRETCH_FACTOR)} of take-home)`,
 			stretch: stretchLow !== stretchHigh ? `${money(stretchLow)} to ${pay(stretchHigh)}` : pay(stretchHigh),
 			stretchSub: "Doable, but less room for savings and surprises.",
 			rows,

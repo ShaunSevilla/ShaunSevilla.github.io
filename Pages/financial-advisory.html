@@ -22,9 +22,9 @@
 		<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
 		<link rel="preload" href="../assets/vendor/cormorant-garamond-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin />
 		<link rel="preload" href="../assets/vendor/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
-		<link rel="stylesheet" href="../assets/vendor/fonts.css?v=20261107d" />
-		<link rel="stylesheet" href="../assets/vendor/icons.css?v=20261107d" />
-		<link rel="stylesheet" href="../css/style.css?v=20261107d" />
+		<link rel="stylesheet" href="../assets/vendor/fonts.css?v=20261116a" />
+		<link rel="stylesheet" href="../assets/vendor/icons.css?v=20261116a" />
+		<link rel="stylesheet" href="../css/style.css?v=20261116a" />
 	</head>
 	<body data-root=".." data-page="financial">
 		<nav id="site-nav"></nav>
@@ -147,6 +147,8 @@
 									</label>
 									<label id="afford-expenses-field"><span>Monthly spending, all in ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="afford-expenses" min="0" step="1" placeholder="Blank = estimate ($2,000 alone, $3,500 as a couple)" /></label>
 									<label><span>Other loan repayments a month ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="afford-debt" min="0" step="1" placeholder="Car, study loan, instalments. Blank = none" /></label>
+									<label class="calc-tweak-only" data-plan="home"><span>Home loan</span><input type="number" id="afford-home-share" min="5" max="30" step="1" /></label>
+									<label class="calc-tweak-only" data-plan="car bike"><span>Car / bike loan</span><input type="number" id="afford-vehicle-share" min="5" max="30" step="1" /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="afford-status" role="status"></p>
 								</form>
@@ -215,6 +217,7 @@
 									</label>
 									<label id="earn-expenses-field"><span>Monthly spending, all in ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="earn-expenses" min="0" step="1" placeholder="Blank = estimate ($2,000 alone, $3,500 as a couple)" /></label>
 									<label><span>Other loan repayments a month ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="earn-debt" min="0" step="1" placeholder="Blank = none" /></label>
+									<label class="calc-tweak-only"><span>Loan instalment</span><input type="number" id="earn-share" min="5" max="30" step="1" /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
 									<p class="booking-status" id="earn-status" role="status"></p>
 								</form>
@@ -661,12 +664,12 @@
 		<script src="../js/srs.js?v=20261107"></script>
 		<script src="../js/shared/btoSale.js?v=20261107"></script>
 		<script src="../js/bto-sale.js?v=20261107"></script>
-		<script src="../js/shared/affordability.js?v=20261106"></script>
-		<script src="../js/tools.js?v=20261107"></script>
+		<script src="../js/shared/affordability.js?v=20261116a"></script>
+		<script src="../js/tools.js?v=20261116a"></script>
 		<script src="../js/share.js?v=20261003"></script>
 		<script src="../js/calc-viz.js?v=20261107d"></script>
 		<script src="../js/calculator-ux.js?v=20261107d"></script>
-		<script src="../js/calc-live.js?v=20261107b"></script>
+		<script src="../js/calc-live.js?v=20261116a"></script>
 		<script src="../js/telegram-app.js?v=20261023"></script>
 	</body>
 </html>

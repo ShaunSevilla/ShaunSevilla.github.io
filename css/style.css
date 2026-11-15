@@ -4986,6 +4986,9 @@ form.is-quick .calc-detail {
 	white-space: nowrap;
 }
 .calc-tweak .calc-range { height: 32px; margin: 0.2rem 0 0; }
+.calculator-form .calc-tweak-only { display: none; }
+.calc-tweak-note { display: block; margin-top: 0.15rem; font-size: 0.72rem; line-height: 1.4; color: var(--gold); }
+.calc-tweak-note[hidden] { display: none; }
 .calc-range:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; border-radius: 6px; }
 @media (min-width: 861px) {
 	.calc-tweak { display: grid; grid-template-columns: 1fr 1fr; column-gap: 2rem; }

@@ -280,6 +280,8 @@
 				familyGrant: wantsHome && first && resale,
 				proximity: wantsHome && resale ? value("afford-proximity") : "none",
 				resale: wantsHome && resale,
+				homeShare: (numberValue("afford-home-share") || 0) / 100,
+				vehicleShare: (numberValue("afford-vehicle-share") || 0) / 100,
 			});
 
 			const bufferBasis = {
@@ -394,6 +396,7 @@
 				monthlyExpenses: numberValue("earn-expenses") || 0,
 				otherDebt: numberValue("earn-debt") || 0,
 				omv: value("earn-omv"),
+				share: (numberValue("earn-share") || 0) / 100,
 			});
 			const s = window.Affordability.needSummary(n);
 			let html = headline(s.headlineLabel, s.headline, s.sub);

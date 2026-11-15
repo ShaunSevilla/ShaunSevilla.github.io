@@ -27,6 +27,26 @@
 		"bto-sale-grants": M(0, 230000, 5000, 0),
 		"bto-sale-age": M(1, 40, 1, 8),
 		"bto-sale-sell": M(200000, 1500000, 10000, 600000),
+		// Share of pay for the loan. Home: of gross pay, up to HDB's 30% cap.
+		// Car/bike: of take-home, 10% is the comfortable default.
+		"afford-home-share": M(5, 30, 1, 30),
+		"afford-vehicle-share": M(5, 30, 1, 10),
+		"earn-share": { bto: M(5, 30, 1, 30), resale: M(5, 30, 1, 30), car: M(5, 30, 1, 10), bike: M(5, 30, 1, 10) },
+	};
+
+	// A one-line heads-up under a slider once its value crosses a limit.
+	const money = (v) => `$${v.toLocaleString("en-SG")}`;
+	const NOTES = {
+		"afford-pay": function (v) {
+			const home = document.getElementById("afford-plan-home");
+			if (!home || !home.checked) return "";
+			const couple = (document.getElementById("afford-with") || {}).value === "partner";
+			const cap = couple ? 16000 : 8000;
+			return v > cap ? `Above the ${money(cap)} ${couple ? "household" : "singles"} BTO income ceiling: resale or private only.` : "";
+		},
+		"cpf-wage": function (v) {
+			return v > 8000 ? "CPF stops at the first $8,000 of monthly pay (CPF wage ceiling)." : "";
+		},
 	};
 
 	// Quick / Detailed: Quick shows only these forms' essentials; everything
@@ -59,6 +79,11 @@
 
 	function show(input, value) {
 		if (!Number.isFinite(value)) return "—";
+		if (/share$/.test(input.id)) {
+			const item = (document.getElementById("earn-item") || {}).value;
+			const ofTakeHome = input.id === "afford-vehicle-share" || (input.id === "earn-share" && (item === "car" || item === "bike"));
+			return `${value}% of ${ofTakeHome ? "take-home" : "pay"}`;
+		}
 		if (/rate/.test(input.id)) return `${value}%`;
 		if (/years|-age$/.test(input.id)) return `${value} ${value === 1 ? "year" : "years"}`;
 		return `$${Math.round(value).toLocaleString("en-SG")}`;
@@ -100,8 +125,16 @@
 			const slider = document.createElement("input");
 			slider.type = "range";
 			slider.className = "calc-range";
-			row.append(head, slider);
+			const note = document.createElement("small");
+			note.className = "calc-tweak-note";
+			note.setAttribute("aria-live", "polite");
+			row.append(head, slider, note);
 			panel.appendChild(row);
+			const updateNote = function () {
+				const text = NOTES[input.id] ? NOTES[input.id](Number(slider.value)) : "";
+				note.textContent = text;
+				note.hidden = !text;
+			};
 
 			const sync = function () {
 				const r = rangeFor(input);
@@ -113,12 +146,14 @@
 				val.textContent = show(input, Number(slider.value));
 				slider.setAttribute("aria-valuetext", val.textContent);
 				fill(slider);
+				updateNote();
 			};
 			slider.addEventListener("input", function () {
 				input.value = slider.value;
 				val.textContent = show(input, Number(slider.value));
 				slider.setAttribute("aria-valuetext", val.textContent);
 				fill(slider);
+				updateNote();
 				input.dispatchEvent(new Event("input", { bubbles: true }));
 			});
 			input.addEventListener("input", function (event) {
@@ -134,7 +169,15 @@
 			if (box.hidden) return;
 			rows.forEach(function (r) {
 				const label = r.input.closest("label") || r.input;
-				r.row.hidden = !label.getClientRects().length;
+				// Slider-only numbers (share of pay) never show in the form; they
+				// follow what's being planned instead.
+				const plan = label.dataset.plan;
+				r.row.hidden = label.classList.contains("calc-tweak-only")
+					? Boolean(plan) && !plan.split(" ").some(function (k) {
+						const box = document.getElementById("afford-plan-" + k);
+						return box && box.checked;
+					})
+					: !label.getClientRects().length;
 				r.sync();
 			});
 		};
@@ -234,6 +277,12 @@
 		if (item && price) {
 			item.addEventListener("change", function () {
 				if (price._syncSlider) price._syncSlider();
+				// The loan share means something different for a home and a car.
+				const share = document.getElementById("earn-share");
+				if (share) {
+					share.value = "";
+					if (share._syncSlider) share._syncSlider();
+				}
 			});
 		}
 	}
