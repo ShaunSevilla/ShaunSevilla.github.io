@@ -230,7 +230,6 @@
 			document.getElementById("afford-pay-label").textContent = together ? "Combined monthly income before CPF, both of you ($)" : "Monthly salary before CPF ($)";
 			document.getElementById("afford-pay").placeholder = together ? "9500" : "5000";
 			document.getElementById("afford-proximity-field").hidden = value("afford-flat") !== "resale";
-			document.getElementById("afford-expenses-field").hidden = value("afford-dependants") === "yes";
 			const pay = numberValue("afford-pay") || 0;
 			const hint = document.getElementById("afford-ehg-hint");
 			if (value("afford-first") !== "yes") {
@@ -279,8 +278,6 @@
 				partnerPay: together ? monthlyPay / 2 : 0,
 				savings,
 				cpfOa: wantsHome ? numberValue("afford-cpf") || 0 : 0,
-				hasDependants: value("afford-dependants") === "yes",
-				monthlyExpenses: numberValue("afford-expenses") || 0,
 				otherDebt: numberValue("afford-debt") || 0,
 				ehg: wantsHome && first,
 				familyGrant: wantsHome && first && resale,
@@ -290,13 +287,7 @@
 				vehicleShare: shareInput("afford-vehicle-share"),
 			});
 
-			const bufferBasis = {
-				expenses: `your ${formatCurrency(r.expenses)} monthly spending`,
-				estimated: `spending, estimated at ${formatCurrency(r.expenses)}/month. Enter your real spending in Detailed for a sharper number`,
-				estimatedDependants: `spending, estimated at ${formatCurrency(r.expenses)}/month with people depending on you. Enter your real spending in Detailed for a sharper number`,
-			}[r.bufferBasis];
-			// The emergency fund comes off first, and stays on screen so the answer reads honestly.
-			let html = note(`Already set aside: a <strong>${formatCurrency(r.buffer)}</strong> emergency fund (6 months of ${bufferBasis}). Everything below leaves it untouched.`, "calc-keep");
+			let html = "";
 
 			if (r.home) {
 				const summary = window.Affordability.homeSummary(r);
@@ -362,7 +353,6 @@
 			form.querySelectorAll(".earn-home-field").forEach(function (el) { el.hidden = !home; });
 			form.querySelectorAll(".earn-car-field").forEach(function (el) { el.hidden = item !== "car"; });
 			document.getElementById("earn-proximity-field").hidden = item !== "resale";
-			document.getElementById("earn-expenses-field").hidden = value("earn-dependants") === "yes";
 			document.getElementById("earn-price").placeholder = { bto: "450000", resale: "600000", car: "120000", bike: "20000" }[item];
 		}
 		form.addEventListener("change", updateVisibility);
@@ -390,15 +380,12 @@
 				cpfOa: home ? numberValue("earn-cpf") || 0 : 0,
 				firstTimer: value("earn-first") === "yes",
 				proximity: value("earn-proximity"),
-				hasDependants: value("earn-dependants") === "yes",
-				monthlyExpenses: numberValue("earn-expenses") || 0,
 				otherDebt: numberValue("earn-debt") || 0,
 				omv: value("earn-omv"),
 				share: shareInput("earn-share"),
 			});
 			const s = window.Affordability.needSummary(n);
 			let html = headline(s.headlineLabel, s.headline, s.sub);
-			html += note("Already set aside: a 6-month emergency fund (your spending if you enter it, otherwise an estimate). The pay below leaves it untouched.", "calc-keep");
 			if (window.CalcViz && n.kind === "home" && n.found) {
 				html += homeFundingViz(n.price, n.loanAmount, n.grants.total, n.cpfAtKeys || 0);
 			} else if (window.CalcViz && n.kind !== "home" && n.tiers.length > 1) {

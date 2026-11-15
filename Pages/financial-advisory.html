@@ -99,7 +99,7 @@
 						</summary>
 						<div class="calculator-dropdown-body">
 							<article class="calculator-card">
-								<p class="calculator-card-note">Your emergency fund comes off first: 6 months of spending, never touched.<span class="afford-home-fields"> Home: the loan instalment stays within your chosen share of pay, up to HDB's 30%.</span><span class="afford-car-note"> Car or bike: 10% of take-home pay to start; slide it to see more or less.</span></p>
+								<p class="calculator-card-note">The most the loan rules allow, using all your savings.<span class="afford-home-fields"> Home: the loan instalment is up to 30% of your gross pay, the most HDB and the banks allow.</span><span class="afford-car-note"> Car or bike: 15% of take-home pay to start; slide it to see more or less.</span></p>
 								<form class="booking-form calculator-form" id="afford-form">
 									<fieldset class="afford-plan">
 										<legend>What do you want to plan for? <em>Tick all that apply.</em></legend>
@@ -139,13 +139,6 @@
 											</select>
 										</label>
 									</div>
-									<label><span>Does anyone depend on you financially?</span>
-										<select id="afford-dependants">
-											<option value="no">No</option>
-											<option value="yes">Yes (kids, parents)</option>
-										</select>
-									</label>
-									<label id="afford-expenses-field"><span>Monthly spending, all in ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="afford-expenses" min="0" step="1" placeholder="Blank = estimate ($2,000 alone, $3,500 as a couple)" /></label>
 									<label><span>Other loan repayments a month ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="afford-debt" min="0" step="1" placeholder="Car, study loan, instalments. Blank = none" /></label>
 									<label class="calc-tweak-only" data-plan="home"><span>Loan · house</span><input type="number" id="afford-home-share" min="0" max="30" step="1" /></label>
 									<label class="calc-tweak-only" data-plan="car bike"><span>Loan · vehicle</span><input type="number" id="afford-vehicle-share" min="0" max="69" step="1" /></label>
@@ -209,13 +202,6 @@
 										<label><span>CPF Ordinary Account balance ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="earn-cpf" min="0" step="1" placeholder="Combined if buying together. Blank = $0" /></label>
 									</div>
 									<label><span>Cash in the bank ($)</span><input type="number" inputmode="numeric" id="earn-savings" min="0" step="1" placeholder="40000" required /></label>
-									<label><span>Does anyone depend on you financially?</span>
-										<select id="earn-dependants">
-											<option value="no">No</option>
-											<option value="yes">Yes (kids, parents)</option>
-										</select>
-									</label>
-									<label id="earn-expenses-field"><span>Monthly spending, all in ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="earn-expenses" min="0" step="1" placeholder="Blank = estimate ($2,000 alone, $3,500 as a couple)" /></label>
 									<label><span>Other loan repayments a month ($) <em>Optional</em></span><input type="number" inputmode="numeric" id="earn-debt" min="0" step="1" placeholder="Blank = none" /></label>
 									<label class="calc-tweak-only"><span>Loan</span><input type="number" id="earn-share" min="1" max="69" step="1" /></label>
 									<button type="submit" class="booking-submit">Calculate</button>
@@ -714,12 +700,12 @@
 		<script src="../js/bto-sale.js?v=20261107"></script>
 		<script src="../js/shared/loanOdds.js?v=20261116d"></script>
 		<script src="../js/loan-odds.js?v=20261116d"></script>
-		<script src="../js/shared/affordability.js?v=20261116g"></script>
-		<script src="../js/tools.js?v=20261116g"></script>
+		<script src="../js/shared/affordability.js?v=20261116h"></script>
+		<script src="../js/tools.js?v=20261116h"></script>
 		<script src="../js/share.js?v=20261003"></script>
 		<script src="../js/calc-viz.js?v=20261107d"></script>
 		<script src="../js/calculator-ux.js?v=20261116d"></script>
-		<script src="../js/calc-live.js?v=20261116g"></script>
+		<script src="../js/calc-live.js?v=20261116h"></script>
 		<script src="../js/telegram-app.js?v=20261023"></script>
 	</body>
 </html>

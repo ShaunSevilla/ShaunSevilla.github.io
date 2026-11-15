@@ -43,8 +43,8 @@
 		"loan-income": M(1000, 40000, 100, 6000),
 		"loan-debt": M(0, 10000, 50, 0),
 		"afford-home-share": H(0, 30, 1, 30), // 30% of pay is HDB's and the banks' cap
-		"afford-vehicle-share": H(0, VEHICLE_MAX, 1, 10),
-		"earn-share": { bto: H(1, 30, 1, 30), resale: H(1, 30, 1, 30), car: H(1, VEHICLE_MAX, 1, 10), bike: H(1, VEHICLE_MAX, 1, 10) },
+		"afford-vehicle-share": H(0, VEHICLE_MAX, 1, 15),
+		"earn-share": { bto: H(1, 30, 1, 30), resale: H(1, 30, 1, 30), car: H(1, VEHICLE_MAX, 1, 15), bike: H(1, VEHICLE_MAX, 1, 15) },
 	};
 
 	function homeShareNote(v) {
@@ -53,8 +53,7 @@
 	function vehicleShareNote(v) {
 		// TDSR: all loans within 55% of gross pay, about 69% of take-home.
 		if (v >= VEHICLE_MAX) return "The banks' limit: all loan repayments within 55% of gross pay (about 69% of take-home).";
-		if (v > 15) return "Above 15% of take-home leaves little room for savings.";
-		return v === 10 ? "10% of take-home: a safe level for a car or bike." : "";
+		return v > 15 ? "Above 15% of take-home leaves little room for savings." : "";
 	}
 	function isVehicle(id) {
 		if (id === "afford-vehicle-share") return true;
@@ -86,8 +85,8 @@
 	// listed here is Detailed only, and counts as blank (or its default) while
 	// Quick is on, so a hidden leftover value can't skew the answer.
 	const DETAIL = {
-		"afford-form": ["#afford-cpf", "#afford-first", "#afford-ehg-hint", "#afford-proximity-field", "#afford-dependants", "#afford-expenses-field", "#afford-debt"],
-		"earn-form": ["#earn-first", "#earn-proximity-field", "#earn-cpf", "#earn-dependants", "#earn-expenses-field", "#earn-debt"],
+		"afford-form": ["#afford-cpf", "#afford-first", "#afford-ehg-hint", "#afford-proximity-field", "#afford-debt"],
+		"earn-form": ["#earn-first", "#earn-proximity-field", "#earn-cpf", "#earn-debt"],
 		"tax-form": [".tax-relief-field", "#tax-mother-fields", "#tax-ptr-field", "#tax-life-field"],
 		"hdb-loan-form": ["#hdb-pay-field", "#hdb-pay-hint", "#hdb-staggered-field", "#hdb-staggered-hint", "#hdb-grants", "#hdb-grants-hint", "#hdb-years", "#hdb-bank-rate"],
 		"cpf-form": ["#cpf-oa", "#cpf-sa", "#cpf-ma", "#cpf-growth", "#cpf-house-monthly", "#cpf-house-lump", "#cpf-house-more", ":scope > p.calculator-field-hint"],

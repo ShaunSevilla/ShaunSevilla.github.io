@@ -55,14 +55,7 @@
 	// Shaun's guide: keep housing repayments within 30% of gross income (the
 	// same line HDB's Mortgage Servicing Ratio draws).
 	const COMFORT_SHARE = 0.3;
-	const MIN_SAVINGS_RATE = 0.2;
 	const TAKE_HOME_SHARE = 0.8; // after 20% employee CPF
-	// Emergency buffer when spending isn't entered: a fixed monthly estimate, so
-	// earning more never shrinks what you can buy with the same savings.
-	const DEFAULT_SPEND = { alone: 2000, couple: 3500, dependants: 1500 };
-	function estimatedSpend(alone, hasDependants) {
-		return (alone ? DEFAULT_SPEND.alone : DEFAULT_SPEND.couple) + (hasDependants ? DEFAULT_SPEND.dependants : 0);
-	}
 	const HDB_STRESS_RATE = 0.03;
 	const BANK_STRESS_RATE = 0.04;
 	const HDB_RATE = 0.026;
@@ -229,13 +222,8 @@
 		const maxLoanAllowed = presentValue(stressCap, bank ? BANK_STRESS_RATE : HDB_STRESS_RATE, years);
 		const planningRate = bank ? BANK_PLANNING_RATE : HDB_RATE;
 
-		let comfortMonthly = Math.min(stressCap, o.income * o.share);
-		if (o.expensesKnown) {
-			// Keep saving at least 20% of take-home after the part of the
-			// instalment that CPF OA contributions don't cover.
-			const cashRoom = Math.max(0, o.takeHome * (1 - MIN_SAVINGS_RATE) - o.expenses);
-			comfortMonthly = Math.min(comfortMonthly, o.oaInflow + cashRoom);
-		}
+		// The chosen share of pay; at 30% this is the most HDB and the banks allow.
+		const comfortMonthly = Math.min(stressCap, o.income * o.share);
 		const comfortLoan = Math.min(maxLoanAllowed, presentValue(comfortMonthly, planningRate, years));
 
 		const fitsFunds = (price, cash) => {
@@ -290,7 +278,7 @@
 	}
 
 	function home(input) {
-		const { age, income, incomes, alone, cash, cashAll, cpf, otherDebt, expenses, expensesKnown } = input;
+		const { age, income, incomes, alone, cash, cashAll, cpf, otherDebt } = input;
 		const ceiling = alone ? HDB_INCOME_CEILING_SINGLE : HDB_INCOME_CEILING_FAMILY;
 		// Above the ceiling: no BTO, no HDB loan, no CPF Housing Grant (EHG is
 		// already $0 above $9,000). Resale with a bank loan still works, and the
@@ -309,8 +297,6 @@
 		const base = {
 			income,
 			takeHome: income * TAKE_HOME_SHARE,
-			expenses,
-			expensesKnown,
 			oaInflow,
 			otherDebt,
 			bto,
@@ -326,9 +312,6 @@
 		if (hdbEligible) options.push(homeOption({ ...base, loan: "hdb" }));
 		options.push(homeOption({ ...base, loan: "bank" }));
 		const best = options.reduce((a, b) => (b.price > a.price ? b : a));
-		const savingsRateAfter = expensesKnown
-			? (base.takeHome - expenses - Math.max(0, best.monthly - oaInflow)) / base.takeHome
-			: null;
 		return {
 			type: bto ? "bto" : "resale",
 			// What they asked for in the dropdown, so a switch to resale is said out loud.
@@ -348,7 +331,6 @@
 			ceiling,
 			share: base.share,
 			singleUnder35: alone && age < SINGLES_MIN_AGE,
-			savingsRateAfter,
 		};
 	}
 
@@ -457,7 +439,7 @@
 			sub: c.share === 0
 				? "With 0% of your pay going to a loan, a car would have to be paid in cash."
 				: c.limitedBy === "savings"
-				? "After your emergency buffer, there isn't enough for the downpayment (30% to 40% of the price, in cash)."
+				? "Your savings don't cover the downpayment yet (30% to 40% of the price, in cash)."
 				: `Keeping the instalment to ${pct(c.share)} of take-home means about ${money(c.instalmentCap)}/month for you, which covers a car of about ${money(c.price)}.`,
 			rows: [],
 			notes: [`A ${money(c.examplePrice)} car needs ${c.examples.map((e) => `${money(e.downpayment)} down and pay of about ${money(e.pay)}/month (${e.label.replace("OMV", "OMV")})`).join(", or ")} to keep its instalment to ${pct(c.share)} of take-home.`],
@@ -487,7 +469,7 @@
 			sub: b.share === 0
 				? "With 0% of your pay going to a loan, a bike would have to be paid in cash."
 				: b.limitedBy === "savings"
-				? "After your emergency buffer, there isn't enough for the 20% downpayment."
+				? "Your savings don't cover the 20% downpayment yet."
 				: `Keeping the instalment to ${pct(b.share)} of take-home means about ${money(b.instalmentCap)}/month for you, which covers a bike of about ${money(b.price)}.`,
 			rows: [],
 			notes: [`A ${money(b.examplePrice)} bike needs about ${money(b.exampleDownpayment)} down, and pay of about ${money(b.examplePay)}/month to keep its instalment to ${pct(b.share)} of take-home.`],
@@ -507,13 +489,9 @@
 		const savings = Math.max(0, Number(input.savings) || 0);
 		const cpf = Math.max(0, Number(input.cpfOa) || 0);
 		const otherDebt = Math.max(0, Number(input.otherDebt) || 0);
-		const vehicleShare = shareOf(input.vehicleShare) ?? VEHICLE_COMFORT_SHARE;
-		const expensesKnown = Number(input.monthlyExpenses) > 0;
-		const expenses = expensesKnown ? Number(input.monthlyExpenses) : estimatedSpend(alone, input.hasDependants);
-		// Six months of spending. With people depending on you, the estimate is
-		// higher; your own figure, when given, is used as is.
-		const buffer = Math.round(expenses * 6);
-		const spare = Math.max(0, savings - buffer);
+		const vehicleShare = shareOf(input.vehicleShare) ?? VEHICLE_STRETCH_SHARE;
+		// Every dollar of savings counts: no emergency fund is held back.
+		const spare = savings;
 		const legacy = { house: ["home"], car: ["car"], both: ["home", "car"], bike: ["bike"] };
 		let plan = Array.isArray(input.plan) ? input.plan : legacy[input.want] || ["home", "car"];
 		plan = ["home", "car", "bike"].filter((item) => plan.includes(item));
@@ -523,9 +501,6 @@
 		const result = {
 			age,
 			income,
-			buffer,
-			bufferBasis: expensesKnown ? "expenses" : input.hasDependants ? "estimatedDependants" : "estimated",
-			expenses: Math.round(expenses),
 			spare,
 			want,
 			plan,
@@ -555,8 +530,6 @@
 				cashAll: savings,
 				cpf,
 				otherDebt,
-				expenses,
-				expensesKnown,
 				ehg: Boolean(input.ehg),
 				familyGrant: Boolean(input.familyGrant),
 				proximity: input.proximity || "none",
@@ -572,7 +545,6 @@
 					cash: Math.max(0, spare - down),
 					cashAll: Math.max(0, savings - down),
 					otherDebt: otherDebt + owned.reduce((sum, v) => sum + v.instalment, 0),
-					expenses: expenses + owned.reduce((sum, v) => sum + v.monthlyAllIn, 0),
 				});
 				result.homeWithCar = withVehicles;
 				result.vehicleCostsYouOfHome = Math.max(0, withoutVehicles.price - withVehicles.price);
@@ -605,7 +577,7 @@
 		if (home.price <= 0) {
 			summary.headlineLabel = "Home";
 			summary.headline = "Not yet";
-			summary.sub = "Once your emergency buffer is set aside, there isn't enough left for the downpayment.";
+			summary.sub = "Your savings, CPF OA and grants don't cover the downpayment yet.";
 		} else {
 			const loanName = best.loan === "hdb" ? "HDB loan" : "Bank loan";
 			const cpfLine = best.cpfCovers >= best.monthly
@@ -637,18 +609,8 @@
 				"What's holding you back",
 				best.limitedBy === "savings" ? "Savings for the downpayment" : `Your income (instalment kept within ${pct(home.share)} of pay, ${money(best.comfortMonthly)}/month)`,
 			]);
-			if (home.savingsRateAfter !== null) {
-				summary.notes.push(`After the instalment you'd still save about ${Math.max(0, Math.round(home.savingsRateAfter * 100))}% of your take-home pay.`);
-			}
 			if (home.type === "resale" && home.grants.items.some((item) => item.key === "ehg" && item.amount > 0)) {
 				summary.notes.push("Enhanced CPF Housing Grant on resale: at least one of you needs to have been working for the 12 months before you apply.");
-			}
-			const optionFee = home.type === "bto" ? BTO_OPTION_FEE : Math.min(home.price * OTP_RATE, OTP_CAP);
-			if (home.type !== "bto" && result.spare < optionFee) {
-				summary.notes.push(`The option fee (about ${money(optionFee)}) has to be paid in cash before CPF can be used, so it comes out of your emergency buffer. Top the buffer back up afterwards.`);
-			}
-			if (home.type === "bto" && result.spare < BTO_OPTION_FEE) {
-				summary.notes.push(`The ${money(BTO_OPTION_FEE)} BTO option fee has to be paid in cash, so it comes out of your emergency buffer. Top the buffer back up before key collection.`);
 			}
 			if (home.type === "bto") {
 				summary.notes.push("BTO: with an HDB loan you pay 10% of the price when you sign the Agreement for Lease and 15% at key collection, so the CPF you build up while waiting counts. Young couples on the Staggered Downpayment Scheme can pay 5% at signing instead. Buying resale instead? Pick a resale option (and its grants) to compare.");
@@ -765,7 +727,6 @@
 		out.cpfCovers = best.cpfCovers;
 		out.loanAmount = best.loanAmount;
 		out.grants = h.grants;
-		out.buffer = comfortable.r.buffer;
 		out.cpfAtKeys = h.cpfAtKeys;
 		// Grants they asked about that this income no longer gets.
 		out.grantsLost = o.firstTimer && h.grants.items.every((item) => item.key !== "ehg" || item.amount === 0);
@@ -787,9 +748,7 @@
 			const income = up(Math.max(inst / o.vehicleShare / TAKE_HOME_SHARE, byTdsr));
 			const stretchIncome = up(Math.max(inst / (o.vehicleShare * STRETCH_FACTOR) / TAKE_HOME_SHARE, byTdsr));
 			const downpayment = Math.round(o.price * (1 - tier.ltv));
-			const expenses = o.monthlyExpenses > 0 ? o.monthlyExpenses : estimatedSpend(o.alone !== false, o.hasDependants);
-			const buffer = Math.round(expenses * 6);
-			const spare = Math.max(0, o.savings - buffer);
+			const spare = o.savings;
 			return {
 				key: tier.key,
 				label: tier.label,
@@ -798,7 +757,6 @@
 				income,
 				stretchIncome,
 				downpayment,
-				buffer,
 				cashShort: Math.max(0, downpayment - spare),
 				allInLow: Math.round(car ? inst * CAR_ALL_IN_LOW : inst + BIKE_RUNNING_LOW),
 				allInHigh: Math.round(car ? inst * CAR_ALL_IN_HIGH : inst + BIKE_RUNNING_HIGH),
@@ -827,7 +785,7 @@
 			resale: input.item === "resale",
 			homeShare: shareOf(input.share) ?? COMFORT_SHARE,
 			// At least 1%: the pay needed for a 0% instalment would be infinite.
-			vehicleShare: Math.max(0.01, shareOf(input.share) ?? VEHICLE_COMFORT_SHARE),
+			vehicleShare: Math.max(0.01, shareOf(input.share) ?? VEHICLE_STRETCH_SHARE),
 		};
 		if (input.item === "car") return vehicleNeed(o, "car");
 		if (input.item === "bike") return vehicleNeed(o, "bike");
@@ -844,7 +802,7 @@
 				const notes = [];
 				if (n.type === "bto") notes.push(`About ${money(n.signing)} is due when you sign the Agreement for Lease (10% of the price plus stamp duty), from the cash and CPF OA you have today. Pay can't speed that up.`);
 				if (n.btoCeilingHit) notes.push(`A BTO also caps household income at ${money(n.ceiling)}, so earning more stops helping past that. A resale flat with a bank loan has no income ceiling.`);
-				notes.push(`Upfront, a flat at ${money(n.price)} needs about ${money(n.upfront)} from cash, CPF OA and grants: the 25% downpayment, ${money(n.stampDuty)} stamp duty and about ${money(LEGAL_AND_FEES)} in fees, with your emergency buffer kept aside. More savings or CPF moves this more than more pay does.`);
+				notes.push(`Upfront, a flat at ${money(n.price)} needs about ${money(n.upfront)} from cash, CPF OA and grants: the 25% downpayment, ${money(n.stampDuty)} stamp duty and about ${money(LEGAL_AND_FEES)} in fees. More savings or CPF moves this more than more pay does.`);
 				if (n.singleUnder35) notes.push("Singles can only buy an HDB flat on their own from age 35.");
 				return { ok: false, headlineLabel: `A ${flat} at ${money(n.price)}`, headline: "Pay alone won't get you there", sub: "It's the upfront money (downpayment) holding this back, not your income.", rows: [], notes };
 			}
@@ -854,7 +812,6 @@
 			rows.push(["Monthly instalment", `${money(n.monthly)}, of which CPF OA covers about ${money(n.cpfCovers)}`]);
 			n.grants.items.forEach((item) => rows.push([item.label, item.amount > 0 ? money(item.amount) : "$0 at this income"]));
 			if (n.type === "bto") rows.push(["Your CPF OA by key collection (~3 years)", `about ${money(n.cpfAtKeys)}`]);
-			rows.push(["Kept aside as your emergency buffer", money(n.buffer)]);
 			const notes = [];
 			if (!n.hdbEligible) {
 				notes.push(`This pay is above HDB's ${money(n.ceiling)} household ceiling, so it's a bank loan with no Enhanced CPF Housing Grant or CPF Housing Grant counted.`);
@@ -887,7 +844,7 @@
 		const short = n.tiers.filter((t) => t.cashShort > 0);
 		if (short.length) {
 			const t = short[0];
-			notes.push(`Savings are the other half: after keeping a ${money(t.buffer)} emergency buffer, you'd need about ${money(t.cashShort)} more in cash for the ${money(t.downpayment)} downpayment.`);
+			notes.push(`Savings are the other half: you'd need about ${money(t.cashShort)} more in cash for the ${money(t.downpayment)} downpayment.`);
 		}
 		if (n.tiers.some((t) => t.tdsrBound)) notes.push("Your other loan repayments push this up: banks cap all your loan repayments at 55% of gross pay.");
 		if (n.kind === "car" && twoTiers) notes.push("Not sure of the car's OMV? The dealer can tell you, and it decides how much you can borrow.");
