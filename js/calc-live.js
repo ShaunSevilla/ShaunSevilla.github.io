@@ -33,14 +33,13 @@
 		"loan-amount": (input) => ({ hdb: M(10000, 1000000, 5000, 350000), bankHdb: M(10000, 1500000, 5000, 400000), private: M(50000, 5000000, 10000, 1000000), car: M(5000, 300000, 1000, 80000), personal: M(1000, 200000, 500, 20000) })[(document.getElementById("loan-type") || {}).value || "hdb"],
 		"loan-income": M(1000, 40000, 100, 6000),
 		"loan-debt": M(0, 10000, 50, 0),
-		"afford-home-share": M(0, 100, 1, 30),
+		"afford-home-share": M(0, 30, 1, 30), // 30% of pay is HDB's and the banks' cap
 		"afford-vehicle-share": M(0, 100, 1, 10),
-		"earn-share": { bto: M(1, 100, 1, 30), resale: M(1, 100, 1, 30), car: M(1, 100, 1, 10), bike: M(1, 100, 1, 10) },
+		"earn-share": { bto: M(1, 30, 1, 30), resale: M(1, 30, 1, 30), car: M(1, 100, 1, 10), bike: M(1, 100, 1, 10) },
 	};
 
 	function homeShareNote(v) {
-		if (v > 30) return "HDB and banks cap home loan repayments at 30% of pay, so the answer stops growing past 30%.";
-		return v < 30 ? "" : "Comfortable: 30% of pay, the most HDB allows.";
+		return v === 30 ? "30% of pay: the most HDB and the banks allow." : "";
 	}
 	function vehicleShareNote(v) {
 		// TDSR: all loans within 55% of gross pay, about 69% of take-home.
