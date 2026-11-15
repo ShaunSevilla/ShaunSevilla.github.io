@@ -1834,6 +1834,15 @@ footer {
 	font-weight: inherit;
 }
 
+.footer-disclosure {
+	max-width: 62ch;
+	margin: 0 auto 1.1rem;
+	font-size: 0.74rem;
+	line-height: 1.6;
+	color: #a8a39a;
+	text-align: center;
+}
+
 .footer-copy {
 	font-size: 0.72rem;
 	letter-spacing: 0.1em;

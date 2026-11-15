@@ -27,6 +27,11 @@
 				href: `${root}/Pages/sg-money-guide.html`,
 			},
 			{
+				key: "market",
+				label: "Markets",
+				href: `${root}/Pages/market-update.html`,
+			},
+			{
 				key: "fitness",
 				label: "Fitness",
 				href: `${root}/Pages/fitness-sports.html`,
@@ -82,6 +87,7 @@
 					<a href="${root}/Pages/booking.html">Book a Chat</a>
 				</div>
 				<div class="footer-contact-links">${social}</div>
+				<p class="footer-disclosure">Shaun Sevilla is a financial adviser with Ascendence Wealth Management (AWM), AIA Singapore. Everything on this site is general information for education. It is not financial advice and does not consider your personal situation. Calculators give estimates only. Investments carry risk and past performance does not predict future returns.</p>
 				<p class="footer-copy">&copy; 2026 <span>Shaun Sevilla</span>. Relentlessly building.</p>
 			</div>
 		`;
