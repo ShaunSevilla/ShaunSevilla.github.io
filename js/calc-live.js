@@ -27,12 +27,28 @@
 		"bto-sale-grants": M(0, 230000, 5000, 0),
 		"bto-sale-age": M(1, 40, 1, 8),
 		"bto-sale-sell": M(200000, 1500000, 10000, 600000),
-		// Share of pay for the loan. Home: of gross pay, up to HDB's 30% cap.
-		// Car/bike: of take-home, 10% is the comfortable default.
-		"afford-home-share": M(5, 30, 1, 30),
-		"afford-vehicle-share": M(5, 30, 1, 10),
-		"earn-share": { bto: M(5, 30, 1, 30), resale: M(5, 30, 1, 30), car: M(5, 30, 1, 10), bike: M(5, 30, 1, 10) },
+		// Share of pay for the loan, 0-100%, starting at comfortable: 30% of
+		// gross pay for a home, 10% of take-home for a car or bike.
+		"afford-home-share": M(0, 100, 1, 30),
+		"afford-vehicle-share": M(0, 100, 1, 10),
+		"earn-share": { bto: M(1, 100, 1, 30), resale: M(1, 100, 1, 30), car: M(1, 100, 1, 10), bike: M(1, 100, 1, 10) },
 	};
+
+	function homeShareNote(v) {
+		if (v > 30) return "HDB and banks cap home loan repayments at 30% of pay, so the answer stops growing past 30%.";
+		return v < 30 ? "" : "Comfortable: 30% of pay, the most HDB allows.";
+	}
+	function vehicleShareNote(v) {
+		// TDSR: all loans within 55% of gross pay, about 69% of take-home.
+		if (v > 69) return "Banks cap all loan repayments at 55% of gross pay (about 69% of take-home), so it stops growing there.";
+		if (v > 15) return "Past 15% of take-home is a stretch: little room left for savings.";
+		return v === 10 ? "Comfortable: 10% of take-home pay, for a car or a bike." : "";
+	}
+	function isVehicle(id) {
+		if (id === "afford-vehicle-share") return true;
+		const item = (document.getElementById("earn-item") || {}).value;
+		return id === "earn-share" && (item === "car" || item === "bike");
+	}
 
 	// A one-line heads-up under a slider once its value crosses a limit.
 	const money = (v) => `$${v.toLocaleString("en-SG")}`;
@@ -43,6 +59,11 @@
 			const couple = (document.getElementById("afford-with") || {}).value === "partner";
 			const cap = couple ? 16000 : 8000;
 			return v > cap ? `Above the ${money(cap)} ${couple ? "household" : "singles"} BTO income ceiling: resale or private only.` : "";
+		},
+		"afford-home-share": homeShareNote,
+		"afford-vehicle-share": vehicleShareNote,
+		"earn-share": function (v) {
+			return isVehicle("earn-share") ? vehicleShareNote(v) : homeShareNote(v);
 		},
 		"cpf-wage": function (v) {
 			return v > 8000 ? "CPF stops at the first $8,000 of monthly pay (CPF wage ceiling)." : "";
@@ -80,9 +101,11 @@
 	function show(input, value) {
 		if (!Number.isFinite(value)) return "—";
 		if (/share$/.test(input.id)) {
-			const item = (document.getElementById("earn-item") || {}).value;
-			const ofTakeHome = input.id === "afford-vehicle-share" || (input.id === "earn-share" && (item === "car" || item === "bike"));
-			return `${value}% of ${ofTakeHome ? "take-home" : "pay"}`;
+			const vehicle = isVehicle(input.id);
+			const pay = input.id.startsWith("afford") ? Number((document.getElementById("afford-pay") || {}).value) : 0;
+			// Afford knows the pay, so show the dollars too: take-home is 80% of gross.
+			const monthly = pay > 0 ? ` · $${Math.round((pay * (vehicle ? 0.8 : 1) * value) / 100).toLocaleString("en-SG")}/mo` : ` of ${vehicle ? "take-home" : "pay"}`;
+			return `${value}%${monthly}`;
 		}
 		if (/rate/.test(input.id)) return `${value}%`;
 		if (/years|-age$/.test(input.id)) return `${value} ${value === 1 ? "year" : "years"}`;

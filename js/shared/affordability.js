@@ -111,9 +111,12 @@
 	const STRETCH_FACTOR = VEHICLE_STRETCH_SHARE / VEHICLE_COMFORT_SHARE;
 	// The share of pay someone chooses to put towards the loan (the website's
 	// slider). Home: of gross pay, never above MSR. Vehicle: of take-home.
-	function shareOf(value, fallback, max) {
+	// Blank means the comfortable default; 0 to 1 (0% to 100%) is taken as
+	// given. MSR and TDSR still cap the loan itself, whatever is picked.
+	function shareOf(value) {
+		if (value === null || value === undefined || value === "") return null;
 		const n = Number(value);
-		return n > 0 ? Math.min(max, Math.max(0.01, n)) : fallback;
+		return Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : null;
 	}
 	const pct = (share) => `${Math.round(share * 100)}%`;
 	const CAR_COMFORT_SHARE = VEHICLE_COMFORT_SHARE;
@@ -317,7 +320,7 @@
 			grants: grants.total,
 			cashComfort: cash,
 			cashAll,
-			share: shareOf(input.share, COMFORT_SHARE, MSR),
+			share: shareOf(input.share) ?? COMFORT_SHARE,
 		};
 		const options = [];
 		if (hdbEligible) options.push(homeOption({ ...base, loan: "hdb" }));
@@ -452,7 +455,9 @@
 			ok: false,
 			headlineLabel: "Car",
 			headline: "Not comfortably yet",
-			sub: c.limitedBy === "savings"
+			sub: c.share === 0
+				? "With 0% of your pay going to a loan, a car would have to be paid in cash."
+				: c.limitedBy === "savings"
 				? "After your emergency buffer, there isn't enough for the downpayment (30% to 40% of the price, in cash)."
 				: `Keeping the instalment to ${pct(c.share)} of take-home means about ${money(c.instalmentCap)}/month for you, which covers a car of about ${money(c.price)}.`,
 			rows: [],
@@ -481,7 +486,9 @@
 			ok: false,
 			headlineLabel: "Motorbike",
 			headline: "Not comfortably yet",
-			sub: b.limitedBy === "savings"
+			sub: b.share === 0
+				? "With 0% of your pay going to a loan, a bike would have to be paid in cash."
+				: b.limitedBy === "savings"
 				? "After your emergency buffer, there isn't enough for the 20% downpayment."
 				: `Keeping the instalment to ${pct(b.share)} of take-home means about ${money(b.instalmentCap)}/month for you, which covers a bike of about ${money(b.price)}.`,
 			rows: [],
@@ -502,7 +509,7 @@
 		const savings = Math.max(0, Number(input.savings) || 0);
 		const cpf = Math.max(0, Number(input.cpfOa) || 0);
 		const otherDebt = Math.max(0, Number(input.otherDebt) || 0);
-		const vehicleShare = shareOf(input.vehicleShare, VEHICLE_COMFORT_SHARE, TDSR);
+		const vehicleShare = shareOf(input.vehicleShare) ?? VEHICLE_COMFORT_SHARE;
 		const expensesKnown = Number(input.monthlyExpenses) > 0;
 		const expenses = expensesKnown ? Number(input.monthlyExpenses) : estimatedSpend(alone, input.hasDependants);
 		// Six months of spending. With people depending on you, the estimate is
@@ -606,7 +613,7 @@
 			const cpfLine = best.cpfCovers >= best.monthly
 				? `your CPF OA (about ${money(home.oaInflow)}/month) covers all of it`
 				: `your CPF OA covers about ${money(best.cpfCovers)}, cash ${money(best.monthly - best.cpfCovers)}`;
-			summary.sub = `${loanName} over ${best.years} years: about ${money(best.monthly)}/month at ${best.ratePercent}% (${pct(best.monthly / home.income)} of your pay), and ${cpfLine}.`;
+			summary.sub = best.loanAmount <= 0 ? "No loan: your cash, CPF OA and grants cover it all." : `${loanName} over ${best.years} years: about ${money(best.monthly)}/month at ${best.ratePercent}% (${pct(best.monthly / home.income)} of your pay), and ${cpfLine}.`;
 			const other = home.options.find((option) => option !== best);
 			if (other) {
 				summary.rows.push([
@@ -823,8 +830,9 @@
 			otherDebt: Math.max(0, Number(input.otherDebt) || 0),
 			omv: input.omv || "unknown",
 			resale: input.item === "resale",
-			homeShare: shareOf(input.share, COMFORT_SHARE, MSR),
-			vehicleShare: shareOf(input.share, VEHICLE_COMFORT_SHARE, TDSR),
+			homeShare: shareOf(input.share) ?? COMFORT_SHARE,
+			// At least 1%: the pay needed for a 0% instalment would be infinite.
+			vehicleShare: Math.max(0.01, shareOf(input.share) ?? VEHICLE_COMFORT_SHARE),
 		};
 		if (input.item === "car") return vehicleNeed(o, "car");
 		if (input.item === "bike") return vehicleNeed(o, "bike");

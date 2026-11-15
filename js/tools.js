@@ -29,6 +29,12 @@
 		return Number.isFinite(value) ? value : NaN;
 	}
 
+	// A 0-100 percentage box as a 0-1 share; blank stays blank (comfortable default).
+	function percent(id) {
+		const v = numberValue(id);
+		return v === null || Number.isNaN(v) ? null : v / 100;
+	}
+
 	function value(id) {
 		const el = document.getElementById(id);
 		return el ? el.value : "";
@@ -280,8 +286,8 @@
 				familyGrant: wantsHome && first && resale,
 				proximity: wantsHome && resale ? value("afford-proximity") : "none",
 				resale: wantsHome && resale,
-				homeShare: (numberValue("afford-home-share") || 0) / 100,
-				vehicleShare: (numberValue("afford-vehicle-share") || 0) / 100,
+				homeShare: percent("afford-home-share"),
+				vehicleShare: percent("afford-vehicle-share"),
 			});
 
 			const bufferBasis = {
@@ -396,7 +402,7 @@
 				monthlyExpenses: numberValue("earn-expenses") || 0,
 				otherDebt: numberValue("earn-debt") || 0,
 				omv: value("earn-omv"),
-				share: (numberValue("earn-share") || 0) / 100,
+				share: percent("earn-share"),
 			});
 			const s = window.Affordability.needSummary(n);
 			let html = headline(s.headlineLabel, s.headline, s.sub);
