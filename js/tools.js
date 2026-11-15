@@ -295,17 +295,14 @@
 				estimated: `spending, estimated at ${formatCurrency(r.expenses)}/month. Enter your real spending in Detailed for a sharper number`,
 				estimatedDependants: `spending, estimated at ${formatCurrency(r.expenses)}/month with people depending on you. Enter your real spending in Detailed for a sharper number`,
 			}[r.bufferBasis];
-			let html = note(`Kept aside first: <strong>${formatCurrency(r.buffer)}</strong> emergency buffer (6 months of ${bufferBasis}). Everything below leaves it untouched.`);
+			// The emergency fund comes off first, and stays on screen so the answer reads honestly.
+			let html = note(`Already set aside: a <strong>${formatCurrency(r.buffer)}</strong> emergency fund (6 months of ${bufferBasis}). Everything below leaves it untouched.`, "calc-keep");
 
 			if (r.home) {
 				const summary = window.Affordability.homeSummary(r);
 				summary.rows.unshift(...paymentRows(r.home, window.HdbPayments));
 				html += headline(summary.headlineLabel, summary.headline, summary.sub);
 				if (window.CalcViz && r.home.price > 0) {
-					html += window.CalcViz.bars("Flat price", [
-						{ label: "Comfortable", value: r.home.price, strong: true },
-						{ label: "Stretch", value: Math.max(r.home.price, r.home.maxPrice) },
-					]);
 					html += homeFundingViz(r.home.price, r.home.best.loanAmount, r.home.grants.total, r.home.cpfAtKeys);
 				}
 				summary.rows.forEach(function (row) {
@@ -320,10 +317,10 @@
 			if (r.car) {
 				const cs = window.Affordability.carSummary(r);
 				html += `<div class="afford-car">` + headline(cs.headlineLabel, cs.headline, cs.sub);
-				if (window.CalcViz && r.car.realistic) {
+				if (window.CalcViz && r.car.realistic && r.car.tiers.length > 1 && r.car.tiers[0].price !== r.car.tiers[1].price) {
 					html += window.CalcViz.bars("Car price", r.car.tiers.flatMap(function (tier) {
 						const tag = tier.key === "low" ? "OMV ≤$20k" : "OMV >$20k";
-						return [{ label: `${tag}`, value: tier.price, strong: true }, { label: `${tag} stretch`, value: tier.stretchPrice }];
+						return [{ label: tag, value: tier.price, strong: true }];
 					}));
 				}
 				cs.rows.forEach(function (row) { html += resultRow(row[0], row[1]); });
@@ -334,12 +331,6 @@
 			if (r.bike) {
 				const bs = window.Affordability.bikeSummary(r);
 				html += `<div class="afford-car">` + headline(bs.headlineLabel, bs.headline, bs.sub);
-				if (window.CalcViz && r.bike.realistic) {
-					html += window.CalcViz.bars("Bike price", [
-						{ label: "Comfortable", value: r.bike.price, strong: true },
-						{ label: "Stretch", value: r.bike.stretchPrice },
-					]);
-				}
 				bs.rows.forEach(function (row) { html += resultRow(row[0], row[1]); });
 				bs.notes.forEach(function (text) { html += note(text); });
 				html += `</div>`;
@@ -407,22 +398,17 @@
 			});
 			const s = window.Affordability.needSummary(n);
 			let html = headline(s.headlineLabel, s.headline, s.sub);
+			html += note("Already set aside: a 6-month emergency fund (your spending if you enter it, otherwise an estimate). The pay below leaves it untouched.", "calc-keep");
 			if (window.CalcViz && n.kind === "home" && n.found) {
-				html += window.CalcViz.bars("Monthly pay needed", [
-					{ label: "Comfortable", value: n.income, strong: true },
-					...(n.stretchIncome && n.stretchIncome < n.income ? [{ label: "Stretch", value: n.stretchIncome }] : []),
-				]);
 				html += homeFundingViz(n.price, n.loanAmount, n.grants.total, n.cpfAtKeys || 0);
-			} else if (window.CalcViz && n.kind !== "home") {
-				html += window.CalcViz.bars("Monthly pay needed", n.tiers.flatMap(function (t) {
-					const tag = n.tiers.length > 1 ? (t.key === "low" ? "OMV ≤$20k" : "OMV >$20k") : "";
-					return [{ label: tag || "Comfortable", value: t.income, strong: true }, { label: tag ? `${tag} stretch` : "Stretch", value: t.stretchIncome }];
+			} else if (window.CalcViz && n.kind !== "home" && n.tiers.length > 1) {
+				html += window.CalcViz.bars("Monthly pay needed", n.tiers.map(function (t) {
+					return { label: t.key === "low" ? "OMV ≤$20k" : "OMV >$20k", value: t.income, strong: true };
 				}));
 			}
-			if (s.stretch && !window.CalcViz) html += `<div class="earn-stretch">${headline(s.stretchLabel, s.stretch, s.stretchSub)}</div>`;
 			s.rows.forEach(function (row) { html += resultRow(row[0], row[1]); });
 			s.notes.forEach(function (text, index) { html += note(text, index === 0 ? "calculator-note-callout" : ""); });
-			html += note("Comfortable means the emergency buffer (6 months of spending: yours if you enter it, otherwise an estimate) stays untouched. Estimates only, not personalised advice.");
+			html += note("Estimates only, not personalised advice.");
 			resultBox.innerHTML = html;
 			resultBox.hidden = false;
 		});

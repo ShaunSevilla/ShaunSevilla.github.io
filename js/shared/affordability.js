@@ -437,14 +437,13 @@
 		if (c.realistic) {
 			const rows = [];
 			c.tiers.forEach((tier) => {
-				rows.push([`${tier.label} (${down(tier.ltv)}): comfortable`, `${money(tier.price)} · ${money(tier.downpayment)} down · ${money(tier.instalment)}/month`]);
-				rows.push([`${tier.label}: stretch`, `${money(tier.stretchPrice)} · ${money(tier.stretchDownpayment)} down · ${money(tier.stretchInstalment)}/month`]);
+				rows.push([`${tier.label} (${down(tier.ltv)})`, `${money(tier.price)} · ${money(tier.downpayment)} down · ${money(tier.instalment)}/month`]);
 			});
-			rows.push(["All-in monthly cost (comfortable)", `${money(c.allInLow)} to ${money(c.allInHigh)} (1.3 to 1.5x the instalment)`]);
+			rows.push(["All-in monthly cost", `${money(c.allInLow)} to ${money(c.allInHigh)} (1.3 to 1.5x the instalment)`]);
 			const high = Math.max(...c.tiers.map((tier) => tier.price));
 			return {
 				ok: true,
-				headlineLabel: high > c.price ? "Car: comfortable, depending on the OMV" : "Car: comfortable up to",
+				headlineLabel: high > c.price ? "Car you can afford, depending on the OMV" : "Car you can afford, up to",
 				headline: high > c.price ? `${money(c.price)} to ${money(high)}` : money(c.price),
 				sub: `Instalment about ${money(c.instalment)}/month, ${pct(c.instalment / c.takeHome)} of your take-home pay. How much you can borrow depends on the car's OMV, so both are shown.`,
 				rows,
@@ -454,7 +453,7 @@
 		return {
 			ok: false,
 			headlineLabel: "Car",
-			headline: "Not comfortably yet",
+			headline: "Not yet",
 			sub: c.share === 0
 				? "With 0% of your pay going to a loan, a car would have to be paid in cash."
 				: c.limitedBy === "savings"
@@ -471,13 +470,12 @@
 		if (b.realistic) {
 			return {
 				ok: true,
-				headlineLabel: "Motorbike: comfortable up to",
+				headlineLabel: "Motorbike you can afford, up to",
 				headline: money(b.price),
 				sub: `Instalment about ${money(b.instalment)}/month, ${pct(b.instalment / b.takeHome)} of your take-home pay.`,
 				rows: [
 					["Downpayment (20%)", money(b.downpayment)],
-					[`Stretch (instalment at ${pct(b.share * STRETCH_FACTOR)} of take-home)`, `${money(b.stretchPrice)} · ${money(b.stretchDownpayment)} down · ${money(b.stretchInstalment)}/month`],
-					["All-in monthly cost (comfortable)", `${money(b.allInLow)} to ${money(b.allInHigh)} (instalment plus insurance, road tax, petrol, parking)`],
+					["All-in monthly cost", `${money(b.allInLow)} to ${money(b.allInHigh)} (instalment plus insurance, road tax, petrol, parking)`],
 				],
 				notes: [],
 			};
@@ -485,7 +483,7 @@
 		return {
 			ok: false,
 			headlineLabel: "Motorbike",
-			headline: "Not comfortably yet",
+			headline: "Not yet",
 			sub: b.share === 0
 				? "With 0% of your pay going to a loan, a bike would have to be paid in cash."
 				: b.limitedBy === "savings"
@@ -598,7 +596,7 @@
 		const btoBlocked = home.wanted === "bto" && home.type !== "bto";
 		const summary = {
 			title: home.type === "bto" ? "Home (BTO)" : btoBlocked ? "Home (resale, BTO not open at this pay)" : "Home (resale)",
-			headlineLabel: btoBlocked ? "No BTO at this pay. Comfortable resale flat instead, up to" : `Comfortable: a ${flat} up to`,
+			headlineLabel: btoBlocked ? "No BTO at this pay. A resale flat instead, up to" : `A ${flat} you can afford, up to`,
 			headline: money(home.price),
 			sub: "",
 			rows: [],
@@ -639,9 +637,6 @@
 				"What's holding you back",
 				best.limitedBy === "savings" ? "Savings for the downpayment" : `Your income (instalment kept within ${pct(home.share)} of pay, ${money(best.comfortMonthly)}/month)`,
 			]);
-			if (home.maxPrice > home.price) {
-				summary.rows.push(["Stretch (the most the loan rules allow, using every dollar)", money(home.maxPrice)]);
-			}
 			if (home.savingsRateAfter !== null) {
 				summary.notes.push(`After the instalment you'd still save about ${Math.max(0, Math.round(home.savingsRateAfter * 100))}% of your take-home pay.`);
 			}
@@ -677,7 +672,7 @@
 	function footnote(result) {
 		const parts = [];
 		if (result.home) {
-			parts.push(`Comfortable keeps the home loan instalment within ${pct(result.home.share)} of gross pay (HDB and banks cap it at 30%). Loans are stress-tested at 3% (HDB) or 4% (bank), and bank loans are planned at 3% since today's ~1.6% packages only last 2 to 3 years.`);
+			parts.push(`The home loan instalment stays within ${pct(result.home.share)} of gross pay (HDB and banks cap it at 30%). Loans are stress-tested at 3% (HDB) or 4% (bank), and bank loans are planned at 3% since today's ~1.6% packages only last 2 to 3 years.`);
 		}
 		if (result.car) {
 			parts.push("Car loans: 7 years at 2.48% flat; MAS lets you borrow 70% of the price if the OMV is $20,000 or less, 60% if above. All-in costs cover insurance, road tax, petrol, parking and servicing.");
@@ -867,15 +862,11 @@
 				notes.push("At this pay the Enhanced CPF Housing Grant is $0 (it stops at $9,000 household income, $4,500 for singles), so it isn't counted.");
 			}
 			if (n.singleUnder35) notes.push("Singles can only buy an HDB flat on their own from age 35.");
-			const hasStretch = n.stretchIncome && n.stretchIncome < n.income;
 			return {
 				ok: true,
-				headlineLabel: `To comfortably buy a ${flat} at ${money(n.price)}, you need about`,
+				headlineLabel: `To buy a ${flat} at ${money(n.price)}, you need about`,
 				headline: pay(n.income),
 				sub: `Gross pay before CPF${who}. The instalment stays within ${pct(n.share)} of it.`,
-				stretchLabel: "Stretch (the least the loan rules allow)",
-				stretch: hasStretch ? pay(n.stretchIncome) : null,
-				stretchSub: hasStretch ? "Passes HDB's and the banks' checks, but uses every dollar of savings and leaves little room each month." : "",
 				rows,
 				notes,
 			};
@@ -884,12 +875,10 @@
 		const twoTiers = n.tiers.length > 1;
 		const high = Math.max(...n.tiers.map((t) => t.income));
 		const low = Math.min(...n.tiers.map((t) => t.income));
-		const stretchHigh = Math.max(...n.tiers.map((t) => t.stretchIncome));
-		const stretchLow = Math.min(...n.tiers.map((t) => t.stretchIncome));
 		const rows = [];
 		n.tiers.forEach((t) => {
 			const tag = twoTiers ? `${t.label}: ` : "";
-			if (twoTiers) rows.push([`${t.label}`, `${pay(t.income)} (stretch ${pay(t.stretchIncome)}) · ${money(t.downpayment)} down (${Math.round((1 - t.ltv) * 100)}%)`]);
+			if (twoTiers) rows.push([`${t.label}`, `${pay(t.income)} · ${money(t.downpayment)} down (${Math.round((1 - t.ltv) * 100)}%)`]);
 			rows.push([`${tag}Loan instalment`, `${money(t.instalment)}/month over ${n.years} years at ${n.ratePercent}% flat`]);
 			if (!twoTiers) rows.push([`Downpayment (${Math.round((1 - t.ltv) * 100)}%, cash)`, money(t.downpayment)]);
 			rows.push([`${tag}All-in monthly cost`, `${money(t.allInLow)} to ${money(t.allInHigh)}${n.kind === "car" ? " (1.3 to 1.5x the instalment)" : " (instalment plus insurance, road tax, petrol, parking)"}`]);
@@ -904,12 +893,9 @@
 		if (n.kind === "car" && twoTiers) notes.push("Not sure of the car's OMV? The dealer can tell you, and it decides how much you can borrow.");
 		return {
 			ok: true,
-			headlineLabel: `To comfortably own a ${name} at ${money(n.price)}, you need about`,
+			headlineLabel: `To own a ${name} at ${money(n.price)}, you need about`,
 			headline: low !== high ? `${money(low)} to ${pay(high)}` : pay(high),
 			sub: `Gross pay before CPF. Keeps the loan instalment to ${pct(n.share)} of your take-home pay.${twoTiers ? " It depends on the car's OMV, so both are shown." : ""}`,
-			stretchLabel: `Stretch (instalment at ${pct(n.share * STRETCH_FACTOR)} of take-home)`,
-			stretch: stretchLow !== stretchHigh ? `${money(stretchLow)} to ${pay(stretchHigh)}` : pay(stretchHigh),
-			stretchSub: "Doable, but less room for savings and surprises.",
 			rows,
 			notes,
 		};

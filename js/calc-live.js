@@ -53,8 +53,8 @@
 	function vehicleShareNote(v) {
 		// TDSR: all loans within 55% of gross pay, about 69% of take-home.
 		if (v >= VEHICLE_MAX) return "The banks' limit: all loan repayments within 55% of gross pay (about 69% of take-home).";
-		if (v > 15) return "Past 15% of take-home is a stretch: little room left for savings.";
-		return v === 10 ? "Comfortable: 10% of take-home pay, for a car or a bike." : "";
+		if (v > 15) return "Above 15% of take-home leaves little room for savings.";
+		return v === 10 ? "10% of take-home: a safe level for a car or bike." : "";
 	}
 	function isVehicle(id) {
 		if (id === "afford-vehicle-share") return true;
