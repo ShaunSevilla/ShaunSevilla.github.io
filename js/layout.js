@@ -7,18 +7,8 @@
 				href: `${root}/index.html`,
 			},
 			{
-				key: "booking",
-				label: "Book",
-				href: `${root}/Pages/booking.html`,
-			},
-			{
-				key: "software",
-				label: "Software",
-				href: `${root}/Pages/software-development.html`,
-			},
-			{
 				key: "financial",
-				label: "Financial",
+				label: "Calculators",
 				href: `${root}/Pages/financial-advisory.html`,
 			},
 			{
@@ -30,6 +20,11 @@
 				key: "market",
 				label: "Markets",
 				href: `${root}/Pages/market-update.html`,
+			},
+			{
+				key: "software",
+				label: "Software",
+				href: `${root}/Pages/software-development.html`,
 			},
 			{
 				key: "fitness",
@@ -53,6 +48,7 @@
 		return `
 			<div class="nav-inner">
 				<a href="${root}/index.html" class="nav-logo" aria-label="Shaun Sevilla, home"><img src="${root}/assets/logo/mark-nav.svg" alt="" width="34" height="34" /></a>
+				${page === "booking" ? "" : `<a href="${root}/Pages/booking.html" class="nav-book">Book a chat</a>`}
 				<button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle navigation" aria-controls="nav-links" aria-expanded="false">
 					<span></span><span></span><span></span>
 				</button>
