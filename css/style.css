@@ -197,7 +197,7 @@ section {
 
 .section-label {
 	display: block;
-	font-size: 0.68rem;
+	font-size: 0.7rem;
 	font-weight: 500;
 	letter-spacing: 0.32em;
 	text-transform: uppercase;
@@ -430,7 +430,7 @@ section {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.4rem;
-	font-size: 0.68rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
 	color: var(--gold);
@@ -479,7 +479,7 @@ section {
 }
 
 .tl-date {
-	font-size: 0.68rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.15em;
 	text-transform: uppercase;
 	color: var(--gold);
@@ -570,7 +570,7 @@ section {
 }
 .contact-label {
 	display: block;
-	font-size: 0.62rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
 	color: var(--text-muted);
@@ -800,7 +800,7 @@ section {
 
 .booking-step-number {
 	color: var(--gold);
-	font-size: 0.68rem;
+	font-size: 0.7rem;
 	font-weight: 600;
 	letter-spacing: 0.12em;
 	padding-top: 0.35rem;
@@ -867,7 +867,7 @@ section {
 
 .booking-time small {
 	color: var(--text-muted);
-	font-size: 0.65rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
 }
@@ -892,7 +892,7 @@ section {
 
 .booking-form label > span {
 	color: var(--text-muted);
-	font-size: 0.68rem;
+	font-size: 0.7rem;
 	font-weight: 500;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
@@ -1011,7 +1011,7 @@ section {
 .github-preview-meta a {
 	border: 1px solid var(--gold-dim);
 	color: var(--gold);
-	font-size: 0.68rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
 	padding: 0.3rem 0.55rem;
@@ -1242,7 +1242,7 @@ section {
 }
 
 .software-grid article > span {
-	font-size: 0.68rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.16em;
 	color: var(--gold);
 }
@@ -1341,7 +1341,7 @@ section {
 .calc-group {
 	margin: 2.75rem 0 0.9rem;
 	font-family: "Inter", sans-serif;
-	font-size: 0.68rem;
+	font-size: 0.7rem;
 	font-weight: 500;
 	letter-spacing: 0.2em;
 	text-transform: uppercase;
@@ -1505,7 +1505,7 @@ section {
 .money-guide-jump a {
 	padding: 0.5rem 0.75rem;
 	border: 1px solid var(--border);
-	font-size: 0.68rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
 	color: var(--text-muted);
@@ -1535,7 +1535,7 @@ section {
 
 .money-principles-grid article > span {
 	color: var(--gold);
-	font-size: 0.65rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.14em;
 }
 
@@ -1686,7 +1686,7 @@ section {
 }
 
 .calculator-result-headline span {
-	font-size: 0.66rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
 	color: var(--text-muted);
@@ -1815,7 +1815,7 @@ footer {
 	padding: 0 0.9rem;
 	border: 1px solid var(--soft-border);
 	border-radius: 999px;
-	font-size: 0.64rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
 	color: var(--text-muted);
@@ -2350,7 +2350,7 @@ footer {
 
 .tool-card span {
 	color: var(--gold);
-	font-size: 0.68rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
 }
@@ -2610,7 +2610,7 @@ footer {
 }
 
 .offset-scenario span {
-	font-size: 0.66rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
 	color: var(--text-muted);
@@ -2940,7 +2940,7 @@ footer {
 	border: 1px solid var(--gold);
 	border-radius: 999px;
 	color: var(--gold);
-	font-size: 0.68rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
 }
@@ -2972,7 +2972,7 @@ footer {
 }
 
 .quiz-traits dt {
-	font-size: 0.66rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
 	color: var(--gold);
@@ -3010,7 +3010,7 @@ footer {
 }
 
 .quiz-card-site {
-	font-size: 0.68rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.08em;
 	color: var(--text-muted);
 }
@@ -3539,7 +3539,7 @@ footer {
 	letter-spacing: 0.1em;
 }
 
-.booking-expect-grid h3 {
+.booking-expect-grid h2 {
 	margin: 0.4rem 0 0.5rem;
 	font-size: 1.15rem;
 }
@@ -3727,6 +3727,8 @@ footer {
 }
 
 .mu-disclaimer a {
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
 	color: var(--gold);
 }
 
@@ -3828,6 +3830,8 @@ footer {
 }
 
 .consultation-perks a {
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
 	color: var(--gold);
 	white-space: nowrap;
 }
@@ -3845,15 +3849,6 @@ footer {
 }
 
 /* How Much Do I Need to Earn: the stretch figure, under the comfortable one */
-.earn-stretch .calculator-result-headline {
-	border: 1px dashed var(--border);
-	background: transparent;
-}
-
-.earn-stretch .calculator-result-headline strong {
-	font-size: clamp(1.6rem, 4vw, 2rem);
-	color: var(--text);
-}
 
 /* Cleanup pass (Oct 2026): tighter phone layouts */
 @media (max-width: 560px) {
@@ -3892,7 +3887,7 @@ footer {
 		padding: 0.9rem;
 	}
 
-	.booking-expect-grid h3 {
+	.booking-expect-grid h2 {
 		font-size: 1rem;
 		margin: 0.25rem 0 0.3rem;
 	}
@@ -3987,7 +3982,7 @@ footer {
 }
 
 .mini-app-heading {
-	font-size: 0.66rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
 	color: var(--gold);
@@ -4149,7 +4144,7 @@ footer {
 }
 
 .ins-out span {
-	font-size: 0.66rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
 	color: var(--text-muted);
@@ -4435,7 +4430,7 @@ footer {
 }
 
 .ins-quick span {
-	font-size: 0.66rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
 	color: var(--text-muted);
@@ -4684,7 +4679,7 @@ input[type="range"] {
 }
 
 .viz figcaption {
-	font-size: 0.66rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
 	color: var(--text-muted);
@@ -4794,7 +4789,7 @@ input[type="range"] {
 .viz-axis {
 	display: flex;
 	justify-content: space-between;
-	font-size: 0.68rem;
+	font-size: 0.7rem;
 	color: var(--text-muted);
 	margin-top: 0.3rem;
 }
@@ -5288,4 +5283,19 @@ a, button, summary, label, select, input, .topic-chip, .calc-mode button {
 	display: block;
 	font-size: 0.8rem;
 	color: var(--text-muted);
+}
+
+/* Plan tick boxes: a full 44px tap target each. */
+.afford-plan .check-row {
+	align-items: center;
+	min-height: 44px;
+	margin-bottom: 0;
+}
+
+.afford-plan .check-row input {
+	margin-top: 0;
+}
+
+.fitness-hero-copy .hero-booking-link {
+	margin-top: 1.25rem;
 }
