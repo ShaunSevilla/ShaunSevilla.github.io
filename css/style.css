@@ -5409,3 +5409,128 @@ a, button, summary, label, select, input, .topic-chip, .calc-mode button {
 		min-height: 44px;
 	}
 }
+
+/* ---- Motion polish. Everything here is skipped for reduced-motion users. ---- */
+.bot-cta-link,
+.hero-booking-link,
+.booking-submit,
+.nav-book,
+.pillar-card,
+.booking-date,
+.booking-time {
+	transition:
+		background var(--transition),
+		border-color var(--transition),
+		color var(--transition),
+		gap var(--transition),
+		transform 0.15s ease;
+}
+
+/* Press feedback: things you tap give a little. */
+.bot-cta-link:active,
+.hero-booking-link:active,
+.booking-submit:active,
+.nav-book:active,
+.tool-card:active,
+.pillar-card:active,
+.booking-date:active,
+.booking-time:active,
+.mini-app-grid a:active {
+	transform: scale(0.97);
+}
+
+/* Arrows lean into the direction of travel on hover. */
+.bot-cta-link i,
+.pillar-link i,
+.tool-card span i {
+	transition: translate 0.2s ease;
+}
+
+.bot-cta-link:hover i.fa-arrow-right,
+.pillar-card:hover .pillar-link i,
+.tool-card:hover span i {
+	translate: 4px 0;
+}
+
+/* The current page is marked in the nav. */
+@media (min-width: 901px) {
+	.nav-links a {
+		position: relative;
+		padding: 0.5rem 0;
+	}
+
+	.nav-links a::after {
+		content: "";
+		position: absolute;
+		inset: auto 0 0 0;
+		height: 1px;
+		background: var(--gold);
+		transform: scaleX(0);
+		transform-origin: left;
+		transition: transform 0.25s ease;
+	}
+
+	.nav-links a:hover::after,
+	.nav-links a.active::after {
+		transform: scaleX(1);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	/* Calculators and "More details" glide open and shut (no JavaScript). */
+	@supports (interpolate-size: allow-keywords) {
+		:root {
+			interpolate-size: allow-keywords;
+		}
+
+		.calculator-dropdown::details-content,
+		.calc-info::details-content {
+			block-size: 0;
+			overflow: clip;
+			transition:
+				block-size 0.32s cubic-bezier(0.2, 0, 0, 1),
+				content-visibility 0.32s allow-discrete;
+		}
+
+		.calculator-dropdown[open]::details-content,
+		.calc-info[open]::details-content {
+			block-size: auto;
+		}
+	}
+
+	/* A fresh answer eases in; the odds bar fills. */
+	.calculator-result.calc-in {
+		animation: result-in 0.4s cubic-bezier(0.2, 0, 0, 1);
+	}
+
+	.calc-in .odds-meter span,
+	.calc-in .viz-bar-track > * {
+		animation: fill-in 0.6s cubic-bezier(0.2, 0, 0, 1);
+		transform-origin: left;
+	}
+
+	/* Home hero: the name arrives in three quick beats. */
+	.hero-tagline,
+	.hero-name,
+	.hero-statement,
+	.hero-actions {
+		animation: result-in 0.6s cubic-bezier(0.2, 0, 0, 1) backwards;
+	}
+
+	.hero-name { animation-delay: 0.08s; }
+	.hero-statement { animation-delay: 0.16s; }
+	.hero-actions { animation-delay: 0.24s; }
+}
+
+@keyframes result-in {
+	from {
+		opacity: 0;
+		translate: 0 0.75rem;
+	}
+}
+
+@keyframes fill-in {
+	from {
+		transform: scaleX(0);
+	}
+}

@@ -174,6 +174,31 @@
 		foldBlock(resultBox, resultBox, "Main");
 	}
 
+	// A fresh answer eases in and its headline number counts up. Not on live
+	// slider updates, and not for people who prefer reduced motion.
+	const calmMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+	function revealResult(resultBox) {
+		if (calmMotion.matches) return;
+		resultBox.classList.remove("calc-in");
+		void resultBox.offsetWidth;
+		resultBox.classList.add("calc-in");
+		setTimeout(function () { resultBox.classList.remove("calc-in"); }, 900);
+		const el = resultBox.querySelector(".calculator-result-headline strong");
+		const m = el && !el.children.length && el.textContent.match(/^(\D*)(\d[\d,]*)(\D*)$/);
+		if (!m) return;
+		const target = Number(m[2].replace(/,/g, ""));
+		if (!(target > 0)) return;
+		const final = el.textContent;
+		const start = performance.now();
+		(function tick(now) {
+			if (!el.isConnected) return;
+			const t = Math.min(1, (now - start) / 600);
+			const eased = 1 - Math.pow(1 - t, 3);
+			el.textContent = t < 1 ? m[1] + Math.round(target * eased).toLocaleString("en-SG") + m[3] : final;
+			if (t < 1) requestAnimationFrame(tick);
+		})(start);
+	}
+
 	function addResultActions(details, form, resultBox) {
 		if (resultBox.hidden || resultBox.querySelector(".calculator-actions")) return;
 		foldNotes(resultBox);
@@ -199,6 +224,7 @@
 		// On phones the result lands below the fold; bring it up (not while
 		// they're dragging a slider: live updates stay where they are).
 		if (window.__calcLive) return;
+		revealResult(resultBox);
 		const top = resultBox.getBoundingClientRect().top;
 		if (top > window.innerHeight * 0.6 || top < 0) {
 			resultBox.scrollIntoView({ behavior: "smooth", block: "start" });
